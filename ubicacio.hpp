@@ -4,6 +4,8 @@
 #include <esin/error>
 #include <esin/util>
 
+#include <tuple>
+
 class ubicacio {
 public:
 
