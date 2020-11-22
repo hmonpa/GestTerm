@@ -1,0 +1,3 @@
+string _mat;
+unsigned int _lon;
+bool matricula_valida(const string &mat);
