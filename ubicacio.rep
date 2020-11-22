@@ -1,8 +1,3 @@
-/*struct ubicacio{
-    int i;          // Indica la filera
-    int j;          // Indica la plaça
-    int k;          // Indica el pis
-};*/
-
-std::tuple<int, int, int> i, j, k;
-
+int _i;       // Filera
+int _j;       // Plaça
+int _k;       // Pis
