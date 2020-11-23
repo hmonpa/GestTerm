@@ -1,10 +1,8 @@
 #ifndef _UBICACIO_HPP
-#define _UBICACIO_HPP 
+#define _UBICACIO_HPP
 
 #include <esin/error>
 #include <esin/util>
-
-#include <tuple>
 
 class ubicacio {
 public:

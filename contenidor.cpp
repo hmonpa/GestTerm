@@ -9,13 +9,13 @@ bool contenidor::matricula_valida(const string &mat)
   bool mat_valida = true;
   if (mat.size() == 0) mat_valida = false;
   for (nat i = 0; i < mat.size(); ++i) {
-    //Comprobar si la and es una or
-    if ( ((mat[i] < 'A') or (mat[i] > 'Z')) and ((mat[i] < '0') or (mat[i] > '9')) mat_valida = false;
+    // Comprobar si la and es una or
+    if (((mat[i] < 'A') or (mat[i] > 'Z')) and ((mat[i] < '0') or (mat[i] > '9')) mat_valida = false;
   }
   return mat_valida;
 }
 
-// θ(1)
+// θ(m.size)
 contenidor::contenidor(const string &m, nat l) throw(error)
 {
   // PRE: True
@@ -83,13 +83,6 @@ string contenidor::matricula() const throw()
   return _mat;
 }
 
-/* Operadors de comparació. L'operador d'igualtat retorna cert si i
-   només si els dos contenidors contenen la mateixa matrícula i longitud.
-   L'operador menor retorna cert si i només si la matrícula del
-   paràmetre implícit es més petit en ordre alfabètic que la c o si les
-   dues matrícules són iguals i la longitud del paràmetre implícit és més
-   petita que la de c. La resta d'operadors es defineixen consistentment
-   respecte a <. */
 // θ(1)
 bool contenidor::operator==(const contenidor &c) const throw()
 {
@@ -98,6 +91,7 @@ bool contenidor::operator==(const contenidor &c) const throw()
   //       false en cas contrari
   return (*this._mat==c._mat) and (*this._lon==c._lon);
 }
+
 // θ(1)
 bool contenidor::operator!=(const contenidor &c) const throw()
 {
@@ -107,26 +101,44 @@ bool contenidor::operator!=(const contenidor &c) const throw()
   return not(*this==c);
 }
 
+// θ(1)
 bool contenidor::operator<(const contenidor &c) const throw()
 {
-  // PRE:
-  // POST:
+  // PRE: True
+  // POST: Retorna true si la matricula del p.i és més petita que la matricula del contenidor c.
+  // O també retorna true si la matricula del p.i es igual que la matricula del contenidor c i, a més,
+  // la longitud del p.i es més petita que la longitud de c. Retorna false en cas contrari
+  return ((*this._mat < c._mat) or ((*this._mat == c._mat and *this._lon < c._lon)));
 }
 
+// θ(1)
 bool contenidor::operator<=(const contenidor &c) const throw()
 {
-  // PRE:
-  // POST:
+  // PRE: True
+  // POST: Retorna true si la matricula del p.i és més petita que la matricula del contenidor c.
+  // O també retorna true si la matricula del p.i es igual que la matricula del contenidor c i, a més,
+  // la longitud del p.i es més petita que la longitud de c. També retornara true si la matricula i la
+  // longitud del p.i son iguals als del contenidor c. Retorna false en cas contrari
+  return (*this < c) or (*this == c);
 }
 
+// θ(1)
 bool contenidor::operator>(const contenidor &c) const throw()
 {
-  // PRE:
-  // POST:
+  // PRE: El paràmetre c es un contenidor
+  // POST: Retorna true si la matricula del p.i és major que la matricula del contenidor c.
+  // O també retorna true si la matricula del p.i es igual que la matricula del contenidor c i, a més,
+  // la longitud del p.i es més petita que la longitud de c. Retorna false en cas contraric
+  return not(*this < c);
 }
 
+// θ(1)
 bool contenidor::operator>=(const contenidor &c) const throw()
 {
-  // PRE:
-  // POST:
+  // PRE: El paràmetre c es un contenidor
+  // POST: Retorna true si la matricula del p.i és major que la matricula del contenidor c.
+  // O també retorna true si la matricula del p.i es igual que la matricula del contenidor c i, a més,
+  // la longitud del p.i es major que la longitud de c. També retornara true si la matricula i la
+  // longitud del p.i son iguals als del contenidor c. Retorna false en cas contrari
+  return (*this > c) or (*this == c);
 }

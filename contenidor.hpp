@@ -1,5 +1,5 @@
 #ifndef _CONTENIDOR_HPP
-#define _CONTENIDOR_HPP 
+#define _CONTENIDOR_HPP
 
 #include <string>
 #include <esin/error>
