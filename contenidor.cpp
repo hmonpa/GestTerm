@@ -10,7 +10,7 @@ bool contenidor::matricula_valida(const string &mat)
   if (mat.size() == 0) mat_valida = false;
   for (nat i = 0; i < mat.size(); ++i) {
     // Comprobar si la and es una or
-    if (((mat[i] < 'A') or (mat[i] > 'Z')) and ((mat[i] < '0') or (mat[i] > '9')) mat_valida = false;
+    if (((mat[i] < 'A') or (mat[i] > 'Z')) and ((mat[i] < '0') or (mat[i] > '9'))) mat_valida = false;
   }
   return mat_valida;
 }
@@ -89,7 +89,7 @@ bool contenidor::operator==(const contenidor &c) const throw()
   // PRE: True
   // POST: Retorna true si el contenidor del p.i i el contenidor c son iguals,
   //       false en cas contrari
-  return (*this._mat==c._mat) and (*this._lon==c._lon);
+  return (this->_mat==c._mat) and (this->_lon==c._lon);
 }
 
 // θ(1)
@@ -108,7 +108,7 @@ bool contenidor::operator<(const contenidor &c) const throw()
   // POST: Retorna true si la matricula del p.i és més petita que la matricula del contenidor c.
   // O també retorna true si la matricula del p.i es igual que la matricula del contenidor c i, a més,
   // la longitud del p.i es més petita que la longitud de c. Retorna false en cas contrari
-  return ((*this._mat < c._mat) or ((*this._mat == c._mat and *this._lon < c._lon)));
+  return ((this->_mat < c._mat) or ((this->_mat == c._mat and this->_lon < c._lon)));
 }
 
 // θ(1)
