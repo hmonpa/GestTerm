@@ -1,0 +1,11 @@
+struct node {
+    string _k;        // Clau = String no buit
+    node* f_esq;      // Fill esquerre
+    node* f_dret;     // Fill dret
+    Valor _v;         // Valor
+};
+int _long;            // Longitud del BST
+node* _arrel;         // Àrrel del BST
+
+// Mètodes privats
+static node* crea_arbre(node* n);

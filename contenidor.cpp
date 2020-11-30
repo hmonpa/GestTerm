@@ -1,5 +1,7 @@
 #include "contenidor.hpp"
 
+// --------------------------- Mètodes privats ---------------------------
+
 // θ(mat.size)
 bool contenidor::matricula_valida(const string &mat)
 {
@@ -14,6 +16,8 @@ bool contenidor::matricula_valida(const string &mat)
   }
   return mat_valida;
 }
+
+// --------------------------- Mètodes públics ---------------------------
 
 // θ(m.size)
 contenidor::contenidor(const string &m, nat l) throw(error)
