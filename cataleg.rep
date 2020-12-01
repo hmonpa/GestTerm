@@ -4,8 +4,49 @@ struct node {
     node* f_dret;     // Fill dret
     Valor _v;         // Valor
 };
-int _long;            // Longitud del BST
+nat _long;            // Longitud del BST
 node* _arrel;         // Àrrel del BST
+
+// Duda:
+nat _numelems;        // Numelems aproximat que contindrà el BST
 
 // Mètodes privats
 static node* crea_arbre(node* n);
+static void borra_arbre(node* &n);
+
+
+
+
+// BST (Arbre binari de cerca)
+
+/*
+  La nostra primera idea després de raonar les caràcteristiques de la classe catàleg,
+  ha sigut escollir un BST per desenvolupar el diccionari, pels següents motius:
+
+  1. Implementació: Un BST no deixa de ser un arbre binari buit, o, un arbre binari tal que,
+    per a tot node, la clau del node es més gran que qualsevol de les claus del subarbre esquerre,
+    i es més petita que qualsevol de les claus del subarbre dret.
+  2. Costos: Logaritmics als casos mitjos
+  3. No hem de coneixer previament la quantitat d'elements (nodes)
+  4. Ens permet tenir el parell Clau-Valor,
+    sent la Clau un string no buit que fa referencia a la matricula d'un contenidor
+    i Valor ....
+    ####(PDTE DE CONFIRMAR)####
+
+    Veiem els costos mitjos en comparació a altres estructures:
+
+    +--------------------------------------------------------------------------------------------+
+    |  Avg case    |       Crear        |      Inserir      |     Elimina       |    Consulta    |
+    +--------------------------------------------------------------------------------------------+
+    |  HASH        |       θ(n)         |       θ(1)        |     θ(1)          |      θ(1)      |
+    |  BST / AVL   |       θ(1)         |       θ(log n)    |     θ(log n)      |      θ(log n)  |
+        TRIES:
+    |   Punters    |       θ(1)         |       θ(L)        |     θ(L)          |      θ(L)      |
+    | PrimfSeggerm |       θ(1)         |       θ(L·S)      |     θ(L·S)        |      θ(L·S)    |
+    |     TST      |       θ(1)         |     θ(L·log S)    |   θ(L·log S)      |    θ(L·log S)  |
+    +--------------------------------------------------------------------------------------------+
+
+    S = Nombre de símbols
+    L = Longitud de la Clau
+
+*/
