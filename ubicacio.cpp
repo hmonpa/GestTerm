@@ -1,7 +1,12 @@
 #include "ubicacio.hpp"
 
 // θ(1)
-ubicacio::ubicacio(int i, int j, int k) throw(error)
+ubicacio::ubicacio(int i, int j, int k) throw(error):
+                // Aquestes assignacions eliminen el següent error:
+                // "may be used uninitialized in this function [-Werror=maybe-uninitialized]""
+                _i(i),
+                _j(j),
+                _k(k)
 {
     // PRE: True
     // POST: Crea una ubicació vàlida amb valors i,j,k. És a dir que: (i >=0 and j >=0 and k >=0) or (i >=-1 and j >=0 and k >=0)  and (i >=-1 and j >=-1 and k >=-1)
@@ -129,7 +134,7 @@ bool ubicacio::operator>(const ubicacio &u) const throw()
   // POST: Es retorna true si la filera del p.i es major a la filera de la ubicació u,
   // o, si la filera del p.i es igual a la filera de la ubicació u i la plaça del p.i es major a la plaça de la ubicació u,
   // o, si la filera del p.i es igual a la filera de la ubicació u i la plaça del p.i es igual a la plaça de la ubicació u i el pis del p.i es major al pis de la ubicació u
-    return not (*this < u);
+    return not (*this <= u);
 }
 
 // θ(1)
@@ -139,5 +144,5 @@ bool ubicacio::operator>=(const ubicacio &u) const throw()
   // POST: Es retorna true si la filera del p.i es major o igual a la filera de la ubicació u,
   // o, si la filera del p.i es igual a la filera de la ubicació u i la plaça del p.i es major o igual a la plaça de la ubicació u,
   // o, si la filera del p.i es igual a la filera de la ubicació u i la plaça del p.i es igual a la plaça de la ubicació u i el pis del p.i es major o igual al pis de la ubicació u
-    return not (*this <= u);
+    return not (*this < u);
 }

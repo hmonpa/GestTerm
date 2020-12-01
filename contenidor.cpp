@@ -133,7 +133,7 @@ bool contenidor::operator>(const contenidor &c) const throw()
   // POST: Retorna true si la matricula del p.i és major que la matricula del contenidor c.
   // O també retorna true si la matricula del p.i es igual que la matricula del contenidor c i, a més,
   // la longitud del p.i es més petita que la longitud de c. Retorna false en cas contraric
-  return not(*this < c);
+  return not(*this <= c);
 }
 
 // θ(1)
@@ -144,5 +144,5 @@ bool contenidor::operator>=(const contenidor &c) const throw()
   // O també retorna true si la matricula del p.i es igual que la matricula del contenidor c i, a més,
   // la longitud del p.i es major que la longitud de c. També retornara true si la matricula i la
   // longitud del p.i son iguals als del contenidor c. Retorna false en cas contrari
-  return (*this > c) or (*this == c);
+  return not(*this < c);
 }
