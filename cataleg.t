@@ -1,81 +1,35 @@
 // --------------------------- Mètodes privats ---------------------------
 
-// Notas Héctor:
-// 1- Tengo dudas acerca de si los templates están correctos
-// 2- Hay que aclarar exactamente a qué hace referencia el Valor
-//    la clave creo que está bastante clara, al ser un string que no puede estar vacío
-//    pero hay que hablarlo
 
-// θ(n)
-template <typename Valor>
-typename cataleg<Valor>::node* cataleg<Valor>::crea_arbre(node* n)
-{
-  // PRE: True
-  // POST: Si n es NULL, es retorna NULL. En cas contrari,
-  // el resultat apuntarà al primer node d'un arbre binari de nodes,
-  // els quals son copia de l'arbre apuntat per n
-
-  node* p;
-  if (n == NULL) p = NULL;
-  else
-  {
-    p = new node;
-    try
-    {
-      p->info = n->info;
-      p->f_esq = crea_arbre(n->f_esq);
-      p->f_dret = crea_arbre(n->f_dret);
-    }
-    catch(...)
-    {
-      delete p;
-      throw;
-    }
-  }
-  return p;
-}
-
-// θ(n)
-template <typename Valor>
-void cataleg<Valor>::borra_arbre(node* &n)
-{
-  // PRE: True
-  // POST: Esborra l'arbre apuntat pel node n, i allibera memòria
-  if (n != NULL)
-  {
-    borra_arbre(n->f_esq);
-    borra_arbre(n->f_dret);
-
-    delete n;
-    n = NULL;
-  }
-}
 
 // --------------------------- Mètodes públics ---------------------------
 
 /* Constructora. Crea un catàleg buit on numelems és el nombre
    aproximat d'elements que com a màxim s'inseriran al catàleg. */
-// θ(1)
+// θ(n)
 template <typename Valor>
-explicit cataleg<Valor>::cataleg(nat numelems) throw(error)
+explicit cataleg<Valor>::cataleg(nat numelems) throw(error):
+                      _mida(numelems)
 {
   // PRE: True
   // POST: Crea un catàleg buit
-  _arrel = NULL;
-  _long = 0;
-  _numelems = numelems;   // Duda
+
+  _taula = new node_hash *[_mida];
+  for (nat i=0;i<_mida;i++)
+  {
+    _taula[i] = NULL;
+  }
 }
 
 
 /* Constructora per còpia, assignació i destructora. */
-// θ(n)
+// θ
 template <typename Valor>
 cataleg<Valor>::cataleg(const cataleg& c) throw(error)
 {
   // PRE: True
   // POST: El p.i es una copia exacta de c
-  _arrel = crea_arbre(c._arrel);
-  _long = c._long;
+
 }
 
 template <typename Valor>
@@ -84,13 +38,13 @@ cataleg<Valor>::cataleg& operator=(const cataleg& c) throw(error)
 
 }
 
-// θ(n)
+// θ
 template <typename Valor>
 cataleg<Valor>::~cataleg() throw()
 {
   // PRE: True
-  // POST: Allibera memòria dinàmica
-  borra_arbre(_arrel);
+  // POST:
+
 }
 
 /* Mètode modificador. Insereix el parell <clau, valor> indicat.
