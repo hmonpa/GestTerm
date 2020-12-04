@@ -8,12 +8,12 @@
    aproximat d'elements que com a màxim s'inseriran al catàleg. */
 // θ(n)
 template <typename Valor>
-explicit cataleg<Valor>::cataleg(nat numelems) throw(error):
-                      _mida(numelems)
+explicit cataleg<Valor>::cataleg(nat numelems) throw(error)
 {
   // PRE: True
   // POST: Crea un catàleg buit
 
+  _mida = numelems;                 // Cambio
   _taula = new node_hash *[_mida];
   for (nat i=0;i<_mida;i++)
   {
@@ -21,17 +21,43 @@ explicit cataleg<Valor>::cataleg(nat numelems) throw(error):
   }
 }
 
-
-/* Constructora per còpia, assignació i destructora. */
-// θ
+// θ(n)
 template <typename Valor>
 cataleg<Valor>::cataleg(const cataleg& c) throw(error)
 {
   // PRE: True
   // POST: El p.i es una copia exacta de c
+  _taula = new node_hash *[_mida];
+  for (nat i=0;i<_mida;i++)
+  {
+    if (c._taula[i] != NULL)
+    {
+      // Copia de claus, valors i punters de la taula
+      _taula[i] = new node_hash;
+      _taula[i]->_k = c._taula[i]->_k;
+      _taula[i]->_v = c._taula[i]->_v;
+      _taula[i]->_seg = NULL;             // Punter a linked-list
 
+      node_hash *l = c._taula[i]->_seg;   // Punter a linked-list de c
+      node_hash *act = _taula[i];
+
+      while (l != NULL)                   // Mentre hi hagin sinònims apuntats per la cel·la i
+      {
+        node_hash *p = new node_hash;
+        p->_k = l->_k;
+        p->_v = l->_v;
+        p->seg = NULL;
+
+        act->_seg = p2;
+
+        act = act->_seg;
+        l = l->_seg;
+      }
+    }
+  }
 }
 
+// θ
 template <typename Valor>
 cataleg<Valor>::cataleg& operator=(const cataleg& c) throw(error)
 {

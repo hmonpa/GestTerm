@@ -1,30 +1,29 @@
 struct node_hash {
     string _k;                  // Clau = String no buit
     Valor _v;                   // Valor
+    node_hash *_seg;
 };
 node_hash **_taula;             // Taula de punters a node
 
 nat _mida;                      // Mida de la taula
 nat _quants;                    // Nombre d'elements guardats al diccionari
 
-static nat const alpha = 0.75;  // Factor de càrrega
+static nat const alpha = 0.75;  // Factor de càrrega = _quants / _mida
+                                // ... si es tracta d'un valor considerablement petit,
+                                // podem assumir que el cost mitjà de totes les operacions
+                                // del diccionari (menys la constructora -> θ(n)), tenen cost constant -> θ(1)
+
 /* Com a regla general, 0.75 es un bon factor de càrrega ja que ofereix un
 bon equilibri entre costos temporals i espaials, valors més alts fan
 decréixer la sobrecàrrega de l'espai, però incrementa el cost de la cerca */
 
-/* Quedaria decidir también el tipo de estrategia para la resolución de colisiones
-    1. Open Hashing
-        1.1. Sinonimos encadenados indirectos
-        1.2. Sinonimos encadenados indirectos
-    2. Open addressing
-        2.1. Sondeo lineal
 
 // Mètodes privats
 void dispersio();               // PDTE: Razonar una buena estrategia buscando equilibrio
                                 // entre costes asumibles y fácil (o asumible) implementación
 
 
-// Raonament i decisions
+// Hash Table - Raonament i decisions
 
 /*
   La nostra primera idea després de raonar les caràcteristiques de la classe catàleg,
@@ -55,6 +54,21 @@ void dispersio();               // PDTE: Razonar una buena estrategia buscando e
     No obstant, la nostra idea inicial va canviar, ja que es volia que la consulta a les dades,
     sigues tan ràpida com fos possible, per tant, comparant els costos temporals, encara que els
     costos espaials fossin més grans, finalment ens vam decantar per una taula de dispersió (Hash Table)
+    amb una estrategia de resolució de col·lisions de dispersió oberta, en concret, sinònims encadenats indirectes
+    (Open hashing - separate chaining) on cada cel·la de la taula apunta a una llista encadenada (Linked list)
+    de sinònims. La propia taula de dispersió guarda un punter al primer element de la llista. Hem escollit aquesta
+    estrategia per les següents raons:
+      1. La taula mai s'omplirà davant de noves col·lisions
+      2. Creiem que es més util quan es desconeix quantes claus i amb quina freqüència
+        s'insertaràn o eliminaran de la taula de dispersió
+      3. Es menys sensible al fàctor de càrrega, ja que la mida de la taula no variarà
 
+    També es cert que no tot es idíl·lic en aquest tipus d'estrategia, ja que hi han parts de la taula que potser,
+    mai s'utilitzaràn, a més, com el seu propi nom indica son encadenaments indirectes, per tant, per accedir al primer
+    element de la llista de sinònims, l'accés no es immediat i hem de mantenir un punter a cada llista.
+
+
+    ### En este enlace hay unos ejemplos visuales muy buenos:
+    ### https://www.geeksforgeeks.org/hashing-set-2-separate-chaining/#:~:text=The%20idea%20is%20to%20make,%2C%2092%2C%2073%2C%20101.
 
 */
