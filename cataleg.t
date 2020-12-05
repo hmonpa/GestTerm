@@ -4,8 +4,6 @@
 
 // --------------------------- Mètodes públics ---------------------------
 
-/* Constructora. Crea un catàleg buit on numelems és el nombre
-   aproximat d'elements que com a màxim s'inseriran al catàleg. */
 // θ(n)
 template <typename Valor>
 explicit cataleg<Valor>::cataleg(nat numelems) throw(error)
@@ -13,7 +11,7 @@ explicit cataleg<Valor>::cataleg(nat numelems) throw(error)
   // PRE: True
   // POST: Crea un catàleg buit
 
-  _mida = numelems;                 // Cambio
+  _mida = numelems;                     // La mida de la taula es numelems
   _taula = new node_hash *[_mida];
   for (nat i=0;i<_mida;i++)
   {
@@ -27,8 +25,11 @@ cataleg<Valor>::cataleg(const cataleg& c) throw(error)
 {
   // PRE: True
   // POST: El p.i es una copia exacta de c
+
   _mida = c._mida;
   _taula = new node_hash *[_mida];
+  _quants = c._quants;
+
   for (nat i=0;i<_mida;i++)
   {
     if (c._taula[i] != NULL)
@@ -58,20 +59,48 @@ cataleg<Valor>::cataleg(const cataleg& c) throw(error)
   }
 }
 
-// θ
+// θ(n)
 template <typename Valor>
-cataleg<Valor>::cataleg& operator=(const cataleg& c) throw(error)
+cataleg& cataleg<Valor>::operator=(const cataleg& c) throw(error)
 {
+  // PRE: True
+  // POST: El p.i es una copia exacta de c
 
+  if (this != &c)
+  {
+    cataleg<Valor> cat(c);                  // cat es una còpia de c
+    node_hash **_aux = _taula;
+    _taula = cat._taula;
+    cat._taula = _aux;
+
+    _mida = c._mida;
+    _quants = c._quants;
+  }
+  return *this;
 }
 
-// θ
+// θ(n)
 template <typename Valor>
 cataleg<Valor>::~cataleg() throw()
 {
   // PRE: True
-  // POST:
+  // POST: S'han eliminat els elements del p.i.
 
+  node_hash *act;                         // Punter a l'actual
+  node_hash *ant;                         // Punter a l'anterior
+  act = ant = NULL;
+
+  for (nat i=0;i<_mida;i++)
+  {
+    act = _taula[i];
+    while (act != NULL)
+    {
+      ant = act;
+      act = act->_seg;
+      delete ant;
+    }
+  }
+  delete[] _taula;
 }
 
 /* Mètode modificador. Insereix el parell <clau, valor> indicat.

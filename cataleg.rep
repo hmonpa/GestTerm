@@ -19,8 +19,8 @@ decréixer la sobrecàrrega de l'espai, però incrementa el cost de la cerca */
 
 
 // Mètodes privats
-void dispersio();               // PDTE: Razonar una buena estrategia buscando equilibrio
-                                // entre costes asumibles y fácil (o asumible) implementación
+// void redispersio();          // Dubte: Tenim que implementarla? Al nostre cas, hi ha una estimació
+                                // ... del nombre de claus aproximat que hi haurà a la taula (numelems)
 
 
 // Hash Table - Raonament i decisions
@@ -66,9 +66,5 @@ void dispersio();               // PDTE: Razonar una buena estrategia buscando e
     També es cert que no tot es idíl·lic en aquest tipus d'estrategia, ja que hi han parts de la taula que potser,
     mai s'utilitzaràn, a més, com el seu propi nom indica son encadenaments indirectes, per tant, per accedir al primer
     element de la llista de sinònims, l'accés no es immediat i hem de mantenir un punter a cada llista.
-
-
-    ### En este enlace hay unos ejemplos visuales muy buenos:
-    ### https://www.geeksforgeeks.org/hashing-set-2-separate-chaining/#:~:text=The%20idea%20is%20to%20make,%2C%2092%2C%2073%2C%20101.
 
 */
