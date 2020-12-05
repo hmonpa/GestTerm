@@ -27,6 +27,7 @@ cataleg<Valor>::cataleg(const cataleg& c) throw(error)
 {
   // PRE: True
   // POST: El p.i es una copia exacta de c
+  _mida = c._mida;
   _taula = new node_hash *[_mida];
   for (nat i=0;i<_mida;i++)
   {
