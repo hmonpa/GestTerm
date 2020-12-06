@@ -17,13 +17,21 @@ static nat const alpha = 0.75;  // Factor de càrrega = _quants / _mida
 bon equilibri entre costos temporals i espaials, valors més alts fan
 decréixer la sobrecàrrega de l'espai, però incrementa el cost de la cerca */
 
-  nat hash( const string &k );
+
 // Mètodes privats
-// void redispersio();          // Dubte: Tenim que implementarla? Al nostre cas, hi ha una estimació
-                                // ... del nombre de claus aproximat que hi haurà a la taula (numelems)
+
+// Càlcula la cel·la de la taula per a la clau donada
+nat hash(const string &k);
+
+// Rehash: Duplica la grandària de la taula al doble de l'actual quam el factor de càrrega
+// ... supera un cert llindar, reinsertant la informació de la taula original a la nova taula.
+// També s'aplica a la inversa, per evitar que el factor de càrrega sigui excessivament baix,
+// es redueix a la meitat la grandària de la taula actual.
+void redispersio();
 
 
-// Hash Table - Raonament i decisions
+
+// ------------------------------------ Hash Table - Raonament i decisions ------------------------------------
 
 /*
   La nostra primera idea després de raonar les caràcteristiques de la classe catàleg,
@@ -38,18 +46,18 @@ decréixer la sobrecàrrega de l'espai, però incrementa el cost de la cerca */
 
     Vam comparar els costos mitjos en comparació a altres estructures:
 
-    +--------------------------------------------------------------------------------------------+
-    |  Avg case    |       Crear        |      Inserir      |     Elimina       |    Consulta    |
-    +--------------------------------------------------------------------------------------------+
-    |  Hash table  |       θ(n)         |       θ(1)        |     θ(1)          |      θ(1)      |
-    |  BST / AVL   |       θ(1)         |       θ(log n)    |     θ(log n)      |      θ(log n)  |
-        TRIES:
-    |   Punters    |       θ(1)         |       θ(L)        |     θ(L)          |      θ(L)      |
-    | PrimfSeggerm |       θ(1)         |       θ(L·S)      |     θ(L·S)        |      θ(L·S)    |
-    |     TST      |       θ(1)         |     θ(L·log S)    |   θ(L·log S)      |    θ(L·log S)  |
-    +--------------------------------------------------------------------------------------------+
-    · S = Nombre de Símbols
-    · L = Longitud de la Clau
+        ---------------------------------------------------------------------------------------
+        |    Avg case    |     Crear     |      Inserir    |     Elimina     |    Consulta    |
+        ---------------------------------------------------------------------------------------
+        |   Hash table   |     θ(n)      |     θ(1)        |     θ(1)        |      θ(1)      |
+        |   BST / AVL    |     θ(1)      |     θ(log n)    |     θ(log n)    |      θ(log n)  |
+               TRIES:
+        |     Punters    |     θ(1)      |     θ(L)        |     θ(L)        |      θ(L)      |
+        |  PrimfSeggerm  |     θ(1)      |     θ(L·S)      |     θ(L·S)      |      θ(L·S)    |
+        |      TST       |     θ(1)      |    θ(L·log S)   |   θ(L·log S)    |    θ(L·log S)  |
+        ---------------------------------------------------------------------------------------
+        · S = Nombre de Símbols
+        · L = Longitud de la Clau
 
     No obstant, la nostra idea inicial va canviar, ja que es volia que la consulta a les dades,
     sigues tan ràpida com fos possible, per tant, comparant els costos temporals, encara que els

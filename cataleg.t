@@ -1,14 +1,22 @@
 // --------------------------- Mètodes privats ---------------------------
+
+// θ(k.size)
 template <typename Valor>
-nat cataleg<Valor>::hash( const string &k, nat m ){
-//LINK:https://cp-algorithms.com/string/string-hashing.html#:~:text=For%20the%20conversion%2C%20we%20need,%3Dhash(t)).
+nat cataleg<Valor>::hash(const string &k, nat m)
+{
+  // PRE: True
+  // POST: Retorna la cel·la de la taula on anirà la clau k
+  // LINK:https://cp-algorithms.com/string/string-hashing.html#:~:text=For%20the%20conversion%2C%20we%20need,%3Dhash(t)).
 
   int prime_number = 31;
   nat hash_value = 0;
-  for (nat i=0;i<k.size();++i) {
-    hash_value+= k[i] * pow(2,i)%m;
+  for (nat i=0; i<k.size(); ++i)
+  {
+    // Suma ponderada on b=2 i pow = (2^i)
+    hash_value += k[i] * pow(2,i);
   }
-  return hash_value;
+
+  return hash_value % _mida;
 }
 
 
