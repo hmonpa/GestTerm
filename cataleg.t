@@ -2,7 +2,7 @@
 
 // θ(k.size)
 template <typename Valor>
-nat cataleg<Valor>::hash(const string &k, nat m)
+nat cataleg<Valor>::hash(const string &k)
 {
   // PRE: True
   // POST: Retorna la cel·la de la taula on anirà la clau k
