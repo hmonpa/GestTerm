@@ -17,7 +17,7 @@ static nat const alpha = 0.75;  // Factor de càrrega = _quants / _mida
 bon equilibri entre costos temporals i espaials, valors més alts fan
 decréixer la sobrecàrrega de l'espai, però incrementa el cost de la cerca */
 
-
+  nat hash( const string &k );
 // Mètodes privats
 // void redispersio();          // Dubte: Tenim que implementarla? Al nostre cas, hi ha una estimació
                                 // ... del nombre de claus aproximat que hi haurà a la taula (numelems)
