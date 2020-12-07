@@ -20,15 +20,16 @@ decréixer la sobrecàrrega de l'espai, però incrementa el cost de la cerca */
 
 // Mètodes privats
 
-// Càlcula la cel·la de la taula per a la clau donada
 nat hash(const string &k);
+// Càlcula la cel·la de la taula per a la clau donada
 
+void redispersio(bool alpha_alt);
 // Rehash: Duplica la grandària de la taula al doble de l'actual quam el factor de càrrega
 // ... supera un cert llindar, reinsertant la informació de la taula original a la nova taula.
 // També s'aplica a la inversa, per evitar que el factor de càrrega sigui excessivament baix,
 // es redueix a la meitat la grandària de la taula actual.
-void redispersio();
 
+// #### NOTA: Tendriamos que fijar cuales son esos umbrales, para cuando hagamos los métodos assign y elimina ####
 
 
 // ------------------------------------ Hash Table - Raonament i decisions ------------------------------------

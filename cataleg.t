@@ -8,7 +8,7 @@ nat cataleg<Valor>::hash(const string &k)
   // POST: Retorna la cel·la de la taula on anirà la clau k
   // LINK:https://cp-algorithms.com/string/string-hashing.html#:~:text=For%20the%20conversion%2C%20we%20need,%3Dhash(t)).
 
-  int prime_number = 31;
+  //int prime_number = 31;
   nat hash_value = 0;
   for (nat i=0; i<k.size(); ++i)
   {
@@ -19,7 +19,40 @@ nat cataleg<Valor>::hash(const string &k)
   return hash_value % _mida;
 }
 
+// θ(n)
+template <typename Valor>
+nat cataleg<Valor>::redispersio(bool alpha_alt)
+{
+  // PRE: True = _mida*=2; False = _mida/=2
+  // POST: Es dobla o redueix a la meitat la mida de la taula i es reinserten els elements
 
+  nat _mida_orig = _mida;
+  if (alpha_alt) _mida*=2;                  // Factor càrrega supera llindar
+  else           _mida/=2;                  // Factor càrrega excessivament baix
+
+  node_hash **_t = new node_hash *[_mida];
+
+  for (nat i=0; i<_mida; i++)
+  {
+    _t[i] = NULL;                           // Preparació de la nova taula
+  }
+
+  for (nat i=0; i<_mida_orig; i++)
+  {
+    node_hash *p = _taula[i];
+    while (p != NULL)
+    {
+      node_hash *aux = p;
+      p = p->_seg;
+      nat nova_cell = hash(aux->_k);
+      aux->_seg = _t[nova_cell];
+      _t[nova_cell] = aux;
+    }
+  }
+
+  delete[] _taula;
+  _taula = _t;
+}
 
 // --------------------------- Mètodes públics ---------------------------
 
@@ -30,9 +63,9 @@ explicit cataleg<Valor>::cataleg(nat numelems) throw(error)
   // PRE: True
   // POST: Crea un catàleg buit
 
-  _mida = numelems;                     // La mida de la taula es numelems
+  _mida = numelems;                         // La mida de la taula es numelems
   _taula = new node_hash *[_mida];
-  for (nat i=0;i<_mida;i++)
+  for (nat i=0; i<_mida; i++)
   {
     _taula[i] = NULL;
   }
@@ -49,7 +82,7 @@ cataleg<Valor>::cataleg(const cataleg& c) throw(error)
   _taula = new node_hash *[_mida];
   _quants = c._quants;
 
-  for (nat i=0;i<_mida;i++)
+  for (nat i=0; i<_mida; i++)
   {
     if (c._taula[i] != NULL)
     {
