@@ -53,7 +53,18 @@ nat cataleg<Valor>::redispersio(bool alpha_alt)
   delete[] _taula;
   _taula = _t;
 }
-
+template <typename Valor>
+node_hash cataleg<Valor>::node_hash(const string &k, const Valor &v, node_hash* seg)
+//PRE: cert
+//POST: Retorna un node amb clau k, valor v i on el següent element es seg
+//Cost O(1)
+{
+  node_hash *n = new node_hash;
+  n->_k = k;
+  n->_v = v;
+  n->_seg = seg;
+  return n;
+}
 // --------------------------- Mètodes públics ---------------------------
 
 // θ(n)
@@ -160,6 +171,22 @@ cataleg<Valor>::~cataleg() throw()
    associat. Genera un error en cas que la clau sigui l'string buit. */
 template <typename Valor>
 void cataleg<Valor>::assig(const string &k, const Valor &v) throw(error){
+  nat pos = hash(k);
+  node_hash *p = _taula[pos];
+  bool existeix = false;
+  while ( p!=NULL and not existeix ) {
+    if (p->_k==k) {
+      existeix = true;
+    }
+    else {
+      p = p->seg;
+    }
+  }
+  if (existeix) p->_v = v;
+  else {
+    _taula[i] = new node_hash(k, v, _taula[pos]->seg);
+    ++_quants;
+  }
 
 }
 
@@ -191,5 +218,5 @@ Valor cataleg<Valor>::operator[](const string &k) const throw(error){
    fins aquest moment. */
 template <typename Valor>
 nat cataleg<Valor>::quants() const throw(){
-
+  return _quants;
 }
