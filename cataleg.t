@@ -6,7 +6,6 @@ nat cataleg<Valor>::hash(const string &k)
 {
   // PRE: True
   // POST: Retorna la cel·la de la taula on anirà la clau k
-  // LINK:https://cp-algorithms.com/string/string-hashing.html#:~:text=For%20the%20conversion%2C%20we%20need,%3Dhash(t)).
 
   //int prime_number = 31;
   nat hash_value = 0;
@@ -32,12 +31,12 @@ nat cataleg<Valor>::redispersio(bool alpha_alt)
 
   node_hash **_t = new node_hash *[_mida];
 
-  for (nat i=0; i<_mida; i++)
+  for (nat i=0; i<_mida; i++)               // Preparació de la nova taula
   {
-    _t[i] = NULL;                           // Preparació de la nova taula
+    _t[i] = NULL;
   }
 
-  for (nat i=0; i<_mida_orig; i++)
+  for (nat i=0; i<_mida_orig; i++)          // Reinserció elements originals
   {
     node_hash *p = _taula[i];
     while (p != NULL)
@@ -47,24 +46,29 @@ nat cataleg<Valor>::redispersio(bool alpha_alt)
       nat nova_cell = hash(aux->_k);
       aux->_seg = _t[nova_cell];
       _t[nova_cell] = aux;
+
+      if (_t[nova_cell]->_seg == NULL) _quants++;
+      else                             _colisions++;
+
     }
   }
-
   delete[] _taula;
   _taula = _t;
 }
+
+// θ(1)
 template <typename Valor>
 node_hash cataleg<Valor>::node_hash(const string &k, const Valor &v, node_hash* seg)
-//PRE: cert
-//POST: Retorna un node amb clau k, valor v i on el següent element es seg
-//Cost O(1)
 {
-  node_hash *n = new node_hash;
-  n->_k = k;
-  n->_v = v;
-  n->_seg = seg;
-  return n;
+    // PRE: True
+    // POST: Retorna un node amb clau k, valor v i on el següent element es seg
+    node_hash *n = new node_hash;
+    n->_k = k;
+    n->_v = v;
+    n->_seg = seg;
+    return n;
 }
+
 // --------------------------- Mètodes públics ---------------------------
 
 // θ(n)
@@ -166,27 +170,51 @@ cataleg<Valor>::~cataleg() throw()
   delete[] _taula;
 }
 
-/* Mètode modificador. Insereix el parell <clau, valor> indicat.
-   En cas que la clau k ja existeixi en el catàleg actualitza el valor
-   associat. Genera un error en cas que la clau sigui l'string buit. */
+// θ
 template <typename Valor>
-void cataleg<Valor>::assig(const string &k, const Valor &v) throw(error){
-  nat pos = hash(k);
-  node_hash *p = _taula[pos];
-  bool existeix = false;
-  while ( p!=NULL and not existeix ) {
-    if (p->_k==k) {
-      existeix = true;
+void cataleg<Valor>::assig(const string &k, const Valor &v) throw(error)
+{
+  // PRE: True
+  // POST: Insereix al catàleg un node amb clau k i valor v
+
+  // Héctor
+  if (k.size() != 0)
+  {
+    nat cell = hash(k);
+
+    if (_taula[cell] == NULL) _quants++;
+    else                      _colisions++;
+
+    node_hash *p = new node_hash(k, v, _taula[cell]);
+    _taula[cell] = p;
+
+    // Aquí: posiblemente tendriamos que hacer _quants+_colisions / _mida, es lo que te comento en el audio que se podría crear una variable _quantsTotals (o algo asi)
+    float alpha_act = (float)_quants / (float)_mida;
+    if (alpha_act > alpha) redispersio(true);
+  }
+  else
+  {
+    throw error(ClauStringBuit);
+  }
+
+  /* Alejandro:
+    nat pos = hash(k);
+    node_hash *p = _taula[pos];
+    bool existeix = false;
+    while ( p!=NULL and not existeix ) {
+      if (p->_k==k) {
+        existeix = true;
+      }
+      else {
+        p = p->seg;
+      }
     }
+    if (existeix) p->_v = v;
     else {
-      p = p->seg;
+      _taula[i] = new node_hash(k, v, _taula[pos]->seg);
+      ++_quants;
     }
-  }
-  if (existeix) p->_v = v;
-  else {
-    _taula[i] = new node_hash(k, v, _taula[pos]->seg);
-    ++_quants;
-  }
+*/
 
 }
 
@@ -214,9 +242,12 @@ Valor cataleg<Valor>::operator[](const string &k) const throw(error){
 
 }
 
-/* Retorna el nombre d'elements que s'han inserit en el catàleg
-   fins aquest moment. */
+// θ(1)
 template <typename Valor>
-nat cataleg<Valor>::quants() const throw(){
+nat cataleg<Valor>::quants() const throw()
+{
+  // PRE: True
+  // POST: Retorna el nombre d'elements que hi ha al catàleg
+
   return _quants;
 }
