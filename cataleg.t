@@ -7,14 +7,12 @@ nat cataleg<Valor>::hash(const string &k)
   // PRE: True
   // POST: Retorna la cel·la de la taula on anirà la clau k
 
-  //int prime_number = 31;
   nat hash_value = 0;
   for (nat i=0; i<k.size(); ++i)
   {
     // Suma ponderada on b=2 i pow = (2^i)
     hash_value += k[i] * pow(2,i);
   }
-
   return hash_value % _mida;
 }
 
@@ -62,6 +60,7 @@ node_hash cataleg<Valor>::node_hash(const string &k, const Valor &v, node_hash* 
 {
     // PRE: True
     // POST: Retorna un node amb clau k, valor v i on el següent element es seg
+
     node_hash *n = new node_hash;
     n->_k = k;
     n->_v = v;
@@ -157,7 +156,7 @@ cataleg<Valor>::cataleg(const cataleg& c) throw(error)
         p->_v = l->_v;
         p->seg = NULL;
 
-        act->_seg = p2;
+        act->_seg = l;
 
         act = act->_seg;
         l = l->_seg;
