@@ -18,7 +18,7 @@ nat cataleg<Valor>::hash(const string &k)
   return hash_value % _mida;
 }
 
-// θ(n)
+// θ(2n)
 template <typename Valor>
 nat cataleg<Valor>::redispersio(bool alpha_alt)
 {
@@ -69,6 +69,7 @@ node_hash cataleg<Valor>::node_hash(const string &k, const Valor &v, node_hash* 
     return n;
 }
 
+// θ(n)
 template <typename Valor>
 nat cataleg<Valor>::primer(nat numelems)
 {
