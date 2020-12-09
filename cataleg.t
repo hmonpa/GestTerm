@@ -69,6 +69,43 @@ node_hash cataleg<Valor>::node_hash(const string &k, const Valor &v, node_hash* 
     return n;
 }
 
+template <typename Valor>
+nat cataleg<Valor>::primer(nat numelems)
+{
+  // PRE: True
+  // POST: Retorna un nombre primer. Si numelems originariament era un nombre primer, ho retorna.
+  // En cas contrari, si no era un nombre primer, retorna el següent nombre primer que trobi
+
+  bool es_primer = true;
+  if (numelems > 1)
+  {
+    int i = 2, orig = 2;
+    while (i<numelems and es_primer)
+    {
+      if(numelems % i == 0)                 // Parell
+      {                                     // ... només el 2 es primer
+         numelems += 1;                     // Busquem el següent nombre
+         i = orig;                          // ... des de l'inici
+      }
+      else                                  // Senar
+      {
+        int k = 2;
+        while (k < numelems and es_primer)
+        {
+          if (numelems % k != 0) k++;       // Comprovació de tots els nombres
+          else es_primer = false;
+        }
+        if (es_primer) i=numelems;          // S'ha trobat un primer
+        else es_primer = true;              // Continuem buscant...
+      }
+      i++;
+    }
+  }
+  else es_primer = false;
+
+  return numelems;
+}
+
 // --------------------------- Mètodes públics ---------------------------
 
 // θ(n)
@@ -78,7 +115,9 @@ explicit cataleg<Valor>::cataleg(nat numelems) throw(error)
   // PRE: True
   // POST: Crea un catàleg buit
 
+  numelems = primer(numelems);
   _mida = numelems;                         // La mida de la taula es numelems
+
   _taula = new node_hash *[_mida];
   for (nat i=0; i<_mida; i++)
   {

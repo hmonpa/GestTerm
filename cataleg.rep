@@ -32,6 +32,9 @@ void redispersio(bool alpha_alt);
 // També s'aplica a la inversa, per evitar que el factor de càrrega sigui excessivament baix,
 // es redueix a la meitat la grandària de la taula actual.
 
+nat primer(nat numelems);
+// Si numelems no es un nombre primer, càlcula el següent
+
 // #### NOTA: Tendriamos que fijar cuales son esos umbrales, para cuando hagamos los métodos assign y elimina ####
 
 
