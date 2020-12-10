@@ -27,6 +27,8 @@ nat cataleg<Valor>::redispersio(bool alpha_alt)
   if (alpha_alt) _mida*=2;                  // Factor càrrega supera llindar
   else           _mida/=2;                  // Factor càrrega excessivament baix
 
+  _mida = primer(_mida);                    // La nova taula també ha de tenir una mida que sigui un nombre primer
+
   node_hash **_t = new node_hash *[_mida];
 
   for (nat i=0; i<_mida; i++)               // Preparació de la nova taula
@@ -80,28 +82,41 @@ nat cataleg<Valor>::primer(nat numelems)
   if (numelems > 1)
   {
     int i = 2, orig = 2;
-    while (i<numelems and es_primer)
+    while (i < numelems and es_primer)
     {
-      if(numelems % i == 0)                 // Parell
-      {                                     // ... només el 2 es primer
-         numelems += 1;                     // Busquem el següent nombre
-         i = orig;                          // ... des de l'inici
-      }
-      else                                  // Senar
+      if (numelems % i == 0)                  // Parell
       {
-        int k = 2;
-        while (k < numelems and es_primer)
-        {
-          if (numelems % k != 0) k++;       // Comprovació de tots els nombres
-          else es_primer = false;
-        }
-        if (es_primer) i=numelems;          // S'ha trobat un primer
-        else es_primer = true;              // Continuem buscant...
+         numelems += 1;                       // Provem amb el segúent
+         i = orig;
       }
-      i++;
+      else                                    // Senar
+      {
+          int k = 2;
+          int arrel = sqrt(numelems)+1;
+
+          while (k < arrel and es_primer)     // Comprova des de 2 fins a sqrt(numelems)+1
+          {                                   // ... el +1 es per arrodonir a l'alça el nombre decimal resultant
+            if (numelems % k != 0) k++;
+            else es_primer = false;
+          }
+
+          if (es_primer)                      // Surt del bucle amb el booleà true -> Hem trobat un primer
+          {
+            i=numelems;
+          }
+          else                                // Continuem buscant...
+          {
+            es_primer = true;
+            numelems+=1;
+          }
+        }
+        i++;
+      }
     }
+  else
+  {
+    numelems = orig;                          // orig = 2
   }
-  else es_primer = false;
 
   return numelems;
 }

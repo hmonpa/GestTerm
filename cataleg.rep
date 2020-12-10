@@ -6,8 +6,11 @@ struct node_hash {
 node_hash **_taula;             // Taula de punters a node
 
 nat _mida;                      // Mida de la taula
-nat _quants;                    // Nombre d'elements guardats al diccionari
+nat _quants;                    // Nombre d'elements
 nat _colisions;                 // Nombre de colisions
+
+// A determinar:
+nat _tots;                      // Nombre total d'elements del diccionari
 
 static nat const alpha = 0.75;  // Factor de càrrega = _quants / _mida
                                 // ... si es tracta d'un valor considerablement petit,
@@ -41,15 +44,14 @@ nat primer(nat numelems);
 // ------------------------------------ Hash Table - Raonament i decisions ------------------------------------
 
 /*
-  La nostra primera idea després de raonar les caràcteristiques de la classe catàleg,
-  va ser escollir un BST per desenvolupar el diccionari, pels següents motius:
+    La nostra primera idea després de raonar les caràcteristiques de la classe catàleg,
+    va ser escollir un BST per desenvolupar el diccionari, pels següents motius:
 
-  1. Implementació: Un BST no deixa de ser un arbre binari buit, o, un arbre binari tal que,
-    per a tot node, la clau del node es més gran que qualsevol de les claus del subarbre esquerre,
-    i es més petita que qualsevol de les claus del subarbre dret.
-  2. Costos: Logaritmics als casos mitjos
-  3. No haviem de coneixer previament la quantitat d'elements (nodes)
-  4. Ens permetia tenir el parell Clau-Valor, sent la Clau un string no buit i Valor un tipus genèric
+    1. Implementació: Un BST no deixa de ser un arbre binari buit, o, un arbre binari tal que,
+      per a tot node, la clau del node es més gran que qualsevol de les claus del subarbre esquerre,
+      i es més petita que qualsevol de les claus del subarbre dret.
+    2. Costos: Logaritmics als casos mitjos
+    3. No haviem de coneixer previament la quantitat d'elements (nodes)
 
     Vam comparar els costos mitjos en comparació a altres estructures:
 
@@ -67,19 +69,34 @@ nat primer(nat numelems);
         · L = Longitud de la Clau
 
     No obstant, la nostra idea inicial va canviar, ja que es volia que la consulta a les dades,
-    sigues tan ràpida com fos possible, per tant, comparant els costos temporals, encara que els
-    costos espaials fossin més grans, finalment ens vam decantar per una taula de dispersió (Hash Table)
-    amb una estrategia de resolució de col·lisions de dispersió oberta, en concret, sinònims encadenats indirectes
-    (Open hashing - separate chaining) on cada cel·la de la taula apunta a una llista encadenada (Linked list)
-    de sinònims. La propia taula de dispersió guarda un punter al primer element de la llista. Hem escollit aquesta
-    estrategia per les següents raons:
+    sigues tan ràpida com fos possible, per tant, comparant els costos temporals amb les altres estructures aptes per el
+    desenvolupament d'un diccionari, encara que els costos espaials fossin més grans, finalment ens vam decantar per una taula de dispersió.
+
+    La estrategia de resolució de col·lisions escollida ha sigut la de dispersió oberta, en concret, sinònims encadenats indirectes
+    on cada cel·la de la taula apunta a una llista encadenada de sinònims i,
+    a la taula de dispersió es guarda un punter al primer element de la llista de sinònims.
+
+    · Hash table:
+    S'ha escollit una taula de dispersió per les següents raons:
       1. La taula mai s'omplirà davant de noves col·lisions
       2. Creiem que es més util quan es desconeix quantes claus i amb quina freqüència
         s'insertaràn o eliminaran de la taula de dispersió
       3. Es menys sensible al fàctor de càrrega, ja que la mida de la taula no variarà
+      4. Encara que el cost de crear la taula es superior davant les altres estructures de dades,
+        la creació es farà només una vegada, però consultes, inserions i eliminacions, es faràn moltes vegades (incomptables).
+        Això fa que encara que aquest sigui un punt negatiu, es compensa amb els baixos costos de la resta d'operacions.
+
+    · Open Hashing - Separate chaining (Encadenaments indirectes):
+    S'ha escollit aquesta estràtegia de resolució de col·lisions per les següents raons:
+      1. La classe catàleg es una classe templatitzada, per tant, pot ser utilitzada per altres classes o programes,
+        i no sabem quantes eliminacions es podrien arribar a fer. Això fa que la utilització d'una tècnica que marqui
+        les cel·les com "esborrades" pot degradar el funcionament de la taula, a diferencia de la tècnica utilitzada,
+        on s'eliminen directament els elements.
+      2. S'evita el problema de l'apinyament que succeeix a la tècnica de Sondeig líneal, ja que, com al punt anterior,
+      tampòc es coneix el nombre d'elements que es poden arribar a inserir a la taula de dispersió i això ho podria ocasionar.
 
     També es cert que no tot es idíl·lic en aquest tipus d'estrategia, ja que hi han parts de la taula que potser,
     mai s'utilitzaràn, a més, com el seu propi nom indica son encadenaments indirectes, per tant, per accedir al primer
-    element de la llista de sinònims, l'accés no es immediat i hem de mantenir un punter a cada llista.
+    element de la llista de sinònims, l'accés no es immediat ja que hem de sortir de la taula i mantenir un punter al primer element de cada llista de sinònims.
 
 */
