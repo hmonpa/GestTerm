@@ -16,7 +16,7 @@ nat cataleg<Valor>::hash(const string &k)
   return hash_value % _mida;
 }
 
-// θ(2n)
+// θ(n)
 template <typename Valor>
 nat cataleg<Valor>::redispersio(bool alpha_alt)
 {
@@ -224,66 +224,128 @@ cataleg<Valor>::~cataleg() throw()
   delete[] _taula;
 }
 
-// θ
+// θ(1)
 template <typename Valor>
 void cataleg<Valor>::assig(const string &k, const Valor &v) throw(error)
 {
   // PRE: True
   // POST: Insereix al catàleg un node amb clau k i valor v
+  //       Si k es un string buit, retorna un error
 
-  // Héctor
   if (k.size() != 0)
   {
-    nat cell = hash(k);
+    nat pos = hash(k);
+    node_hash *p = _taula[pos];
+    bool existeix = false;
 
-    if (_taula[cell] == NULL) _quants++;
-    else                      _colisions++;
+    while (p != NULL and not existeix)
+    {
+      if (p->_k == k)
+      {
+        existeix = true;
+      }
+      else
+      {
+        p = p->_seg;
+      }
+    }
 
-    node_hash *p = new node_hash(k, v, _taula[cell]);
-    _taula[cell] = p;
+    if (trobat)
+    {
+      p->_v = v;                                        // Només canviem valor associat
+    }
+    else
+    {
+      node_hash *p = new node_hash(k, v, _taula[pos]);  // Creem un nou node i l'afegim al principi de la llista de sinònims
+      ++_quants;                                        // Nou element a la taula
+    }
 
-    // Aquí: posiblemente tendriamos que hacer _quants+_colisions / _mida, es lo que te comento en el audio que se podría crear una variable _quantsTotals (o algo asi)
-    float alpha_act = (float)_quants / (float)_mida;
-    if (alpha_act > alpha) redispersio(true);
+    float fc_actual = (float)_quants / (float)_mida;    // Fàctor de càrrega actual = fc_actual
+    if (fc_actual > alpha)                              // ... es comprova si es major a 0.75
+    {
+      redispersio(true);                               // ... en cas afirmatiu, fem redispersió doblant la mida de la taula
+    }
   }
   else
   {
     throw error(ClauStringBuit);
   }
-
-  /* Alejandro:
-    nat pos = hash(k);
-    node_hash *p = _taula[pos];
-    bool existeix = false;
-    while ( p!=NULL and not existeix ) {
-      if (p->_k==k) {
-        existeix = true;
-      }
-      else {
-        p = p->seg;
-      }
-    }
-    if (existeix) p->_v = v;
-    else {
-      _taula[i] = new node_hash(k, v, _taula[pos]->seg);
-      ++_quants;
-    }
-*/
-
 }
 
-/* Elimina del catàleg el parell que té com a clau k.
-   En cas que la clau k no existeixi en el catàleg genera un error. */
+// θ(1)
 template <typename Valor>
-void cataleg<Valor>::elimina(const string &k) throw(error){
+void cataleg<Valor>::elimina(const string &k) throw(error)
+{
+  // PRE: True
+  // POST: Elimina del catàleg la posició que conté la clau k
+  //       Si k no es una clau existent al catàleg, retorna un error
 
+  nat pos = hash(k);
+  node_hash *p = _taula[pos], *p_ant = NULL;
+  bool existeix = false;
+
+  while (p != NULL and not existeix)
+  {
+    if (p->_k == k)
+    {
+      existeix = true;
+    }
+    else
+    {
+      p_ant = p;
+      p = p->_seg;
+    }
+  }
+  if (existeix)
+  {
+    if (p_ant == NULL)                    // Era el primer element de la llista de sinònims
+    {
+      _taula[pos] = p->_seg;              // NULL
+    }
+    else                                  // Era qualsevol element següent de la llista
+    {
+      p_ant->seg = p->_seg;
+    }
+
+    delete p;
+    _quants--;
+
+    float fc_actual = (float)_quants / (float)_mida;    // Fàctor de càrrega actual = fc_actual
+    if (fc_actual < (alpha/3))                          // ... es comprova si es 3 cops mes petit que 0.75
+    {
+      redispersio(false);                               // ... en cas afirmatiu, fem redispersió partint la mida de la taula
+    }
+  }
+  else
+  {
+    throw error(ClauInexistent);
+  }
 }
 
-/* Retorna true si i només si la clau k existeix dins del catàleg; false
-   en cas contrari. */
+// θ(1)
 template <typename Valor>
-bool cataleg<Valor>::existeix(const string &k) const throw(){
+bool cataleg<Valor>::existeix(const string &k) const throw()
+{
+  // PRE: True
+  // POST: Es retorna True si k existeix al catàleg, False en cas contrari
 
+  nat pos = hash(k);
+  node_hash *p = _taula[pos];
+  bool existeix = false;
+
+  while (p != NULL and not existeix)
+  {
+    if (p->_k == k)
+    {
+      existeix = true;
+    }
+    else
+    {
+      p = p->_seg;
+    }
+  }
+
+  return existeix;
 }
 
 /* Retorna el valor associat a la clau k; si no existeix cap parell amb

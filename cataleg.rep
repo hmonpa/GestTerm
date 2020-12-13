@@ -6,11 +6,7 @@ struct node_hash {
 node_hash **_taula;             // Taula de punters a node
 
 nat _mida;                      // Mida de la taula
-nat _quants;                    // Nombre d'elements
-nat _colisions;                 // Nombre de colisions
-
-// A determinar:
-nat _tots;                      // Nombre total d'elements del diccionari
+nat _quants;                    // Nombre d'elements del catàleg
 
 static nat const alpha = 0.75;  // Factor de càrrega = _quants / _mida
                                 // ... si es tracta d'un valor considerablement petit,
@@ -37,8 +33,6 @@ void redispersio(bool alpha_alt);
 
 nat primer(nat numelems);
 // Si numelems no es un nombre primer, càlcula el següent
-
-// #### NOTA: Tendriamos que fijar cuales son esos umbrales, para cuando hagamos los métodos assign y elimina ####
 
 
 // ------------------------------------ Hash Table - Raonament i decisions ------------------------------------
