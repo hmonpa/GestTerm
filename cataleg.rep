@@ -1,4 +1,4 @@
-struct node_hash {
+struct node_hash{
     string _k;                  // Clau = String no buit
     Valor _v;                   // Valor
     node_hash *_seg;
@@ -21,8 +21,7 @@ decréixer la sobrecàrrega de l'espai, però incrementa el cost de la cerca */
 
 
 // Mètodes privats
-
-nat hash(const string &k);
+nat hash(const string &k) const;
 // Càlcula la cel·la de la taula per a la clau donada
 
 void redispersio(bool alpha_alt);

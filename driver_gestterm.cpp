@@ -9,7 +9,7 @@
 
 #include "contenidor.hpp"
 #include "ubicacio.hpp"
-//#include "cataleg.hpp"
+#include "cataleg.hpp"
 //#include "terminal.hpp"
 
 using util::nat;
@@ -86,7 +86,7 @@ void* user_init(gen_driver& dr) {
 		  gen_driver::WrongNumArgsMsg);
     }
   }
-  /*else if (tid == "cataleg<int>") {
+  else if (tid == "cataleg<int>") {
     if (dr.nargs()==3) {
       return static_cast<void*>(new cataleg<int>(util::toint(dr.args(3))));
     }
@@ -94,7 +94,7 @@ void* user_init(gen_driver& dr) {
       throw error(gen_driver::WrongNumArgs, gen_driver::nom_mod,
 		  gen_driver::WrongNumArgsMsg);
     }
-  }
+  }/*
   else if (tid == "terminal") {
     if (dr.nargs()==5) {
       if ((util::toint(dr.args(3)) < 0) or (util::toint(dr.args(4)) < 0) or
@@ -138,7 +138,7 @@ void* user_init(gen_driver& dr) {
 
 template <> const char* TypeTraits<contenidor>::name = "contenidor";
 template <> const char* TypeTraits<ubicacio>::name = "ubicacio";
-//template <> const char* TypeTraits<cataleg<int> >::name = "cataleg<int>";
+template <> const char* TypeTraits<cataleg<int> >::name = "cataleg<int>";
 //template <> const char* TypeTraits<terminal>::name = "terminal";
 
 /*-------------------------< CONTENIDOR >--------------------------*/
@@ -274,7 +274,7 @@ void tracta_major_igual(gen_driver& dr) {
 
 
 /*------------------------------< CATALEG<T> >-----------------------*/
-/*
+
 template <typename T>
 void tracta_assig(gen_driver& dr) {
   cataleg<T> *ct = dr.template object<cataleg<T> >();
@@ -282,7 +282,6 @@ void tracta_assig(gen_driver& dr) {
   T *v = dr.object<T> (dr.args(2));
   ct->assig(k, *v);
 }
-
 template <>
 void tracta_assig<int>(gen_driver& dr) {
   cataleg<int> *ct = dr.object<cataleg<int> >();
@@ -290,21 +289,18 @@ void tracta_assig<int>(gen_driver& dr) {
   int v = util::toint(dr.args(2));
   ct->assig(k, v);
 }
-
 template <typename T>
 void tracta_consulta(gen_driver& dr) {
   cataleg<T> *ct = dr.template object<cataleg<T> >();
   string k = dr.args(1);
   dr.get_ostream() << (*ct) [k] << endl;
 }
-
 template <typename T>
 void tracta_elimina(gen_driver& dr) {
   cataleg<T> *ct = dr.template object<cataleg<T> >();
   string k = dr.args(1);
   ct->elimina(k);
 }
-
 template <typename T>
 void tracta_existeix(gen_driver& dr) {
   cataleg<T> *ct = dr.template object<cataleg<T> >();
@@ -312,13 +308,12 @@ void tracta_existeix(gen_driver& dr) {
   dr.get_ostream() <= ct->existeix(k);
   dr.get_ostream() << endl;
 }
-
 template <typename T>
 void tracta_quants(gen_driver& dr) {
   cataleg<T> *ct = dr.template object<cataleg<T> >();
   dr.get_ostream() << ct->quants() << endl;
 }
-*/
+
 
 /*------------------------------< TERMINAL >-----------------------*/
 /*
@@ -327,13 +322,11 @@ void tracta_on(gen_driver& dr) {
   string s = dr.args(1);
   dr.get_ostream() <<  t -> on(s) << endl;
 }
-
 void tracta_longitud_terminal(gen_driver& dr) {
   terminal *t = dr.object<terminal>();
   string s = dr.args(1);
   dr.get_ostream() <<  t -> longitud(s) << endl;
 }
-
 void tracta_contenidor_ocupa(gen_driver& dr) {
   terminal *t = dr.object<terminal>();
   ubicacio *u = dr.object<ubicacio> (dr.args(1));
@@ -341,49 +334,40 @@ void tracta_contenidor_ocupa(gen_driver& dr) {
   t -> contenidor_ocupa(*u, matricula);
   dr.get_ostream() <<  matricula << endl;
 }
-
 void tracta_fragmentacio(gen_driver& dr) {
   terminal *t = dr.object<terminal>();
   dr.get_ostream() <<  t -> fragmentacio() << endl;
 }
-
 void tracta_ops_grua(gen_driver& dr) {
   terminal *t = dr.object<terminal>();
   dr.get_ostream() <<  t -> ops_grua() << endl;
 }
-
 void tracta_area_espera(gen_driver& dr) {
   terminal *t = dr.object<terminal>();
   list<string> L;
   t -> area_espera(L);
   dr.get_ostream() << L << endl;
 }
-
 void tracta_num_fileres(gen_driver& dr) {
   terminal *t = dr.object<terminal>();
   dr.get_ostream() << t -> num_fileres() << endl;
 }
-
 void tracta_num_places(gen_driver& dr) {
   terminal *t = dr.object<terminal>();
   dr.get_ostream() << t -> num_places() << endl;
 }
-
 void tracta_num_pisos(gen_driver& dr)  {
   terminal *t = dr.object<terminal>();
   dr.get_ostream() << t -> num_pisos() << endl;
 }
-
 void tracta_insereix_contenidor(gen_driver& dr) {
   contenidor* c = dr.object<contenidor>(dr.args(1));
   dr.object<terminal>() -> insereix_contenidor(*c);
 }
-
 void tracta_retira_contenidor(gen_driver& dr) {
   string s = dr.args(1);
   dr.object<terminal>() -> retira_contenidor(s);
 }
-
 void tracta_mapa(gen_driver& dr) {
   terminal *t = dr.object<terminal>();
   list<string> l;
@@ -391,7 +375,6 @@ void tracta_mapa(gen_driver& dr) {
   dr.get_ostream() << "espera: " << l << endl;
   dr.get_ostream() << "fragmentacio: " << t->fragmentacio() << endl;
   dr.get_ostream() << "ops_grua: " << t->ops_grua() << endl;
-
   for (nat i=0; i < t->num_fileres(); ++i) {
     dr.get_ostream() << endl << "filera " << i << endl;
     dr.get_ostream() << "---------" << endl;;
@@ -455,13 +438,13 @@ int main(){
   d.add_call(">=", tracta_major_igual, "any", "any");
 
   // cataleg<int>
-  /*
+  
   d.add_call("assig", tracta_assig<int>, "cataleg<int>", "string int");
   d.add_call("val", tracta_consulta<int>, "cataleg<int>", "string");
   d.add_call("existeix", tracta_existeix<int>, "cataleg<int>", "string");
   d.add_call("elimina", tracta_elimina<int>, "cataleg<int>", "string");
   d.add_call("quants", tracta_quants<int>, "cataleg<int>");
-*/
+
   //terminal
   /*
   d.add_call("on", tracta_on, "terminal", "string");
@@ -473,7 +456,6 @@ int main(){
   d.add_call("num_fileres", tracta_num_fileres, "any");
   d.add_call("num_places", tracta_num_places, "any");
   d.add_call("num_pisos", tracta_num_pisos, "any");
-
   d.add_call("insereix_c", tracta_insereix_contenidor, "any", "contenidor");
   d.add_call("insereix_contenidor", tracta_insereix_contenidor, "any", "contenidor");
   d.add_call("retira_c", tracta_retira_contenidor, "any", "string");
@@ -483,7 +465,7 @@ int main(){
   // instal�lacio de tipus
   d.install_type<contenidor>();
   d.install_type<ubicacio>();
-//  d.install_type<cataleg<int> >();
+  d.install_type<cataleg<int> >();
 //  d.install_type<terminal>();
 
   d.go();

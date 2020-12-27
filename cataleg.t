@@ -1,8 +1,9 @@
 // --------------------------- Mètodes privats ---------------------------
+#include <cmath>
 
 // θ(k.size)
 template <typename Valor>
-nat cataleg<Valor>::hash(const string &k)
+nat cataleg<Valor>::hash(const string &k) const
 {
   // PRE: True
   // POST: Retorna la cel·la de la taula on anirà la clau k
@@ -18,7 +19,7 @@ nat cataleg<Valor>::hash(const string &k)
 
 // θ(n)
 template <typename Valor>
-nat cataleg<Valor>::redispersio(bool alpha_alt)
+void cataleg<Valor>::redispersio(bool alpha_alt)
 {
   // PRE: True = _mida*=2; False = _mida/=2
   // POST: Es dobla o redueix a la meitat la mida de la taula i es reinserten els elements
@@ -47,8 +48,7 @@ nat cataleg<Valor>::redispersio(bool alpha_alt)
       aux->_seg = _t[nova_cell];
       _t[nova_cell] = aux;
 
-      if (_t[nova_cell]->_seg == NULL) _quants++;
-      else                             _colisions++;
+      //_quants++;
 
     }
   }
@@ -57,8 +57,8 @@ nat cataleg<Valor>::redispersio(bool alpha_alt)
 }
 
 // θ(1)
-template <typename Valor>
-node_hash cataleg<Valor>::node_hash(const string &k, const Valor &v, node_hash* seg)
+/*template <typename Valor>
+typename cataleg<Valor>::node_hash* cataleg<Valor>::node(const string &k, const Valor &v, node_hash* seg)
 {
     // PRE: True
     // POST: Retorna un node amb clau k, valor v i on el següent element es seg
@@ -68,7 +68,7 @@ node_hash cataleg<Valor>::node_hash(const string &k, const Valor &v, node_hash* 
     n->_v = v;
     n->_seg = seg;
     return n;
-}
+}*/
 
 // θ(n)
 template <typename Valor>
@@ -81,13 +81,13 @@ nat cataleg<Valor>::primer(nat numelems)
   bool es_primer = true;
   if (numelems > 1)
   {
-    int i = 2, orig = 2;
+    int i = 2;
     while (i < numelems and es_primer)
     {
       if (numelems % i == 0)                  // Parell
       {
          numelems += 1;                       // Provem amb el segúent
-         i = orig;
+         i = 2;
       }
       else                                    // Senar
       {
@@ -115,7 +115,7 @@ nat cataleg<Valor>::primer(nat numelems)
     }
   else
   {
-    numelems = orig;                          // orig = 2
+    numelems = 2;                          // orig = 2
   }
 
   return numelems;
@@ -125,7 +125,7 @@ nat cataleg<Valor>::primer(nat numelems)
 
 // θ(n)
 template <typename Valor>
-explicit cataleg<Valor>::cataleg(nat numelems) throw(error)
+cataleg<Valor>::cataleg(nat numelems) throw(error)
 {
   // PRE: True
   // POST: Crea un catàleg buit
@@ -169,7 +169,7 @@ cataleg<Valor>::cataleg(const cataleg& c) throw(error)
         node_hash *p = new node_hash;
         p->_k = l->_k;
         p->_v = l->_v;
-        p->seg = NULL;
+        p->_seg = NULL;
 
         act->_seg = l;
 
@@ -182,7 +182,7 @@ cataleg<Valor>::cataleg(const cataleg& c) throw(error)
 
 // θ(n)
 template <typename Valor>
-cataleg& cataleg<Valor>::operator=(const cataleg& c) throw(error)
+cataleg<Valor>& cataleg<Valor>::operator=(const cataleg& c) throw(error)
 {
   // PRE: True
   // POST: El p.i es una copia exacta de c
@@ -250,13 +250,20 @@ void cataleg<Valor>::assig(const string &k, const Valor &v) throw(error)
       }
     }
 
-    if (trobat)
+    if (existeix)
     {
       p->_v = v;                                        // Només canviem valor associat
     }
     else
     {
-      node_hash *p = new node_hash(k, v, _taula[pos]);  // Creem un nou node i l'afegim al principi de la llista de sinònims
+      //node_hash *p = new node(k, v, _taula[pos]);  // Creem un nou node i l'afegim al principi de la llista de sinònims
+	node_hash *n = new node_hash;
+    	n->_k = k;
+    	n->_v = v;
+	n->_seg = _taula[pos];
+
+	_taula[pos] = n;
+
       ++_quants;                                        // Nou element a la taula
     }
 
@@ -304,7 +311,7 @@ void cataleg<Valor>::elimina(const string &k) throw(error)
     }
     else                                  // Era qualsevol element següent de la llista
     {
-      p_ant->seg = p->_seg;
+      p_ant->_seg = p->_seg;
     }
 
     delete p;
@@ -348,13 +355,34 @@ bool cataleg<Valor>::existeix(const string &k) const throw()
   return existeix;
 }
 
-/* Retorna el valor associat a la clau k; si no existeix cap parell amb
-   clau k llavors genera un error. Exemple:
-     cataleg<int> ct;
-     ...
-     int n = ct["dia"]; */
+// θ(1)
 template <typename Valor>
-Valor cataleg<Valor>::operator[](const string &k) const throw(error){
+Valor cataleg<Valor>::operator[](const string &k) const throw(error)
+{
+  // PRE: True
+  // POST: Retorna el valor associat a la clau k.
+  // 	   Retorna un error en cas de que la clau k no existeixi
+
+  nat pos = hash(k);
+  node_hash *p = _taula[pos];
+  bool existeix = false;
+  Valor v;
+
+  while (p != NULL and not existeix)
+  {
+    if (p->_k == k)
+    {
+      v = p->_v;
+      existeix = true;
+    }
+    else
+    {
+      p = p->_seg;
+    }
+  }
+	
+  if (not existeix) throw error(ClauInexistent);
+  else return v;
 
 }
 
