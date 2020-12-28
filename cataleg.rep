@@ -1,37 +1,32 @@
 struct node_hash{
     string _k;                  // Clau = String no buit
     Valor _v;                   // Valor
-    node_hash *_seg;
+    node_hash *_seg;            // Punter al següent element de la llista de sinònims
 };
 node_hash **_taula;             // Taula de punters a node
 
 nat _mida;                      // Mida de la taula
 nat _quants;                    // Nombre d'elements del catàleg
 
-static nat const alpha = 0.75;  // Factor de càrrega = _quants / _mida
-                                // ... si es tracta d'un valor considerablement petit,
-                                // podem assumir que el cost mitjà de totes les operacions
-                                // del diccionari (menys la constructora -> θ(n)), tenen cost constant -> θ(1)
+static nat const alpha = 0.75;  /* Factor de càrrega = _quants / _mida
+                                   ... si es tracta d'un valor considerablement petit,
+                                   podem assumir que el cost mitjà de totes les operacions
+                                   del diccionari (menys la constructora -> θ(n)), tenen cost constant -> θ(1)
 
-
-
-/* Com a regla general, 0.75 es un bon factor de càrrega ja que ofereix un
-bon equilibri entre costos temporals i espaials, valors més alts fan
-decréixer la sobrecàrrega de l'espai, però incrementa el cost de la cerca */
+                                   Com a regla general, 0.75 es un bon factor de càrrega ja que ofereix un
+                                   bon equilibri entre costos temporals i espaials, valors més alts fan
+                                   decréixer la sobrecàrrega de l'espai, però incrementa el cost de la cerca */
 
 
 // Mètodes privats
-nat hash(const string &k) const;
-// Càlcula la cel·la de la taula per a la clau donada
+nat hash(const string &k) const;  // Càlcula la cel·la de la taula per a la clau donada
 
-void redispersio(bool alpha_alt);
-// Rehash: Duplica la grandària de la taula al doble de l'actual quam el factor de càrrega
-// ... supera un cert llindar, reinsertant la informació de la taula original a la nova taula.
-// També s'aplica a la inversa, per evitar que el factor de càrrega sigui excessivament baix,
-// es redueix a la meitat la grandària de la taula actual.
+void redispersio(bool alpha_alt); /* Rehash: Duplica la grandària de la taula al doble de l'actual quam el factor de càrrega
+                                    ... supera un cert llindar, reinsertant la informació de la taula original a la nova taula.
+                                    També s'aplica a la inversa, per evitar que el factor de càrrega sigui excessivament baix,
+                                    es redueix a la meitat la grandària de la taula actual. */
 
-nat primer(nat numelems);
-// Si numelems no es un nombre primer, càlcula el següent
+nat primer(nat numelems);         // Si numelems no es un nombre primer, busca el següent
 
 
 // ------------------------------------ Hash Table - Raonament i decisions ------------------------------------

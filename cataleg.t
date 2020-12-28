@@ -22,7 +22,7 @@ template <typename Valor>
 void cataleg<Valor>::redispersio(bool alpha_alt)
 {
   // PRE: True = _mida*=2; False = _mida/=2
-  // POST: Es dobla o redueix a la meitat la mida de la taula i es reinserten els elements
+  // POST: Es dobla o redueix a la meitat la mida de la taula, segons si alpha_alt es T o F, i es reinserten els elements
 
   nat _mida_orig = _mida;
   if (alpha_alt) _mida*=2;                  // Factor càrrega supera llindar
@@ -31,6 +31,7 @@ void cataleg<Valor>::redispersio(bool alpha_alt)
   _mida = primer(_mida);                    // La nova taula també ha de tenir una mida que sigui un nombre primer
 
   node_hash **_t = new node_hash *[_mida];
+  _quants = 0;
 
   for (nat i=0; i<_mida; i++)               // Preparació de la nova taula
   {
@@ -48,27 +49,13 @@ void cataleg<Valor>::redispersio(bool alpha_alt)
       aux->_seg = _t[nova_cell];
       _t[nova_cell] = aux;
 
-      //_quants++;
+      _quants++;
 
     }
   }
   delete[] _taula;
   _taula = _t;
 }
-
-// θ(1)
-/*template <typename Valor>
-typename cataleg<Valor>::node_hash* cataleg<Valor>::node(const string &k, const Valor &v, node_hash* seg)
-{
-    // PRE: True
-    // POST: Retorna un node amb clau k, valor v i on el següent element es seg
-
-    node_hash *n = new node_hash;
-    n->_k = k;
-    n->_v = v;
-    n->_seg = seg;
-    return n;
-}*/
 
 // θ(n)
 template <typename Valor>
@@ -115,7 +102,7 @@ nat cataleg<Valor>::primer(nat numelems)
     }
   else
   {
-    numelems = 2;                          // orig = 2
+    numelems = 2;
   }
 
   return numelems;
@@ -256,13 +243,11 @@ void cataleg<Valor>::assig(const string &k, const Valor &v) throw(error)
     }
     else
     {
-      //node_hash *p = new node(k, v, _taula[pos]);  // Creem un nou node i l'afegim al principi de la llista de sinònims
-	node_hash *n = new node_hash;
+      node_hash *n = new node_hash;
     	n->_k = k;
     	n->_v = v;
-	n->_seg = _taula[pos];
-
-	_taula[pos] = n;
+      n->_seg = _taula[pos];
+      _taula[pos] = n;
 
       ++_quants;                                        // Nou element a la taula
     }
@@ -270,7 +255,7 @@ void cataleg<Valor>::assig(const string &k, const Valor &v) throw(error)
     float fc_actual = (float)_quants / (float)_mida;    // Fàctor de càrrega actual = fc_actual
     if (fc_actual > alpha)                              // ... es comprova si es major a 0.75
     {
-      redispersio(true);                               // ... en cas afirmatiu, fem redispersió doblant la mida de la taula
+      redispersio(true);                                // ... en cas afirmatiu, fem redispersió doblant la mida de la taula
     }
   }
   else
@@ -351,7 +336,6 @@ bool cataleg<Valor>::existeix(const string &k) const throw()
       p = p->_seg;
     }
   }
-
   return existeix;
 }
 
@@ -361,7 +345,7 @@ Valor cataleg<Valor>::operator[](const string &k) const throw(error)
 {
   // PRE: True
   // POST: Retorna el valor associat a la clau k.
-  // 	   Retorna un error en cas de que la clau k no existeixi
+  // 	     Retorna un error en cas de que la clau k no existeixi
 
   nat pos = hash(k);
   node_hash *p = _taula[pos];
@@ -380,10 +364,8 @@ Valor cataleg<Valor>::operator[](const string &k) const throw(error)
       p = p->_seg;
     }
   }
-	
   if (not existeix) throw error(ClauInexistent);
   else return v;
-
 }
 
 // θ(1)
