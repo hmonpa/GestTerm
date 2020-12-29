@@ -23,7 +23,8 @@ bool contenidor::matricula_valida(const string &mat)
 contenidor::contenidor(const string &m, nat l) throw(error)
 {
   // PRE: True
-  // POST: Crea un contenidor vàlid
+  // POST: Crea un contenidor vàlid, retorna un error en cas contrari
+  
   if (matricula_valida(m))
   {
     if (l != 10 and l != 20 and l != 30)

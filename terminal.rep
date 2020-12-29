@@ -1,3 +1,12 @@
-nat _n;    // Fileres de la terminal
-nat _m;    // Plaçes per filera
-nat _h;    // Alçada màxima d'apilament
+nat _n;                   // Fileres de la terminal
+nat _m;                   // Plaçes per filera
+nat _h;                   // Alçada màxima d'apilament
+
+// Àrea emmagatzematge (si fos un BST o AVL) -> Consulta amb costos logaritmics
+struct node
+{
+  ubicacio _k;              // Clave = ubicacion
+  node *_fesq;
+  node *_fdret;
+  contenidor _v;            // Valor = contenedor
+};
