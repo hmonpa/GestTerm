@@ -4,12 +4,12 @@ nat _m;                   // Plaçes per filera
 nat _h;                   // Alçada màxima d'apilament
 estrategia _st;           // Estrategia utilizada
 
+static nat const _numelems = _n * _m * _h;
 
-// ---- IDEAS ----
-// Catalegs de la terminal - Guardan los contenedores que se introducen en la terminal (AEM y AM)
-cataleg<contenidor> ct;    // Cataleg de contenidors de la terminal
+// Catalegs para guardar los contenedores que se introducen en la terminal (AEM y AM)
+cataleg<contenidor> ct (_numelems);    // Cataleg de contenidors de la terminal
 
-// Posibilidad 1: Lista enlazada para guardar ubicaciones libres
+// Lista enlazada para guardar ubicaciones libres
 node {
   ubicacio u;
   node *seg;
@@ -18,16 +18,16 @@ node {
 node *head;
 node *pi;                 // Punt interés
 
-// Posibilidad 2: Cataleg para guardar ubicaciones
-cataleg<ubicacio> u;      // Cataleg de ubicacions u
+// Cataleg para guardar ubicaciones presentes en el AM
+cataleg<ubicacio> ut (_numelems);      // Cataleg de ubicacions u
 
 // Àrea espera
 list area_espera;
 
 // Mètodes privats
 // EST FIRST_FIT
-void insereix_cont_FF(const contenidor &c) throw(error);
-void retira_cont_FF(const string &m) throw(error);
+void insereix_ff(const contenidor &c) throw(error);
+void retira_ff(const string &m) throw(error);
 
 // EST LLIURE
 void insereix_cont_LL(const contenidor &c) throw(error);

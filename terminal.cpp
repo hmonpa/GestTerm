@@ -54,10 +54,47 @@ terminal::~terminal() throw()
 
 }
 
+void terminal::insereix_ff(const contenidor &c) throw(error)
+{
+  if (not ct.existeix(c._mat))
+  {
+    ct.assig(c._mat, c);
+
+    node *p = head;
+    bool trobat = false;
+    nat num_ubicacions = c._lon/10;
+
+    while (p != NULL and not trobat)
+    {
+      if (num_ubicacions == 1)
+      {
+        ut.assig(c._mat, p->u);
+        node *aux = p;
+        p = p->_seg;
+        delete aux;
+        head = p;
+        trobat = true;
+      }
+      else if (num_ubicacions == 2) {
+
+        if (p->u._i == p->_seg->u._i and p->u._k == p->_seg->u._k){
+
+        }
+
+      }
+    }
+
+  }
+  else
+  {
+    throw error(MatriculaInexistent);
+  }
+}
+
 void terminal::insereix_contenidor(const contenidor &c) throw(error)
 {
-  if (_st == FIRST_FIT) insereix_cont_FF(c);
-  if (_st == LLIURE) insereix_cont_LL(c);
+  if (_st == FIRST_FIT) insereix_ff(c);
+  if (_st == LLIURE) insereix_ll(c);
 
   // TO DO:
   /* Hay que añadir el contenedor c a la terminal usando la estrategia indicada.
