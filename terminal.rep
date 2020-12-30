@@ -1,12 +1,32 @@
+// Dimensiones de la TERMINAL
+
 nat _n;                   // Fileres de la terminal
 nat _m;                   // Plaçes per filera
 nat _h;                   // Alçada màxima d'apilament
 
-// Àrea emmagatzematge (si fos un BST o AVL) -> Consulta amb costos logaritmics
-struct node
+// Estrategia
+estrategia _st;            // Estrategia utilizada
+
+// Catalegs
+cataleg<contenidor> c;    // Cataleg de contenidors c
+cataleg<ubicacio> u;      // Cataleg de ubicacions u
+
+
+// Mètodes privats
+// EST FIRST_FIT
+void insereix_cont_FF(const contenidor &c) throw(error);
+void retira_cont_FF(const string &m) throw(error);
+
+// EST LLIURE
+void insereix_cont_LL(const contenidor &c) throw(error);
+void retira_cont_LL(const string &m) throw(error);
+
+
+/*struct node
 {
   ubicacio _k;              // Clave = ubicacion
   node *_fesq;
   node *_fdret;
   contenidor _v;            // Valor = contenedor
-};
+  estrategia st;
+};*/

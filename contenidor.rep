@@ -1,3 +1,5 @@
 string _mat;
 nat _lon;
+
+// Mètodes privats
 bool matricula_valida(const string &mat);

@@ -6,7 +6,8 @@
 terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
         _n(n),
         _m(m),
-        _h(h)
+        _h(h),
+        _st(st)
 {
   // PRE: True
   // POST: Crea una terminal vàlida, retorna un error en cas contrari
@@ -17,8 +18,8 @@ terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
     _m = m;
     _h = h;
 
-    if (st == FIRST_FIT)    // TO DO
-    else if (st == LLIURE)  // TO DO
+    if (st == FIRST_FIT)    _st = FIRST_FIT;
+    else if (st == LLIURE)  _st = LLIURE;
   }
   else if (n == 0)
   {
@@ -55,6 +56,9 @@ terminal::~terminal() throw()
 
 void terminal::insereix_contenidor(const contenidor &c) throw(error)
 {
+  if (_st == FIRST_FIT) insereix_cont_FF(c);
+  if (_st == LLIURE) insereix_cont_LL(c);
+
   // TO DO:
   /* Hay que añadir el contenedor c a la terminal usando la estrategia indicada.
      --- EST FIRST_FIT ---
@@ -170,7 +174,11 @@ nat terminal::num_pisos() const throw()
   return _h;
 }
 
+// θ(1)
 estrategia terminal::quina_estrategia() const throw()
 {
+  // PRE:
+  // POST:
 
+  return st;
 }
