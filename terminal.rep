@@ -1,16 +1,28 @@
 // Dimensiones de la TERMINAL
-
 nat _n;                   // Fileres de la terminal
 nat _m;                   // Plaçes per filera
 nat _h;                   // Alçada màxima d'apilament
+estrategia _st;           // Estrategia utilizada
 
-// Estrategia
-estrategia _st;            // Estrategia utilizada
 
-// Catalegs
-cataleg<contenidor> c;    // Cataleg de contenidors c
+// ---- IDEAS ----
+// Catalegs de la terminal - Guardan los contenedores que se introducen en la terminal (AEM y AM)
+cataleg<contenidor> ct;    // Cataleg de contenidors de la terminal
+
+// Posibilidad 1: Lista enlazada para guardar ubicaciones libres
+node {
+  ubicacio u;
+  node *seg;
+  node *ant;
+};
+node *head;
+node *pi;                 // Punt interés
+
+// Posibilidad 2: Cataleg para guardar ubicaciones
 cataleg<ubicacio> u;      // Cataleg de ubicacions u
 
+// Àrea espera
+list area_espera;
 
 // Mètodes privats
 // EST FIRST_FIT
@@ -22,11 +34,20 @@ void insereix_cont_LL(const contenidor &c) throw(error);
 void retira_cont_LL(const string &m) throw(error);
 
 
-/*struct node
-{
-  ubicacio _k;              // Clave = ubicacion
-  node *_fesq;
-  node *_fdret;
-  contenidor _v;            // Valor = contenedor
-  estrategia st;
-};*/
+/* Estructuras utilizadas por el momento:
+  1. catàleg contenidors
+  2. catàleg ubicacions
+  3. lista area_espera
+  4. gestión forats
+
+  ## ###  ##
+  INSEREIX:
+  1. Comprovar si un contenidor existeix:
+    1.1 En caso afirmativo, lanza error de duplicidad
+    1.2 En caso negativo:
+        1.2.1 Buscar primer hueco adecuado para nuestro contenedor --> Función privada, que devuelva la ubicacion
+              y marque que ubicaciones dejan de estar disponible. Existe ese hueco:
+            1.2.1.1 Guardar en catalogo de contenedores el contenedor (objeto) según su clave (matricula)
+            1.2.1.2 Guardar en catalogo de ubicaciones (la que hemos sacado en el paso 1.2.1) según su clave (matricula)
+        1.2.2 Area espera
+*/

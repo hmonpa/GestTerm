@@ -2,8 +2,6 @@
 
 // θ(1)
 ubicacio::ubicacio(int i, int j, int k) throw(error):
-                // Aquestes assignacions eliminen el següent error:
-                // "may be used uninitialized in this function [-Werror=maybe-uninitialized]""
                 _i(i),
                 _j(j),
                 _k(k)
