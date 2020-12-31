@@ -8,7 +8,7 @@ ubicacio::ubicacio(int i, int j, int k) throw(error):
 {
     // PRE: True
     // POST: Crea una ubicació vàlida amb valors i,j,k. És a dir que: (i >=0 and j >=0 and k >=0) or (i >=-1 and j >=0 and k >=0)  and (i >=-1 and j >=-1 and k >=-1)
-    if (((_i >= 0) and (_j >= 0) and (_k >= 0) ) || ((_i == -1) and (_j >= 0) and (_k >= 0)) || ((_i == -1) and (_j == -1) and (_k == -1 )))
+    if (((_i >= 0) and (_j >= 0) and (_k >= 0) ) || ((_i == -1) and (_j == 0) and (_k == 0)) || ((_i == -1) and (_j == -1) and (_k == -1 )))
     {
       _i = i;
       _j = j;

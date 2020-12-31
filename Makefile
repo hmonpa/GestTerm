@@ -10,7 +10,10 @@ ubicacio.o: ubicacio.cpp ubicacio.hpp
 contenidor.o: contenidor.cpp contenidor.hpp
 	g++ -c contenidor.cpp $(OPCIONS)
 
-driver_gestterm.o: driver_gestterm.cpp ubicacio.hpp contenidor.hpp
+#terminal.o: terminal.cpp terminal.hpp
+#	g++ -c terminal.cpp $(OPCIONS)
+
+driver_gestterm.o: driver_gestterm.cpp ubicacio.hpp contenidor.hpp #terminal.hpp
 	g++ -c driver_gestterm.cpp $(OPCIONS)
 
 clean:
