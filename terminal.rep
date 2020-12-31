@@ -1,37 +1,39 @@
-// Dimensiones de la TERMINAL
-nat _n;                   // Fileres de la terminal
-nat _m;                   // Plaçes per filera
-nat _h;                   // Alçada màxima d'apilament
-estrategia _st;           // Estrategia utilizada
+// Dimensions de la terminal
+nat _n;                               // Fileres de la terminal
+nat _m;                               // Plaçes per filera
+nat _h;                               // Alçada màxima d'apilament
+estrategia _st;                       // Estrategia utilizada
 
+//
 static nat const _numelems = _n * _m * _h;
 
-// Catalegs para guardar los contenedores que se introducen en la terminal (AEM y AM)
-cataleg<contenidor> ct (_numelems);    // Cataleg de contenidors de la terminal
+cataleg<contenidor> ct (_numelems);    /* Catàleg que guarda els contenidors presents a la terminal (Àrees d'emmagatzematge i d'espera)*/
 
-// Lista enlazada para guardar ubicaciones libres
-node {
-  ubicacio u;
-  node *seg;
-  node *ant;
+// Llista enllaçada: Guarda ubicacions lliures de l'àrea d'emmagatzematge
+struct node {
+  ubicacio _u;                         // Cada node de la llista guarda un objecte ubicació
+  node *_seg;                          // Punter al següent node
+  node *_ant;
 };
-node *head;
-node *pi;                 // Punt interés
+node *_head;                          // Punter al primer element de la llista d'ubicacions lliures
 
-// Cataleg para guardar ubicaciones presentes en el AM
-cataleg<ubicacio> ut (_numelems);      // Cataleg de ubicacions u
 
-// Àrea espera
-list area_espera;
+cataleg<ubicacio> ut (_numelems);     /* Catàleg que guarda ubicacions presents al àrea d'emmagatzematge un cop son ocupades.
+                                         La clau es la matricula d'un contenidor i el valor es la ubicació on està situat,
+                                         en cas de ser un contenidor de més de 10 peus, la ubicació serà la menor plaça */
+
+// Àrea espera: Guarda contenidors que no poden ser col·locats a l'àrea d'emmagatzematge
+list<contenidor> area_espera;
 
 // Mètodes privats
-// EST FIRST_FIT
-void insereix_ff(const contenidor &c) throw(error);
-void retira_ff(const string &m) throw(error);
+void crea_llista(nat n, nat m, nat h);
 
-// EST LLIURE
-void insereix_cont_LL(const contenidor &c) throw(error);
-void retira_cont_LL(const string &m) throw(error);
+// Estrategia FIRST_FIT
+void insereix_ff(const contenidor &c, nat h) throw(error);         // Insereix contenidor seguint la estrategia FIRST_FIT
+void retira_ff(const string &m) throw(error);               // Retira contenidor seguint la estrategia FIRST_FIT
+// Estrategia LLIURE
+void insereix_cont_LL(const contenidor &c) throw(error);    // Insereix contenidor seguint la estrategia LLIURE
+void retira_cont_LL(const string &m) throw(error);          // Retira contenidor seguint la estrategia FIRST_FIT
 
 
 /* Estructuras utilizadas por el momento:

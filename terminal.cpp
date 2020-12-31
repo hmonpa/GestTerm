@@ -1,5 +1,157 @@
 #include "terminal.hpp"
 
+// --------------------------- Mètodes privats ---------------------------
+
+//
+void terminal::crea_llista(nat n, nat m, nat h):
+        _head(NULL);
+{
+  //
+  //
+
+  _head = NULL;
+  node *act;
+  node *prev = NULL;
+
+  for (nat i=0; i<n; i++)
+  {
+    for (nat j=0; j<m; j++)
+    {
+      for (nat k=0; k<h; k++)
+      {
+        act = new node;
+        act->_u = ubicacio(i,j,k);
+        act->_seg = NULL;
+
+        if (prev == NULL)   _head = act;
+        else                prev->_seg = act;
+
+        prev = act;
+      }
+    }
+  }
+  prev->seg = NULL;
+}
+
+void terminal::insereix_ff(const contenidor &c, nat h) throw(error)
+{
+  if (not ct.existeix(c._mat))
+  {
+    ct.assig(c._mat, c);
+
+    node *p = _head;
+    bool trobat = false;
+    nat long = c._lon/10;
+
+    while (p != NULL and not trobat)
+    {
+      if (long == 1)
+      {
+        node *aux = p;
+        p = p->_seg;
+        delete aux;
+        head = p;
+        trobat = true;
+      }
+      else {
+        nat i = 1;
+        node* inici = p;
+        node* p2;
+        while (i < long and not trobat){
+          // Caso 1: estamos en la base
+          if (inici->u._k == 0)
+          {
+            nat z = 0;
+            while (p!=NULL and z < h) // Fem el salt cap a la següent plaça
+            {
+              p = p->seg;
+              z++;
+            }
+            if (z != h) trobat = true;
+            if (not trobat)
+            {
+              if (inici->u._i == p->u._i and inici->u._k == p->u._k){
+                p2 = p;
+                i++;
+              }
+              else {
+                inici = inici->seg;
+                p = inici;
+                i = 1;
+              }
+            }
+          }
+          // Caso 2: No estamos en la base
+          else if (inici->u._k > 0){
+            nat z = 0;
+            nat estic = inici->u._h;   // Estic = piso en el que nos encontramos
+            while (p!=NULL z < h-estic)
+            {
+              p = p->seg;
+            }
+            if (z != h) trobat = true;
+            if (inici->u._i == p->u._i and inici->u._k == p->u._k){
+              p2 = p;
+              i++;
+            }
+            else {
+              inici = inici->seg;
+              p = inici;
+              i = 1;
+            }
+          }
+        }
+        if (not trobat){  // i == long (Se ha insertado un contenedor)
+                          // manda contenedor i ubicacion al catalogo de ubicaciones
+          if (long == 2){
+            ut.assig(c._mat, inici->u);
+            ut.assig(c._mat, p2->u);
+          }
+          else if (long == 3){
+            ut.assig(c._mat, inici->u);
+            ut.assig(c._mat, p2->u);
+            ut.assig(c._mat, p->u);
+          }
+          // reordena encadenamientos
+          if (inici = _head){
+            _head = inici->_seg;
+            _head->_ant = NULL;
+            _head->_seg = inici->_seg->_seg;
+          }
+          else{
+            inici->_ant->_seg = inici->_seg;
+            inici->_seg->_ant = inici->_ant;
+          }
+          if (p2 != p){
+            p2->_ant->_seg = p2->_seg;
+            p2->_seg->_ant = p2->_ant;
+            p->_ant->_seg = p->_seg;
+            p->_seg->_ant = p->_ant;
+          }
+          else {
+            p->_ant->_seg = p->_seg;
+            p->_seg->_ant = p->_ant;
+          }
+          delete inici;
+          delete p2;
+          delete p;
+        }
+        else {      // se ha salido de la lista de ubicaciones libres
+                    // manda c.matricula al area de espera
+          if (long != 1){
+            area_espera.push_front(c);
+          }
+        }
+      }
+    }
+
+  }
+  else
+  {
+    throw error(MatriculaInexistent);
+  }
+}
+
 // --------------------------- Mètodes públics ---------------------------
 
 //
@@ -7,16 +159,20 @@ terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
         _n(n),
         _m(m),
         _h(h),
-        _st(st)
+        _st(st),
+        _head(NULL)
 {
   // PRE: True
-  // POST: Crea una terminal vàlida, retorna un error en cas contrari
+  // POST: Crea una terminal vàlida, y una llista enllaçada d'ubicacions lliures
+  //       Retorna un error en cas contrari
 
   if ((_n != 0) and (_m != 0) and (_h != 0) and _h <= HMAX and (st == FIRST_FIT || st == LLIURE))
   {
     _n = n;
     _m = m;
     _h = h;
+
+    _head = crea_llista(_n, _m, _h);
 
     if (st == FIRST_FIT)    _st = FIRST_FIT;
     else if (st == LLIURE)  _st = LLIURE;
@@ -52,43 +208,6 @@ terminal& terminal::operator=(const terminal& b) throw(error)
 terminal::~terminal() throw()
 {
 
-}
-
-void terminal::insereix_ff(const contenidor &c) throw(error)
-{
-  if (not ct.existeix(c._mat))
-  {
-    ct.assig(c._mat, c);
-
-    node *p = head;
-    bool trobat = false;
-    nat num_ubicacions = c._lon/10;
-
-    while (p != NULL and not trobat)
-    {
-      if (num_ubicacions == 1)
-      {
-        ut.assig(c._mat, p->u);
-        node *aux = p;
-        p = p->_seg;
-        delete aux;
-        head = p;
-        trobat = true;
-      }
-      else if (num_ubicacions == 2) {
-
-        if (p->u._i == p->_seg->u._i and p->u._k == p->_seg->u._k){
-
-        }
-
-      }
-    }
-
-  }
-  else
-  {
-    throw error(MatriculaInexistent);
-  }
 }
 
 void terminal::insereix_contenidor(const contenidor &c) throw(error)
