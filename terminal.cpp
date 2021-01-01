@@ -201,7 +201,7 @@ terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
     _m = m;
     _h = h;
 
-    _head = crea_llista(_n, _m, _h);
+    crea_llista(_n, _m, _h);
 
     if (st == FIRST_FIT)    _st = FIRST_FIT;
     else if (st == LLIURE)  _st = LLIURE;
