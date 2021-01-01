@@ -2,21 +2,24 @@
 #include <fstream>
 #include <list>
 #include "terminal.hpp"
+#include "cataleg.hpp"
+#include "contenidor.hpp"
+#include "ubicacio.hpp"
 using util::byte;
 using namespace std;
-void printa_lista(list<string> &l)
+/*void printa_lista(list<string> &l)
 {
   list<string>::iterator it;
   for (it = l.begin(); it != l.end(); it++)
       cout << " " << *it;
   cout << endl;
-}
-void estado_terminal(terminal &t) {
-  list<string> l;
-  t.area_espera(l);
-  cout<<"Area d'espera: "<<endl;
-  printa_lista(l);
-  cout<<endl;
+}*/
+//void estado_terminal(terminal &t) {
+  //list<string> l;
+  //t.area_espera(l);
+  //cout<<"Area d'espera: "<<endl;
+  //printa_lista(l);
+  //cout<<endl;
   /*
   cout<<"Operacions de grua: "<<t.ops_grua()<<endl;
   cout<<"Fragmentacion"<<t.fragmentacio()<<endl;
@@ -60,12 +63,13 @@ void estado_terminal(terminal &t) {
     cout << endl;
   }
   */
-}
+//}
 
 int main() {
   cout<<"Introdueix les dimensions del terminal que vols crear:"<<endl;
   nat n, m, h;
   cin>>n>>m>>h;
-  terminal t(n,m,h, terminal::FIRST_FIT);
+  terminal t (n,m,h, terminal::FIRST_FIT);
 
+  return 0;
 }

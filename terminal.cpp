@@ -1,115 +1,118 @@
 #include "terminal.hpp"
-
 // --------------------------- Mètodes privats ---------------------------
 
 //
-void terminal::crea_llista(nat n, nat m, nat h):
-        _head(NULL);
+void terminal::crea_llista(int n, int m, int h)
 {
   //
   //
 
-  _head = NULL;
-  node *act;
+  node *act = p;
   node *prev = NULL;
 
-  for (nat i=0; i<n; i++)
+  for (int i=0; i<n; i++)
   {
-    for (nat j=0; j<m; j++)
+    for (int j=0; j<m; j++)
     {
-      for (nat k=0; k<h; k++)
+      for (int k=0; k<h; k++)
       {
         act = new node;
         act->_u = ubicacio(i,j,k);
         act->_seg = NULL;
 
-        if (prev == NULL)   _head = act;
-        else                prev->_seg = act;
-
+        if (prev == NULL){
+          act->_ant = NULL;
+          _head = act;
+        }
+        else{
+          prev->_seg = act;
+          act->_ant = prev;
+        }
         prev = act;
       }
     }
   }
-  prev->seg = NULL;
+  prev->_seg = NULL;
 }
 
 //
-void terminal::insereix_ff(const contenidor &c, nat h) throw(error)
+void terminal::insereix_ff(contenidor c, nat h) throw(error)
 {
   //
   //
-  if (not ct.existeix(c._mat))
+  if (not ct.existeix(c.matricula()))
   {
-    ct.assig(c._mat, c);
+    //ct.assig(c.matricula(), c);
 
     node *p = _head;
     bool trobat = false;
-    nat long = c._lon/10;
+
+    nat longi = c.longitud() / 10;
 
     while (p != NULL and not trobat)
     {
-      if (long == 1)
+      if (longi == 1)
       {
-        ut.assig(c._mat, p->u);
+        ct.assig(c.matricula(), p->_u);
         // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
         // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
         node *aux = p;
         p = p->_seg;
         delete aux;
         p->_ant = NULL;
-        head = p;
+        _head = p;
         trobat = true;
       }
       else {
         nat i = 1;
         node* inici = p;
         node* p2;
-        while (i < long and not trobat){
+        while (i < longi and not trobat){
           // Caso 1: estamos en la base
-          if (inici->u._k == 0)
+          if (inici->_u.pis() == 0)
           {
             nat z = 0;
             while (p!=NULL and z < h) // Fem el salt cap a la següent plaça
             {
-              p = p->seg;
+              p = p->_seg;
               z++;
             }
             if (z != h) trobat = true;
             if (not trobat)
             {
-              if (inici->u._i == p->u._i and inici->u._k == p->u._k){
+              if (inici->_u.filera() == p->_u.filera() and inici->_u.pis() == p->_u.pis()){
                 p2 = p;
                 i++;
               }
               else {
-                inici = inici->seg;
+                inici = inici->_seg;
                 p = inici;
                 i = 1;
               }
             }
           }
           // Caso 2: No estamos en la base
-          else if (inici->u._k > 0){
+          else if (inici->_u.pis() > 0){
             nat z = 0;
-            nat estic = inici->u._h;   // Estic = piso en el que nos encontramos
-            while (p!=NULL z < h-estic)
+            nat estic = inici->_u.pis();   // Estic = piso en el que nos encontramos
+            while (p!=NULL and z < h-estic)
             {
-              p = p->seg;
+              p = p->_seg;
             }
             if (z != h) trobat = true;
-            if (inici->u._i == p->u._i and inici->u._k == p->u._k){
+            if (inici->_u.filera() == p->_u.filera() and inici->_u.pis() == p->_u.pis()){
               p2 = p;
               i++;
             }
             else {
-              inici = inici->seg;
+              inici = inici->_seg;
               p = inici;
               i = 1;
             }
           }
         }
         if (not trobat){
-          // S'han trobat ubicacions per un contenidor de 20 o 30 peus ( i == long )
+          // S'han trobat ubicacions per un contenidor de 20 o 30 peus ( i == longi )
           // per tant, tenim que:
           //          1- enviar el contenidor en qüestió i la seva ubicació al catàleg d'ubicacions
           //            sent K = contenidor.matricula i V = objecte ubicació.
@@ -117,17 +120,17 @@ void terminal::insereix_ff(const contenidor &c, nat h) throw(error)
 
           // 1- Insercions al catàleg d'ubicacions:
           // Contenidor de 20 peus -> Insercions al catàleg d'ubicacions
-          if (long == 2){
-            ut.assig(c._mat, inici->u);
-            ut.assig(c._mat, p2->u);
+          if (longi == 2){
+            ct.assig(c.matricula(), inici->_u);
+            ct.assig(c.matricula(), p2->_u);
             // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
             // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
           }
           // Contenidor 30 peus -> Insercions al catàleg d'ubicacions
-          else if (long == 3){
-            ut.assig(c._mat, inici->u);
-            ut.assig(c._mat, p2->u);
-            ut.assig(c._mat, p->u);
+          else if (longi == 3){
+            ct.assig(c.matricula(), inici->_u);
+            ct.assig(c.matricula(), p2->_u);
+            ct.assig(c.matricula(), p->_u);
             // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
             // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
           }
@@ -167,8 +170,8 @@ void terminal::insereix_ff(const contenidor &c, nat h) throw(error)
           //    2- Buscnt ubicacions adjacents per a un contenidor de 20 o 30 peus, ens hem sortit
           //    de les dimensions de l'àrea d'emmagatzematge
 
-          // Long != 1, per tant, ens em sortit de les dimensions
-          if (long != 1){
+          // longi != 1, per tant, ens em sortit de les dimensions
+          if (longi != 1){
             _area_espera.push_front(c);
           }
         }
@@ -181,6 +184,18 @@ void terminal::insereix_ff(const contenidor &c, nat h) throw(error)
   }
 }
 
+void terminal::borra_llista_lliures(node *&n)
+{
+    //PRE:
+    //POST:
+    if (n != NULL)
+    {
+        borra_llista_lliures(n->_seg);
+        delete n;
+        n = NULL;
+    }
+}
+
 // --------------------------- Mètodes públics ---------------------------
 
 //
@@ -190,7 +205,6 @@ terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
         _h(h),
         _st(st),
         ct(n*m*h),
-        ut(n*m*h),
         _head(NULL)
 {
   // PRE: True
@@ -211,7 +225,7 @@ terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
   else if (n == 0)
   {
     throw error(NumFileresIncorr);
-  )
+  }
   else if (m == 0)
   {
       throw error(NumPlacesIncorr);
@@ -238,20 +252,22 @@ terminal& terminal::operator=(const terminal& b) throw(error)
 
 terminal::~terminal() throw()
 {
+  ct.~cataleg();
 
+  borra_llista_lliures(_head);
 }
 
 void terminal::insereix_contenidor(const contenidor &c) throw(error)
 {
-  if (_st == FIRST_FIT) insereix_ff(c);
-  if (_st == LLIURE) insereix_ll(c);
+  if (_st == FIRST_FIT) insereix_ff(c, _h);
+  //if (_st == LLIURE) insereix_ll(c);
 
   // TO DO:
   /* Hay que añadir el contenedor c a la terminal usando la estrategia indicada.
      --- EST FIRST_FIT ---
       1. ¿El contenedor existe dentro de la terminal (AM o AEM)?
-        BuscarEnAEM(c._mat)
-        BuscarEnAM(c._mat)
+        BuscarEnAEM(c.matricula())
+        BuscarEnAM(c.matricula())
 
         - En caso afirmativo, genera un error de Duplicidad, ya existe
         - En caso negativo, inserta el contenedor en el primer lugar libre que encuentre del AM
@@ -287,8 +303,8 @@ void terminal::retira_contenidor(const string &m) throw(error)
   /* Se retira el contenedor con matricula m de la terminal (es decir, desaparece de AM y de AEM)
       --- EST FIRST_FIT ---
       1. ¿El contenedor con matricula m existe en la terminal?
-      BuscarEnAEM(c._mat)
-      BuscarEnAM(c._mat)
+      BuscarEnAEM(c.matricula())
+      BuscarEnAM(c.matricula())
 
       - En caso negativo, genera un error, la matricula no existe
       - En caso afirmativo, se tendrán que enviar a la AEM todos los contenedores que hayan encima (Misma N, misma M, H superior)
