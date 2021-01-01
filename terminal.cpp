@@ -33,8 +33,11 @@ void terminal::crea_llista(nat n, nat m, nat h):
   prev->seg = NULL;
 }
 
+//
 void terminal::insereix_ff(const contenidor &c, nat h) throw(error)
 {
+  //
+  //
   if (not ct.existeix(c._mat))
   {
     ct.assig(c._mat, c);
@@ -47,9 +50,13 @@ void terminal::insereix_ff(const contenidor &c, nat h) throw(error)
     {
       if (long == 1)
       {
+        ut.assig(c._mat, p->u);
+        // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
+        // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
         node *aux = p;
         p = p->_seg;
         delete aux;
+        p->_ant = NULL;
         head = p;
         trobat = true;
       }
@@ -101,50 +108,72 @@ void terminal::insereix_ff(const contenidor &c, nat h) throw(error)
             }
           }
         }
-        if (not trobat){  // i == long (Se ha insertado un contenedor)
-                          // manda contenedor i ubicacion al catalogo de ubicaciones
+        if (not trobat){
+          // S'han trobat ubicacions per un contenidor de 20 o 30 peus ( i == long )
+          // per tant, tenim que:
+          //          1- enviar el contenidor en qüestió i la seva ubicació al catàleg d'ubicacions
+          //            sent K = contenidor.matricula i V = objecte ubicació.
+          //          2- reordenar encadenaments a la llista d'ubicacions lliures
+
+          // 1- Insercions al catàleg d'ubicacions:
+          // Contenidor de 20 peus -> Insercions al catàleg d'ubicacions
           if (long == 2){
             ut.assig(c._mat, inici->u);
             ut.assig(c._mat, p2->u);
+            // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
+            // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
           }
+          // Contenidor 30 peus -> Insercions al catàleg d'ubicacions
           else if (long == 3){
             ut.assig(c._mat, inici->u);
             ut.assig(c._mat, p2->u);
             ut.assig(c._mat, p->u);
+            // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
+            // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
           }
-          // reordena encadenamientos
-          if (inici = _head){
+          // 2. Reordenació encadenaments
+          // Inici es el primer node de la llista d'ubicacions lliures (Retirem el primer node)
+          if (inici = _head)
+          {
             _head = inici->_seg;
             _head->_ant = NULL;
             _head->_seg = inici->_seg->_seg;
           }
-          else{
+          // Inici no es el primer node de la llista d'ubicacións lliures (Retirem el primer node)
+          else
+          {
             inici->_ant->_seg = inici->_seg;
             inici->_seg->_ant = inici->_ant;
+            delete inici;
           }
+          // Contenidor de 30 peus, retirem una ubicació que ocupa 3 nodes
           if (p2 != p){
             p2->_ant->_seg = p2->_seg;
             p2->_seg->_ant = p2->_ant;
             p->_ant->_seg = p->_seg;
             p->_seg->_ant = p->_ant;
+            delete p2;
           }
+          // Contenidor de 20 peus, retirem una ubicació que ocupa 2 nodes
           else {
             p->_ant->_seg = p->_seg;
             p->_seg->_ant = p->_ant;
+            delete p;
           }
-          delete inici;
-          delete p2;
-          delete p;
         }
-        else {      // se ha salido de la lista de ubicaciones libres
-                    // manda c.matricula al area de espera
+        else {
+          // El bool trobat es true, per tant, hi han dos possilibitats:
+          //    1- S'ha afegit un contenidor de 10 peus (això es fa directament dins del bucle i es força la sortida amb el booleà)
+          //    2- Buscnt ubicacions adjacents per a un contenidor de 20 o 30 peus, ens hem sortit
+          //    de les dimensions de l'àrea d'emmagatzematge
+
+          // Long != 1, per tant, ens em sortit de les dimensions
           if (long != 1){
             area_espera.push_front(c);
           }
         }
       }
     }
-
   }
   else
   {
