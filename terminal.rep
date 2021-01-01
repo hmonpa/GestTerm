@@ -5,9 +5,9 @@ nat _h;                               // Alçada màxima d'apilament
 estrategia _st;                       // Estrategia utilizada
 
 //
-static nat const _numelems = _n * _m * _h;
+//nat const _numelems = _n * _m * _h;
 
-cataleg<contenidor> ct (_numelems);    /* Catàleg que guarda els contenidors presents a la terminal (Àrees d'emmagatzematge i d'espera)*/
+cataleg<contenidor> ct ();    /* Catàleg que guarda els contenidors presents a la terminal (Àrees d'emmagatzematge i d'espera)*/
 
 // Llista enllaçada: Guarda ubicacions lliures de l'àrea d'emmagatzematge
 struct node {
@@ -18,12 +18,12 @@ struct node {
 node *_head;                          // Punter al primer element de la llista d'ubicacions lliures
 
 
-cataleg<ubicacio> ut (_numelems);     /* Catàleg que guarda ubicacions presents al àrea d'emmagatzematge un cop son ocupades.
+cataleg<ubicacio> ut ();     /* Catàleg que guarda ubicacions presents al àrea d'emmagatzematge un cop son ocupades.
                                          La clau es la matricula d'un contenidor i el valor es la ubicació on està situat,
                                          en cas de ser un contenidor de més de 10 peus, la ubicació serà la menor plaça */
 
 // Àrea espera: Guarda contenidors que no poden ser col·locats a l'àrea d'emmagatzematge
-list<contenidor> area_espera;
+list<contenidor> _area_espera;
 
 // Mètodes privats
 void crea_llista(nat n, nat m, nat h);

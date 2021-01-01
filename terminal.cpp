@@ -169,7 +169,7 @@ void terminal::insereix_ff(const contenidor &c, nat h) throw(error)
 
           // Long != 1, per tant, ens em sortit de les dimensions
           if (long != 1){
-            area_espera.push_front(c);
+            _area_espera.push_front(c);
           }
         }
       }
@@ -189,6 +189,8 @@ terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
         _m(m),
         _h(h),
         _st(st),
+        ct(n*m*h),
+        ut(n*m*h),
         _head(NULL)
 {
   // PRE: True
