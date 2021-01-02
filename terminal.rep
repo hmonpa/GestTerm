@@ -11,7 +11,7 @@ cataleg<ubicacio> ct;                 // Guarda els contenidors presents a la te
 
 // 2. Àrea d'emmagatzematge: Ternary Search Tree
 struct node_tst {
-  int i;                              // Símbol = Enter que representará una filera, plaça o pis
+  int _k;                             // Clau = Enter que representará una filera, plaça o pis
   node_tst *_esq;                     // Fill esquerre
   node_tst *_dret;                    // Fill dret
   node_tst *_cen;                     // Fill central
