@@ -5,9 +5,9 @@ nat _h;                               // Alçada màxima d'apilament
 estrategia _st;                       // Estrategia utilizada
 
 // ----- Estructures de dades -----
-// 1. Catàleg de contenidors
-cataleg<ubicacio> _ct;                 // Guarda els contenidors presents a la terminal (Àrees d'emmagatzematge i d'espera),
-                                      // sent Clau = Matricula i Valor = Ubicació del contenidor
+// 1. Catàleg de contenidors de la terminal (Àrees d'emmagatzematge i espera)
+cataleg<ubicacio> _ct;                // Guarda els contenidors presents a la terminal,
+                                      // sent Clau = Matricula, i Valor = Ubicació del contenidor
 
 // 2. Àrea d'emmagatzematge: Ternary Search Tree
 struct node_tst {
@@ -28,7 +28,7 @@ struct node {
 node *_head;                          // Punter al primer element de la llista d'ubicacions lliures
 
 // 4. Àrea espera: Guarda contenidors que no poden ser col·locats a l'àrea d'emmagatzematge
-list<contenidor> _area_espera;
+list<contenidor> _areaespera;
 
 
 // Mètodes privats

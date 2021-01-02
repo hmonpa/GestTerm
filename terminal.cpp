@@ -152,8 +152,6 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
             _ct.assig(c.matricula(), inici->_u);
             _ct.assig(c.matricula(), p2->_u);
             _ct.assig(c.matricula(), p->_u);
-            // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
-            // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
           }
           // 2. Reordenació encadenaments
           // Inici es el primer node de la llista d'ubicacions lliures (Retirem el primer node)
@@ -184,6 +182,8 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
             p->_seg->_ant = p->_ant;
             delete p;
           }
+          // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambian,
+          // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
         }
         else {
           // El bool trobat es true, per tant, hi han dos possilibitats:
@@ -283,8 +283,19 @@ terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
 
 terminal::terminal(const terminal& b) throw(error)
 {
+  // PRE:
+  // POST:
+
+  _n = b._n;
+  _m = b._m;
+  _h = b._h;
+
+  _head = crea_llista_lliures(_n, _m, _h);
+
+  _ct = b._ct;
+
   _arrel = crea_tst(b._arrel);
-  // TO CONTINUE...
+
 }
 
 terminal& terminal::operator=(const terminal& b) throw(error)
