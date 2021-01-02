@@ -6,7 +6,7 @@ estrategia _st;                       // Estrategia utilizada
 
 // ----- Estructures de dades -----
 // 1. Catàleg de contenidors
-cataleg<ubicacio> ct;                 // Guarda els contenidors presents a la terminal (Àrees d'emmagatzematge i d'espera),
+cataleg<ubicacio> _ct;                 // Guarda els contenidors presents a la terminal (Àrees d'emmagatzematge i d'espera),
                                       // sent Clau = Matricula i Valor = Ubicació del contenidor
 
 // 2. Àrea d'emmagatzematge: Ternary Search Tree
@@ -32,8 +32,11 @@ list<contenidor> _area_espera;
 
 
 // Mètodes privats
-void crea_llista(int n, int m, int h);
+void crea_llista_lliures(int n, int m, int h);
 void borra_llista_lliures(node* &n);
+node_tst* crea_tst(node_tst* n);
+void borra_tst(node_tst* n);
+
 
 // Estrategia FIRST_FIT
 void insereix_ff(contenidor c, nat h) throw(error);         // Insereix contenidor seguint la estrategia FIRST_FIT

@@ -2,10 +2,10 @@
 // --------------------------- Mètodes privats ---------------------------
 
 //
-void terminal::crea_llista(int n, int m, int h)
+void terminal::crea_llista_lliures(int n, int m, int h)
 {
-  //
-  //
+  // PRE:
+  // POST:
 
   node *act = p;
   node *prev = NULL;
@@ -36,10 +36,31 @@ void terminal::crea_llista(int n, int m, int h)
 }
 
 //
+terminal::node_tst* terminal::crea_tst(node_tst *n)
+{
+  // PRE:
+  // POST:
+
+  node_tst* aux = NULL;
+
+  if (n != NULL)
+  {
+    aux = new node_tst;
+    aux->_esq = crea_tst(n->_esq);
+    aux->_cen = crea_tst(n->_cen);
+    aux->_dret = crea_tst(n->_dret);
+    aux->_k = n->_k;
+    aux->_v = n->_v;
+  }
+  return aux;
+}
+
+//
 void terminal::insereix_ff(contenidor c, nat h) throw(error)
 {
-  //
-  //
+  // PRE:
+  // POST:
+
   if (not ct.existeix(c.matricula()))
   {
     //ct.assig(c.matricula(), c);
@@ -53,7 +74,7 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
     {
       if (longi == 1)
       {
-        ct.assig(c.matricula(), p->_u);
+        _ct.assig(c.matricula(), p->_u);
         // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
         // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
         node *aux = p;
@@ -121,16 +142,16 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
           // 1- Insercions al catàleg d'ubicacions:
           // Contenidor de 20 peus -> Insercions al catàleg d'ubicacions
           if (longi == 2){
-            ct.assig(c.matricula(), inici->_u);
-            ct.assig(c.matricula(), p2->_u);
+            _ct.assig(c.matricula(), inici->_u);
+            _ct.assig(c.matricula(), p2->_u);
             // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
             // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
           }
           // Contenidor 30 peus -> Insercions al catàleg d'ubicacions
           else if (longi == 3){
-            ct.assig(c.matricula(), inici->_u);
-            ct.assig(c.matricula(), p2->_u);
-            ct.assig(c.matricula(), p->_u);
+            _ct.assig(c.matricula(), inici->_u);
+            _ct.assig(c.matricula(), p2->_u);
+            _ct.assig(c.matricula(), p->_u);
             // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
             // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
           }
@@ -184,16 +205,35 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
   }
 }
 
+//
 void terminal::borra_llista_lliures(node *&n)
 {
-    //PRE:
-    //POST:
+    // PRE:
+    // POST:
+
     if (n != NULL)
     {
         borra_llista_lliures(n->_seg);
         delete n;
         n = NULL;
     }
+}
+
+//
+void terminal::borra_tst(node_tst* n)
+{
+  // PRE:
+  // POST: 
+
+  if (n != NULL)
+  {
+    borra_tst(n->_esq);
+    borra_tst(n->_cen);
+    borra_tst(n->_dret);
+
+    delete n;
+    n = NULL;
+  }
 }
 
 // --------------------------- Mètodes públics ---------------------------
@@ -204,7 +244,8 @@ terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
         _m(m),
         _h(h),
         _st(st),
-        ct(n*m*h),
+        _ct(n*m*h),
+        _arrel(NULL),
         _head(NULL)
 {
   // PRE: True
@@ -217,7 +258,7 @@ terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
     _m = m;
     _h = h;
 
-    crea_llista(_n, _m, _h);
+    crea_llista_lliures(_n, _m, _h);
 
     if (st == FIRST_FIT)    _st = FIRST_FIT;
     else if (st == LLIURE)  _st = LLIURE;
@@ -242,7 +283,8 @@ terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
 
 terminal::terminal(const terminal& b) throw(error)
 {
-
+  _arrel = crea_tst(b._arrel);
+  // TO CONTINUE...
 }
 
 terminal& terminal::operator=(const terminal& b) throw(error)
@@ -250,10 +292,14 @@ terminal& terminal::operator=(const terminal& b) throw(error)
 
 }
 
+// 
 terminal::~terminal() throw()
 {
-  ct.~cataleg();
+  // PRE:
+  // POST:
 
+  _ct.~cataleg();
+  borra_tst(_arrel);
   borra_llista_lliures(_head);
 }
 
@@ -263,36 +309,21 @@ void terminal::insereix_contenidor(const contenidor &c) throw(error)
   //if (_st == LLIURE) insereix_ll(c);
 
   // TO DO:
-  /* Hay que añadir el contenedor c a la terminal usando la estrategia indicada.
-     --- EST FIRST_FIT ---
-      1. ¿El contenedor existe dentro de la terminal (AM o AEM)?
-        BuscarEnAEM(c.matricula())
-        BuscarEnAM(c.matricula())
+  /*if (c existe) Error duplicidad
+    else
+          1- le busca una ubicacion en la lista de ubicacions lliures
+              1.1- la encuentra:
+                    1.1.1 añade al catalogo ct <K = Matricula y V= Ubicación encontrada>
+                    1.1.2 arregla encadenamientos en la lista de ubicaciones libres, elimina los que se han ocupado
+                    1.1.3 Añade al tst una clave ubicacion = i, j, k -> TO INT -> se le asocia el contenedor como valor
+                    En caso de ser un contenedor de 20 o 30 pies, se harán 2 o 3 addiciones al catalogo ct (el mismo contenedor 2 o 3 veces con sus 2 o 3 ubicaciones),
+                    se tendrán que arreglar 2 o 3 encadenamientos de la lista de lliures y se añadirán al TST 2 o 3 ubicaciones y se les asociará el mismo contenedor como valor.
 
-        - En caso afirmativo, genera un error de Duplicidad, ya existe
-        - En caso negativo, inserta el contenedor en el primer lugar libre que encuentre del AM
-                - En caso de no encontrar ningún lugar libre, inserta el contenedor en el AEM
-
-
-        En caso de ser un BST:
-        Búsqueda en AEM -> Recorrer la lista con un iterador de begin a end
-        Búsqueda en AM -> Recorrer el BST desde la raíz recursivamente hasta que llegue a NULL, comparando cada clave ubicación
-        con el campo "mat" de su valor contenedor (c.mat)
-
-        Tras la búsqueda:
-        1. si ha encontrado la matricula, devuelve el error de duplicidad.
-        2. si no ha encontrado la matricula:
-        Vuelve a la raíz del BST, revisa el primer hueco libre que encuentra y compara si la clave (contenedor) es de lon = 10 (c.lon)
-          - En caso afirmativo, puede colocar el contenedor.
-          - En caso negativo, mira si el siguiente hueco (plaza+1) está vacio.
-                                            - En caso afirmativo, mira el contenedor es de lon = 20
-                                                            - En caso afirmativo lo coloca.
-                                                            - En caso negativo, mira si el siguiente hueco (plaza +1) está vacio
-                                                                              - En caso afirmativo coloca el contenedor (será de lon = 30) asociandolo
-                                                                                a los tres nodos visitados. (Es decir, las claves 000, 010, 020 -> valor A30)
-                                                                              - En caso negativo, busca el siguiente hueco libre y repite el preoceso
-                                            - En caso negativo, busca el siguiente hueco libre y repite el proceso.
-
+                    1.1.4 recorre área de espera de inicio a fin, e intenta hacer un insereix(c) de todos los contenedores almacenados
+                      1.1.4.1 Consigue añadir contenedor: vuelve al paso 1.1.1.
+                      1.1.4.2 No consigue añadir contenedor: sale del método insereix y el área de espera se queda intacta.
+              1.2- no encuentra sitio:
+                    1.2.1 se añade contenedor al área de espera
 
   */
 }
@@ -300,18 +331,6 @@ void terminal::insereix_contenidor(const contenidor &c) throw(error)
 void terminal::retira_contenidor(const string &m) throw(error)
 {
   // TO DO:
-  /* Se retira el contenedor con matricula m de la terminal (es decir, desaparece de AM y de AEM)
-      --- EST FIRST_FIT ---
-      1. ¿El contenedor con matricula m existe en la terminal?
-      BuscarEnAEM(c.matricula())
-      BuscarEnAM(c.matricula())
-
-      - En caso negativo, genera un error, la matricula no existe
-      - En caso afirmativo, se tendrán que enviar a la AEM todos los contenedores que hayan encima (Misma N, misma M, H superior)
-      al contenedor con matricula m, para poder retirar el contenedor con matricula m.
-      Una vez retirado, se intenta traer de vuelta de la AEM a la AM los contenedores retirados anteriormente,
-      si las dimensiones actuales (agujero que ha dejado el contenedor con matricula m) lo permiten
-  */
 }
 
 ubicacio terminal::on(const string &m) const throw()
