@@ -7,7 +7,7 @@ void terminal::crea_llista_lliures(int n, int m, int h)
   // PRE:
   // POST:
 
-  node *act = p;
+  node *act = NULL;
   node *prev = NULL;
 
   for (int i=0; i<n; i++)
@@ -61,7 +61,7 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
   // PRE:
   // POST:
 
-  if (not ct.existeix(c.matricula()))
+  if (not _ct.existeix(c.matricula()))
   {
     //ct.assig(c.matricula(), c);
 
@@ -74,7 +74,10 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
     {
       if (longi == 1)
       {
-        _ct.assig(c.matricula(), p->_u);
+        _ct.assig(c.matricula(), std::make_pair(c,p->_u));
+        // PENDIENTE: Insertar en el área de almacenaje (TST) el contenedor
+        opsgrua++;
+
         // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
         // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
         node *aux = p;
@@ -139,23 +142,29 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
           //            sent K = contenidor.matricula i V = objecte ubicació.
           //          2- reordenar encadenaments a la llista d'ubicacions lliures
 
-          // 1- Insercions al catàleg d'ubicacions:
+          // 1- Insercions al catàleg de contenidors:
           // Contenidor de 20 peus -> Insercions al catàleg d'ubicacions
           if (longi == 2){
-            _ct.assig(c.matricula(), inici->_u);
-            _ct.assig(c.matricula(), p2->_u);
+
+            _ct.assig(c.matricula(), std::make_pair(c,inici->_u));
+            _ct.assig(c.matricula(), std::make_pair(c,p2->_u));
+            // PENDIENTE: Insertar en e área de almacenaje (TST) el contenedor
+            opsgrua++;
             // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
             // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
           }
-          // Contenidor 30 peus -> Insercions al catàleg d'ubicacions
+          // Contenidor 30 peus -> Insercions al catàleg de contenidors
           else if (longi == 3){
-            _ct.assig(c.matricula(), inici->_u);
-            _ct.assig(c.matricula(), p2->_u);
-            _ct.assig(c.matricula(), p->_u);
+            _ct.assig(c.matricula(), std::make_pair(c,inici->_u));
+            _ct.assig(c.matricula(), std::make_pair(c,p2->_u));
+            _ct.assig(c.matricula(), std::make_pair(c,p->_u));
+            // PENDIENTE: Insertar en e área de almacenaje (TST) el contenedor
+            opsgrua++;
+
           }
           // 2. Reordenació encadenaments
           // Inici es el primer node de la llista d'ubicacions lliures (Retirem el primer node)
-          if (inici = _head)
+          if (p->_ant = NULL)
           {
             _head = inici->_seg;
             _head->_ant = NULL;
@@ -193,7 +202,9 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
 
           // longi != 1, per tant, ens em sortit de les dimensions
           if (longi != 1){
-            _area_espera.push_front(c);
+            ubicacio u_ae(-1,0,0);          // Ubicacio especial àrea espera
+            _ct.assig(c.matricula(), std::make_pair(c,u_ae));   // S'afegeix al catàleg de contenidors la matricula amb la ubicació d'àrea espera
+            _area_espera.push_front(c);       // S'afegeix objecte contenidor a l'àrea d'espera
           }
         }
       }
@@ -290,7 +301,7 @@ terminal::terminal(const terminal& b) throw(error)
   _m = b._m;
   _h = b._h;
 
-  _head = crea_llista_lliures(_n, _m, _h);
+  crea_llista_lliures(_n, _m, _h);
 
   _ct = b._ct;
 
@@ -351,7 +362,17 @@ ubicacio terminal::on(const string &m) const throw()
 
 nat terminal::longitud(const string &m) const throw(error)
 {
+  // PRE:
+  // POST:
 
+  if (_ct.existeix(m))
+  {
+
+  }
+  else
+  {
+
+  }
 }
 
 void terminal::contenidor_ocupa(const ubicacio &u, string &m) const throw(error)
@@ -364,9 +385,13 @@ nat terminal::fragmentacio() const throw()
 
 }
 
+//
 nat terminal::ops_grua() const throw()
 {
+  // PRE:
+  // POST:
 
+  return opsgrua;
 }
 
 //

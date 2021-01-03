@@ -6,7 +6,7 @@ estrategia _st;                       // Estrategia utilizada
 
 // ----- Estructures de dades -----
 // 1. Catàleg de contenidors de la terminal (Àrees d'emmagatzematge i espera)
-cataleg<ubicacio> _ct;                // Guarda els contenidors presents a la terminal,
+cataleg< std::pair<contenidor, ubicacio > > _ct;     // Guarda els contenidors presents a la terminal,
                                       // sent Clau = Matricula, i Valor = Ubicació del contenidor
 
 // 2. Àrea d'emmagatzematge: Ternary Search Tree
@@ -28,7 +28,10 @@ struct node {
 node *_head;                          // Punter al primer element de la llista d'ubicacions lliures
 
 // 4. Àrea espera: Guarda contenidors que no poden ser col·locats a l'àrea d'emmagatzematge
-list<contenidor> _areaespera;
+list<contenidor> _area_espera;
+
+
+nat opsgrua;
 
 
 // Mètodes privats
