@@ -1,6 +1,88 @@
 #include "terminal.hpp"
 // --------------------------- Mètodes privats ---------------------------
 
+
+/*terminal::terminal::node (ubicacio u, bool lliu, node* seg, node* ant):
+ _u(u), _lliu(lliu), _seg(seg), _ant(ant)
+{
+
+}*/
+
+// --- ORDENACIÓN -> TRADUCIDA DIRECTAMENTE DE MERGESORT DE ENTEROS, HAY QUE RETOCARLA ---
+/*
+//
+void terminal::merge(list<string> l1, list<string> l2)
+{
+  // PRE:
+  // POST:
+
+  nat cont1 = 0, cont2 = 0;
+  list<string> l(l1.size() + l2.size());
+
+  for (int i=0; i<l.size(); i++){
+      if (cont1 >= l1.size() and cont2 < l2.size()){
+          l(i) = l2(cont2);
+          cont2++;
+      }
+      else if (cont2 >= l2.size() and cont1 < l1.size()){
+          l(i) = l1(cont1);
+          cont1++;
+      }
+      else if (l1(cont1) < l2(cont2) and cont1 < l1.size()){
+          l(i) = l1(cont1);
+          cont1++;
+      }
+      else if (l1(cont1) > l2(cont2) and cont2 < l2.size()){
+          l(i) = l2(cont2);
+          cont2++;
+      }
+  }
+  return l;
+}
+
+// 
+void terminal::mergesort(list<string> &l)
+{
+  // PRE:
+  // POST:
+
+    int mida = l.size();
+    list<string> l2(mida/2);
+    nat m = mida/2;
+    if (mida%2 != 0) m++;
+    list<string> l1(m);                               // Dos llistes de tamany "mida/2" (o un mida/2 i l'altre (mida/2)+1)
+
+    for (nat i=0; i<m; i++){
+        if (i < l2.size()){
+            l2(l2.size()-i-1) = l(mida-i-1);
+        }
+        l1(i) = l(i);
+    }
+    if (l1.size() > 1) mergesort(l1);            // Partir
+    if (l2.size() > 1) mergesort(l2);
+    l = merge(l1, l2);
+}*/
+
+//
+void terminal::inicialitza_am(int n, int m, int h)
+{
+  // PRE:
+  // POST:
+
+  for (int i=0; i<n; i++)
+  {
+    for (int j=0; j<m; j++)
+    {
+      for (int k=0; k<h; k++)
+      {
+        est_am[i][j][k].matricula() = ' ';
+      }
+    }
+  }
+
+}
+
+
 //
 void terminal::crea_llista_lliures(int n, int m, int h)
 {
@@ -18,7 +100,7 @@ void terminal::crea_llista_lliures(int n, int m, int h)
       {
         act = new node;
         act->_u = ubicacio(i,j,k);
-        act->_lliu = true;
+        act->_lliu = true;            // Se inicializan las posiciones a TRUE = Están libres todas inicialmente
         act->_seg = NULL;
 
         if (prev == NULL){
@@ -37,26 +119,6 @@ void terminal::crea_llista_lliures(int n, int m, int h)
 }
 
 //
-terminal::node_tst* terminal::crea_tst(node_tst *n)
-{
-  // PRE:
-  // POST:
-
-  node_tst* aux = NULL;
-
-  if (n != NULL)
-  {
-    aux = new node_tst;
-    aux->_esq = crea_tst(n->_esq);
-    aux->_cen = crea_tst(n->_cen);
-    aux->_dret = crea_tst(n->_dret);
-    aux->_k = n->_k;
-    aux->_v = n->_v;
-  }
-  return aux;
-}
-
-//
 void terminal::insereix_ff(contenidor c, nat h) throw(error)
 {
   // PRE:
@@ -64,8 +126,6 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
 
   if (not _ct.existeix(c.matricula()))
   {
-    //ct.assig(c.matricula(), c);
-
     node *p = _head;
     bool trobat = false;
 
@@ -79,8 +139,13 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
       }
       if (longi == 1)
       {
-        _ct.assig(c.matricula(), std::make_pair(c,p->_u));
-        // PENDIENTE: Insertar en el área de almacenaje (TST) el contenedor
+        _ct.assig(c.matricula(), {c, p->_u});
+        // Se inserta contenedor en su ubicación del área de almacenaje (matriz)
+        int i = p->_u.filera();
+        int j = p->_u.placa();
+        int k = p->_u.pis();
+        est_am[i][j][k] = c;
+
         opsgrua++;
 
         // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
@@ -110,7 +175,7 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
             if (z != h) trobat = true;
             if (not trobat)
             {
-              if (inici->_u.filera() == p->_u.filera() and inici->_u.pis() == p->_u.pis()){
+              if ((inici->_u.filera() == p->_u.filera()) and (inici->_lliu == true and p->_lliu == true)){
                 p2 = p;
                 i++;
               }
@@ -119,25 +184,6 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
                 p = inici;
                 i = 1;
               }
-            }
-          }
-          // Caso 2: No estamos en la base
-          else if (inici->_u.pis() > 0){
-            nat z = 0;
-            nat estic = inici->_u.pis();   // Estic = piso en el que nos encontramos
-            while (p!=NULL and z < h-estic)
-            {
-              p = p->_seg;
-            }
-            if (z != h) trobat = true;
-            if (inici->_u.filera() == p->_u.filera() and inici->_u.pis() == p->_u.pis()){
-              p2 = p;
-              i++;
-            }
-            else {
-              inici = inici->_seg;
-              p = inici;
-              i = 1;
             }
           }
         }
@@ -152,58 +198,58 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
           // Contenidor de 20 peus -> Insercions al catàleg d'ubicacions
           if (longi == 2){
 
-            _ct.assig(c.matricula(), std::make_pair(c,inici->_u));
-            _ct.assig(c.matricula(), std::make_pair(c,p2->_u));
-            // PENDIENTE: Insertar en e área de almacenaje (TST) el contenedor
+            _ct.assig(c.matricula(), {c,inici->_u});
+            _ct.assig(c.matricula(), {c, p2->_u});
+            // Se inserta contenedor en su ubicación del área de almacenaje (matriz)
+            int i = inici->_u.filera();
+            int j = inici->_u.placa();
+            int k = inici->_u.pis();
+            est_am[i][j][k] = c;
+
+            i = p2->_u.filera();
+            j = p2->_u.placa();
+            k = p2->_u.pis();
+            est_am[i][j][k] = c;
+
             opsgrua++;
+
             inici->_lliu = false;
             p2->_lliu = false;
+
             // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
             // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
           }
           // Contenidor 30 peus -> Insercions al catàleg de contenidors
           else if (longi == 3){
-            _ct.assig(c.matricula(), std::make_pair(c,inici->_u));
-            _ct.assig(c.matricula(), std::make_pair(c,p2->_u));
-            _ct.assig(c.matricula(), std::make_pair(c,p->_u));
-            // PENDIENTE: Insertar en e área de almacenaje (TST) el contenedor
+            _ct.assig(c.matricula(), {c, inici->_u});
+            _ct.assig(c.matricula(), {c,p2->_u});
+            _ct.assig(c.matricula(), {c,p->_u});
+            // Se inserta contenedor en su ubicación del área de almacenaje (matriz)
+            int i = inici->_u.filera();
+            int j = inici->_u.placa();
+            int k = inici->_u.pis();
+            est_am[i][j][k] = c;
+
+            i = p2->_u.filera();
+            j = p2->_u.placa();
+            k = p2->_u.pis();
+            est_am[i][j][k] = c;
+
+            i = p->_u.filera();
+            j = p->_u.placa();
+            k = p->_u.pis();
+            est_am[i][j][k] = c;
+
             opsgrua++;
+
             inici->_lliu = false;
             p2->_lliu = false;
             p->_lliu = false;
 
+            // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
+            // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
+
           }
-          // 2. Reordenació encadenaments
-          // Inici es el primer node de la llista d'ubicacions lliures (Retirem el primer node)
-          /*if (p->_ant = NULL)
-          {
-            _head = inici->_seg;
-            _head->_ant = NULL;
-            _head->_seg = inici->_seg->_seg;
-          }
-          // Inici no es el primer node de la llista d'ubicacións lliures (Retirem el primer node)
-          else
-          {
-            inici->_ant->_seg = inici->_seg;
-            inici->_seg->_ant = inici->_ant;
-            delete inici;
-          }
-          // Contenidor de 30 peus, retirem una ubicació que ocupa 3 nodes
-          if (p2 != p){
-            p2->_ant->_seg = p2->_seg;
-            p2->_seg->_ant = p2->_ant;
-            p->_ant->_seg = p->_seg;
-            p->_seg->_ant = p->_ant;
-            delete p2;
-          }
-          // Contenidor de 20 peus, retirem una ubicació que ocupa 2 nodes
-          else {
-            p->_ant->_seg = p->_seg;
-            p->_seg->_ant = p->_ant;
-            delete p;
-          }*/
-          // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambian,
-          // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
         }
         else {
           // El bool trobat es true, per tant, hi han dos possilibitats:
@@ -214,8 +260,8 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
           // longi != 1, per tant, ens em sortit de les dimensions
           if (longi != 1){
             ubicacio u_ae(-1,0,0);          // Ubicacio especial àrea espera
-            _ct.assig(c.matricula(), std::make_pair(c,u_ae));   // S'afegeix al catàleg de contenidors la matricula amb la ubicació d'àrea espera
-            _area_espera.push_front(c);       // S'afegeix objecte contenidor a l'àrea d'espera
+            _ct.assig(c.matricula(), {c, u_ae});   // S'afegeix al catàleg de contenidors la matricula amb la ubicació d'àrea espera
+            _area_espera.push_front(c.matricula());       // S'afegeix objecte contenidor a l'àrea d'espera
           }
         }
       }
@@ -241,22 +287,6 @@ void terminal::borra_llista_lliures(node *&n)
     }
 }
 
-//
-void terminal::borra_tst(node_tst* n)
-{
-  // PRE:
-  // POST: 
-
-  if (n != NULL)
-  {
-    borra_tst(n->_esq);
-    borra_tst(n->_cen);
-    borra_tst(n->_dret);
-
-    delete n;
-    n = NULL;
-  }
-}
 
 // --------------------------- Mètodes públics ---------------------------
 
@@ -266,13 +296,13 @@ terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
         _m(m),
         _h(h),
         _st(st),
-        _ct(n*m*h),
-        _arrel(NULL),
+        _ct(n * m * h),
         _head(NULL)
 {
   // PRE: True
   // POST: Crea una terminal vàlida, y una llista enllaçada d'ubicacions lliures
   //       Retorna un error en cas contrari
+
 
   if ((_n != 0) and (_m != 0) and (_h != 0) and _h <= HMAX and (st == FIRST_FIT || st == LLIURE))
   {
@@ -280,6 +310,9 @@ terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
     _m = m;
     _h = h;
 
+    est_am[_n][_m][_h];
+
+    inicialitza_am(_n, _m, _h);
     crea_llista_lliures(_n, _m, _h);
 
     if (st == FIRST_FIT)    _st = FIRST_FIT;
@@ -313,10 +346,7 @@ terminal::terminal(const terminal& b) throw(error)
   _h = b._h;
 
   crea_llista_lliures(_n, _m, _h);
-
   _ct = b._ct;
-
-  _arrel = crea_tst(b._arrel);
 
 }
 
@@ -332,7 +362,6 @@ terminal::~terminal() throw()
   // POST:
 
   _ct.~cataleg();
-  borra_tst(_arrel);
   borra_llista_lliures(_head);
 }
 
@@ -346,11 +375,11 @@ void terminal::insereix_contenidor(const contenidor &c) throw(error)
     else
           1- le busca una ubicacion en la lista de ubicacions lliures
               1.1- la encuentra:
-                    1.1.1 añade al catalogo ct <K = Matricula y V= <pair<Contenedor, MÍNIMA Ubicación encontrada>>
+                    1.1.1 añade al catalogo ct <K = Matricula y V= struct Cu = <Contenedor, Ubicación>>
                     1.1.2 Marca las ubicaciones de la lista como FALSE en caso de ser ocupadas por un contenedor
-                    1.1.3 Añade al tst una clave ubicacion = i, j, k -> TOSTING -> se le asocia el contenedor como valor
+                    1.1.3 Añade a la matriz el contenedor en la ubicación indicada
                     En caso de ser un contenedor de 20 o 30 pies, se harán 2 o 3 addiciones al catalogo ct (el mismo contenedor 2 o 3 veces con sus 2 o 3 ubicaciones),
-                    se tendrán que arreglar 2 o 3 encadenamientos de la lista de lliures y se añadirán al TST 2 o 3 ubicaciones y se les asociará el mismo contenedor como valor.
+                    se tendrán que marcar como false 2 o 3 ubicaciones de la lista de lliures y se añadirán a la matriz 2 o 3 ubicaciones y se les añdirá el mismo contenedor
 
                     1.1.4 recorre área de espera de inicio a fin, e intenta hacer un insereix(c) de todos los contenedores almacenados
                       1.1.4.1 Consigue añadir contenedor: vuelve al paso 1.1.1.
@@ -372,14 +401,13 @@ ubicacio terminal::on(const string &m) const throw()
   // PRE:
   // POST:
 
+  ubicacio u = ubicacio(-1,-1,-1);
+
   if (_ct.existeix(m))
   {
-    ubicacio u = _ct[m].second;   // No tengo claro que se haga así
+    ubicacio u = _ct[m].u;
   }
-  else
-  {
-    ubicacio u(-1,-1,-1);
-  }
+
   return u;
 }
 
@@ -391,7 +419,7 @@ nat terminal::longitud(const string &m) const throw(error)
 
   if (_ct.existeix(m))
   {
-    contenidor c = _ct[m].first;
+    contenidor c = _ct[m].c;
     nat lon = c.longitud();
     return lon;
   }
@@ -435,7 +463,7 @@ nat terminal::fragmentacio() const throw()
           }
         }
         else {
-          p = p->seg;
+          p = p->_seg;
         } 
       }
       else {                        // Si aux no està a la ultima plaça de la filera
@@ -450,7 +478,7 @@ nat terminal::fragmentacio() const throw()
           }
         }
         else {
-          p = p->seg;
+          p = p->_seg;
         } 
       }
     }
