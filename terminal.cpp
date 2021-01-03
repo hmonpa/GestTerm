@@ -79,7 +79,6 @@ void terminal::inicialitza_am(int n, int m, int h)
       }
     }
   }
-
 }
 
 
@@ -98,16 +97,16 @@ void terminal::crea_llista_lliures(int n, int m, int h)
     {
       for (int k=0; k<h; k++)
       {
-        act = new node;
+        if (prev == NULL){
+          _head = new node;
+          act->_ant = NULL;
+        }
+        act = _head;
         act->_u = ubicacio(i,j,k);
         act->_lliu = true;            // Se inicializan las posiciones a TRUE = Están libres todas inicialmente
         act->_seg = NULL;
-
-        if (prev == NULL){
-          act->_ant = NULL;
-          _head = act;
-        }
-        else{
+        
+        if (prev != NULL){
           prev->_seg = act;
           act->_ant = prev;
         }
@@ -139,7 +138,7 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
       }
       if (longi == 1)
       {
-        _ct.assig(c.matricula(), {c, p->_u});
+        _ct.assig(c.matricula(), std::make_pair(c, p->_u));
         // Se inserta contenedor en su ubicación del área de almacenaje (matriz)
         int i = p->_u.filera();
         int j = p->_u.placa();
@@ -198,8 +197,8 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
           // Contenidor de 20 peus -> Insercions al catàleg d'ubicacions
           if (longi == 2){
 
-            _ct.assig(c.matricula(), {c,inici->_u});
-            _ct.assig(c.matricula(), {c, p2->_u});
+            _ct.assig(c.matricula(), std::make_pair(c, inici->_u));
+            _ct.assig(c.matricula(), std::make_pair(c, p2->_u));
             // Se inserta contenedor en su ubicación del área de almacenaje (matriz)
             int i = inici->_u.filera();
             int j = inici->_u.placa();
@@ -221,9 +220,10 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
           }
           // Contenidor 30 peus -> Insercions al catàleg de contenidors
           else if (longi == 3){
-            _ct.assig(c.matricula(), {c, inici->_u});
-            _ct.assig(c.matricula(), {c,p2->_u});
-            _ct.assig(c.matricula(), {c,p->_u});
+            //_ct.assig(c.matricula(), {c, inici->_u});
+            _ct.assig(c.matricula(), std::make_pair(c, inici->_u));
+            _ct.assig(c.matricula(), std::make_pair(c, p2->_u));
+            _ct.assig(c.matricula(), std::make_pair(c, p->_u));
             // Se inserta contenedor en su ubicación del área de almacenaje (matriz)
             int i = inici->_u.filera();
             int j = inici->_u.placa();
@@ -260,7 +260,7 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
           // longi != 1, per tant, ens em sortit de les dimensions
           if (longi != 1){
             ubicacio u_ae(-1,0,0);          // Ubicacio especial àrea espera
-            _ct.assig(c.matricula(), {c, u_ae});   // S'afegeix al catàleg de contenidors la matricula amb la ubicació d'àrea espera
+            _ct.assig(c.matricula(), std::make_pair(c, u_ae));   // S'afegeix al catàleg de contenidors la matricula amb la ubicació d'àrea espera
             _area_espera.push_front(c.matricula());       // S'afegeix objecte contenidor a l'àrea d'espera
           }
         }
@@ -310,13 +310,14 @@ terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
     _m = m;
     _h = h;
 
-    est_am[_n][_m][_h];
+    est_am = new contenidor [_n][_m][_h];
 
     inicialitza_am(_n, _m, _h);
     crea_llista_lliures(_n, _m, _h);
 
     if (st == FIRST_FIT)    _st = FIRST_FIT;
     else if (st == LLIURE)  _st = LLIURE;
+
   }
   else if (n == 0)
   {
@@ -341,12 +342,12 @@ terminal::terminal(const terminal& b) throw(error)
   // PRE:
   // POST:
 
-  _n = b._n;
+  /*_n = b._n;
   _m = b._m;
   _h = b._h;
 
   crea_llista_lliures(_n, _m, _h);
-  _ct = b._ct;
+  _ct = b._ct;*/
 
 }
 
@@ -405,7 +406,7 @@ ubicacio terminal::on(const string &m) const throw()
 
   if (_ct.existeix(m))
   {
-    ubicacio u = _ct[m].u;
+    ubicacio u = _ct[m].second;
   }
 
   return u;
@@ -419,7 +420,7 @@ nat terminal::longitud(const string &m) const throw(error)
 
   if (_ct.existeix(m))
   {
-    contenidor c = _ct[m].c;
+    contenidor c = _ct[m].first;
     nat lon = c.longitud();
     return lon;
   }
@@ -533,10 +534,10 @@ nat terminal::num_pisos() const throw()
 }
 
 // θ(1)
-estrategia terminal::quina_estrategia() const throw()
+terminal::estrategia terminal::quina_estrategia() const throw()
 {
   // PRE:
   // POST:
 
-  return st;
+  return _st;
 }
