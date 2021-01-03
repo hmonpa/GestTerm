@@ -4,24 +4,15 @@ nat _m;                               // Plaçes per filera
 nat _h;                               // Alçada màxima d'apilament
 estrategia _st;                       // Estrategia utilizada
 
-struct cu {
-	//cu(): c('  ', 10), u(0,0,0) {};
-  	contenidor c;
-  	ubicacio u;
-};
-
-/*cu::cu (contenidor ci, ubicacio ui) throw(error)
-: c(ci), u(ui)
-{
-}*/
-
 // ----- Estructures de dades -----
 // 1. Catàleg de contenidors de la terminal (Àrees d'emmagatzematge i espera)
 cataleg< std::pair<contenidor,ubicacio> > _ct;     // Guarda els contenidors presents a la terminal,
                       // sent Clau = Matricula, i Valor = Cu (Struct format per un camp contenidor i un camp ubicació)
 
 // 2. Àrea d'emmagatzematge: Tridimensional array
-contenidor est_am[0][0][0];
+//contenidor est_am[0][0][0];
+contenidor ***est_am;
+
 
 // 3. Llista enllaçada: Guarda ubicacions lliures de l'àrea d'emmagatzematge
 struct node {
@@ -46,8 +37,10 @@ nat opsgrua;
 
 // Mètodes privats
 void inicialitza_am(int n, int m, int h);
+void borra_am(int n, int m, int h);
 void crea_llista_lliures(int n, int m, int h);
 void borra_llista_lliures(node* &n);
+
 
 // Ordenació àrea espera
 void mergesort(list<string> &l);

@@ -69,18 +69,45 @@ void terminal::inicialitza_am(int n, int m, int h)
   // PRE:
   // POST:
 
+  //est_am = new contenidor**[n];
+
   for (int i=0; i<n; i++)
   {
+    //est_am[i] = new contenidor*[m];
     for (int j=0; j<m; j++)
     {
+      
       for (int k=0; k<h; k++)
       {
-        est_am[i][j][k].matricula() = ' ';
+        est_am[i][j][k] = contenidor(" ", 10);
+        //est_am[i][j][k].matricula() = ' ';
+        //est_am[i][j][k].longitud() = 0;
       }
     }
   }
 }
 
+void terminal::borra_am(int n, int m, int h)
+{
+  // PRE:
+  // POST:
+
+  //est_am = new contenidor**[n];
+
+  for (int i=0; i<n; i++)
+  {
+    //est_am[i] = new contenidor*[m];
+    for (int j=0; j<m; j++)
+    {
+      
+      for (int k=0; k<h; k++)
+      {
+        // PENDT: REVISAR
+        delete[] est_am;
+      }
+    }
+  }
+}
 
 //
 void terminal::crea_llista_lliures(int n, int m, int h)
@@ -138,7 +165,7 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
       }
       if (longi == 1)
       {
-        _ct.assig(c.matricula(), std::make_pair(c, p->_u));
+        _ct.assig(c.matricula(), std::make_pair<contenidor,ubicacio>(c, p->_u));
         // Se inserta contenedor en su ubicación del área de almacenaje (matriz)
         int i = p->_u.filera();
         int j = p->_u.placa();
@@ -197,8 +224,8 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
           // Contenidor de 20 peus -> Insercions al catàleg d'ubicacions
           if (longi == 2){
 
-            _ct.assig(c.matricula(), std::make_pair(c, inici->_u));
-            _ct.assig(c.matricula(), std::make_pair(c, p2->_u));
+            _ct.assig(c.matricula(), std::make_pair<contenidor,ubicacio>(c, inici->_u));
+            _ct.assig(c.matricula(), std::make_pair<contenidor,ubicacio>(c, p2->_u));
             // Se inserta contenedor en su ubicación del área de almacenaje (matriz)
             int i = inici->_u.filera();
             int j = inici->_u.placa();
@@ -221,9 +248,9 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
           // Contenidor 30 peus -> Insercions al catàleg de contenidors
           else if (longi == 3){
             //_ct.assig(c.matricula(), {c, inici->_u});
-            _ct.assig(c.matricula(), std::make_pair(c, inici->_u));
-            _ct.assig(c.matricula(), std::make_pair(c, p2->_u));
-            _ct.assig(c.matricula(), std::make_pair(c, p->_u));
+            _ct.assig(c.matricula(), std::make_pair<contenidor,ubicacio>(c, inici->_u));
+            _ct.assig(c.matricula(), std::make_pair<contenidor,ubicacio>(c, p2->_u));
+            _ct.assig(c.matricula(), std::make_pair<contenidor,ubicacio>(c, p->_u));
             // Se inserta contenedor en su ubicación del área de almacenaje (matriz)
             int i = inici->_u.filera();
             int j = inici->_u.placa();
@@ -260,7 +287,7 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
           // longi != 1, per tant, ens em sortit de les dimensions
           if (longi != 1){
             ubicacio u_ae(-1,0,0);          // Ubicacio especial àrea espera
-            _ct.assig(c.matricula(), std::make_pair(c, u_ae));   // S'afegeix al catàleg de contenidors la matricula amb la ubicació d'àrea espera
+            _ct.assig(c.matricula(), std::make_pair<contenidor,ubicacio>(c, u_ae));   // S'afegeix al catàleg de contenidors la matricula amb la ubicació d'àrea espera
             _area_espera.push_front(c.matricula());       // S'afegeix objecte contenidor a l'àrea d'espera
           }
         }
@@ -309,8 +336,6 @@ terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
     _n = n;
     _m = m;
     _h = h;
-
-    est_am = new contenidor [_n][_m][_h];
 
     inicialitza_am(_n, _m, _h);
     crea_llista_lliures(_n, _m, _h);
@@ -362,8 +387,8 @@ terminal::~terminal() throw()
   // PRE:
   // POST:
 
-  _ct.~cataleg();
-  borra_llista_lliures(_head);
+  //_ct.~cataleg();
+  //borra_llista_lliures(_head);
 }
 
 void terminal::insereix_contenidor(const contenidor &c) throw(error)
