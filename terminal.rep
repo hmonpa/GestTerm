@@ -11,7 +11,7 @@ cataleg< std::pair<contenidor, ubicacio > > _ct;     // Guarda els contenidors p
 
 // 2. Àrea d'emmagatzematge: Ternary Search Tree
 struct node_tst {
-  int _k;                             // Clau = Enter que representará una filera, plaça o pis
+  string _k;                             // Clau = Enter que representará una filera, plaça o pis
   node_tst *_esq;                     // Fill esquerre
   node_tst *_dret;                    // Fill dret
   node_tst *_cen;                     // Fill central
@@ -22,6 +22,7 @@ node_tst *_arrel;
 // 3. Llista enllaçada: Guarda ubicacions lliures de l'àrea d'emmagatzematge
 struct node {
   ubicacio _u;                        // Cada node de la llista guarda un objecte ubicació
+  bool _lliu;                         // Indica si la ubicació està lliure o no
   node *_seg;                         // Punter al següent node
   node *_ant;                         // Punter a l'anterior
 };

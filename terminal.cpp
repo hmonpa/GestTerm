@@ -18,6 +18,7 @@ void terminal::crea_llista_lliures(int n, int m, int h)
       {
         act = new node;
         act->_u = ubicacio(i,j,k);
+        act->_lliu = true;
         act->_seg = NULL;
 
         if (prev == NULL){
@@ -72,6 +73,10 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
 
     while (p != NULL and not trobat)
     {
+      while (p->_lliu != true)
+      {
+        p = p->_seg;
+      }
       if (longi == 1)
       {
         _ct.assig(c.matricula(), std::make_pair(c,p->_u));
@@ -80,11 +85,12 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
 
         // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
         // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
-        node *aux = p;
-        p = p->_seg;
-        delete aux;
-        p->_ant = NULL;
-        _head = p;
+        p->_lliu = false;
+        //node *aux = p;
+        //p = p->_seg;
+        //delete aux;
+        //p->_ant = NULL;
+        //_head = p;
         trobat = true;
       }
       else {
@@ -150,6 +156,8 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
             _ct.assig(c.matricula(), std::make_pair(c,p2->_u));
             // PENDIENTE: Insertar en e área de almacenaje (TST) el contenedor
             opsgrua++;
+            inici->_lliu = false;
+            p2->_lliu = false;
             // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
             // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
           }
@@ -160,11 +168,14 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
             _ct.assig(c.matricula(), std::make_pair(c,p->_u));
             // PENDIENTE: Insertar en e área de almacenaje (TST) el contenedor
             opsgrua++;
+            inici->_lliu = false;
+            p2->_lliu = false;
+            p->_lliu = false;
 
           }
           // 2. Reordenació encadenaments
           // Inici es el primer node de la llista d'ubicacions lliures (Retirem el primer node)
-          if (p->_ant = NULL)
+          /*if (p->_ant = NULL)
           {
             _head = inici->_seg;
             _head->_ant = NULL;
@@ -190,7 +201,7 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
             p->_ant->_seg = p->_seg;
             p->_seg->_ant = p->_ant;
             delete p;
-          }
+          }*/
           // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambian,
           // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
         }
@@ -335,9 +346,9 @@ void terminal::insereix_contenidor(const contenidor &c) throw(error)
     else
           1- le busca una ubicacion en la lista de ubicacions lliures
               1.1- la encuentra:
-                    1.1.1 añade al catalogo ct <K = Matricula y V= Ubicación encontrada>
-                    1.1.2 arregla encadenamientos en la lista de ubicaciones libres, elimina los que se han ocupado
-                    1.1.3 Añade al tst una clave ubicacion = i, j, k -> TO INT -> se le asocia el contenedor como valor
+                    1.1.1 añade al catalogo ct <K = Matricula y V= <pair<Contenedor, MÍNIMA Ubicación encontrada>>
+                    1.1.2 Marca las ubicaciones de la lista como FALSE en caso de ser ocupadas por un contenedor
+                    1.1.3 Añade al tst una clave ubicacion = i, j, k -> TOSTING -> se le asocia el contenedor como valor
                     En caso de ser un contenedor de 20 o 30 pies, se harán 2 o 3 addiciones al catalogo ct (el mismo contenedor 2 o 3 veces con sus 2 o 3 ubicaciones),
                     se tendrán que arreglar 2 o 3 encadenamientos de la lista de lliures y se añadirán al TST 2 o 3 ubicaciones y se les asociará el mismo contenedor como valor.
 
@@ -355,11 +366,24 @@ void terminal::retira_contenidor(const string &m) throw(error)
   // TO DO:
 }
 
+//
 ubicacio terminal::on(const string &m) const throw()
 {
+  // PRE:
+  // POST:
 
+  if (_ct.existeix(m))
+  {
+    ubicacio u = _ct[m].second;   // No tengo claro que se haga así
+  }
+  else
+  {
+    ubicacio u(-1,-1,-1);
+  }
+  return u;
 }
 
+//
 nat terminal::longitud(const string &m) const throw(error)
 {
   // PRE:
@@ -367,11 +391,13 @@ nat terminal::longitud(const string &m) const throw(error)
 
   if (_ct.existeix(m))
   {
-
+    contenidor c = _ct[m].first;
+    nat lon = c.longitud();
+    return lon;
   }
   else
   {
-
+    throw error(MatriculaInexistent);
   }
 }
 
@@ -380,9 +406,55 @@ void terminal::contenidor_ocupa(const ubicacio &u, string &m) const throw(error)
 
 }
 
+// 
 nat terminal::fragmentacio() const throw()
 {
+  // PRE:
+  // POST:
 
+    node *p = _head;
+    nat frag = 0;
+    node* aux = NULL;
+    while (p != NULL)
+    {
+      aux = p;
+      int i = 0;
+      while (aux != NULL and i < _h)
+      {
+        aux = aux->_seg;
+      }
+      if (aux->_u.placa() == _m)      // Si aux està a la ultima plaça de la filera...
+      {
+        if (p->_lliu == false and aux->_lliu == true){   // Es compara la penultima plaça i la ultima, si hi ha un forat a la ultima, frag++
+          if (p->_u.filera() == aux->_u.filera()){
+            frag++;
+          } 
+          while (p != NULL and p->_u.pis() != 0)      // Trobada una fragmentació o sent fileres diferents, passem a la següent plaça
+          {
+            p = p->_seg;
+          }
+        }
+        else {
+          p = p->seg;
+        } 
+      }
+      else {                        // Si aux no està a la ultima plaça de la filera
+        if (p->_lliu == true and aux->_lliu == false) // Es comparen dues places consecutives, si hi ha un forat a la primera d'elles, frag++
+        {  
+          if (p->_u.filera() == aux->_u.filera()){
+            frag++;
+          }
+          while (p != NULL and p->_u.pis() != 0)      // Trobada una fragmentació o sent fileres diferents, passem a la següent plaça
+          {
+            p = p->_seg;
+          }
+        }
+        else {
+          p = p->seg;
+        } 
+      }
+    }
+    return frag;
 }
 
 //
