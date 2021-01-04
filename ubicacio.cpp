@@ -21,7 +21,8 @@ ubicacio::ubicacio(int i, int j, int k) throw(error):
 }
 
 // θ(1)
-ubicacio::ubicacio(const ubicacio& u) throw(error)
+ubicacio::ubicacio(const ubicacio& u) throw(error):
+_i(u._i), _j(u._j), _k(u._k)
 {
     // PRE: True
     // POST: El p.i es una copia exacta de u

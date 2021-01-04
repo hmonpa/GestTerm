@@ -4,10 +4,16 @@ nat _m;                               // Plaçes per filera
 nat _h;                               // Alçada màxima d'apilament
 estrategia _st;                       // Estrategia utilizada
 
+/*struct cu {
+  contenidor c;
+  ubicacio u;
+};*/
 // ----- Estructures de dades -----
 // 1. Catàleg de contenidors de la terminal (Àrees d'emmagatzematge i espera)
+//cataleg<cu> _ct;
 cataleg< std::pair<contenidor,ubicacio> > _ct;     // Guarda els contenidors presents a la terminal,
                       // sent Clau = Matricula, i Valor = Cu (Struct format per un camp contenidor i un camp ubicació)
+
 
 // 2. Àrea d'emmagatzematge: Tridimensional array
 //contenidor est_am[0][0][0];
@@ -26,8 +32,6 @@ struct node {
 
 node *_head;                          // Punter al primer element de la llista d'ubicacions lliures
 
-/*terminal::node::node(ubicacio ui, bool lliuu, node* _segg, node* _antt)
-: _u(ui), _lliu(lliuu), _seg(_segg), _ant(_antt) {}*/
 
 // 4. Àrea espera: Guarda matricules de contenidos que no poden ser col·locats a l'àrea d'emmagatzematge
 list<string> _area_espera;
@@ -37,7 +41,7 @@ nat opsgrua;
 
 // Mètodes privats
 void inicialitza_am(int n, int m, int h);
-void borra_am(int n, int m, int h);
+void borra_am();
 void crea_llista_lliures(int n, int m, int h);
 void borra_llista_lliures(node* &n);
 
@@ -53,4 +57,3 @@ void retira_ff(const string &m) throw(error);               // Retira contenidor
 // Estrategia LLIURE
 void insereix_cont_LL(const contenidor &c) throw(error);    // Insereix contenidor seguint la estrategia LLIURE
 void retira_cont_LL(const string &m) throw(error);          // Retira contenidor seguint la estrategia LLIURE
-
