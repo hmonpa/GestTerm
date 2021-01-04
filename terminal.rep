@@ -4,16 +4,19 @@ nat _m;                               // Plaçes per filera
 nat _h;                               // Alçada màxima d'apilament
 estrategia _st;                       // Estrategia utilizada
 
-/*struct cu {
+struct Cu {                           // Tipo Cu: Contiene un campo contenedor y otro ubicacion
+  Cu(): c(" ", 10), u(0,0,0){}        // Inicializador por defecto del tipo Cu
+
   contenidor c;
   ubicacio u;
-};*/
+};
 // ----- Estructures de dades -----
 // 1. Catàleg de contenidors de la terminal (Àrees d'emmagatzematge i espera)
-//cataleg<cu> _ct;
-cataleg< std::pair<contenidor,ubicacio> > _ct;     // Guarda els contenidors presents a la terminal,
-                      // sent Clau = Matricula, i Valor = Cu (Struct format per un camp contenidor i un camp ubicació)
+cataleg<Cu> _ct;
 
+//typedef std::pair<contenidor,ubicacio> cu;
+//cataleg<cu> *_ct;      // Guarda els contenidors presents a la terminal,
+                         // sent Clau = Matricula, i Valor = Cu (Struct format per un camp contenidor i un camp ubicació)
 
 // 2. Àrea d'emmagatzematge: Tridimensional array
 //contenidor est_am[0][0][0];

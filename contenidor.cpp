@@ -20,8 +20,7 @@ bool contenidor::matricula_valida(const string &mat)
 // --------------------------- Mètodes públics ---------------------------
 
 // θ(m.size)
-contenidor::contenidor(const string &m, nat l) throw(error):
-_mat(m), _lon(l)
+contenidor::contenidor(const string &m, nat l) throw(error)
 {
   // PRE: True
   // POST: Crea un contenidor vàlid, retorna un error en cas contrari
@@ -45,8 +44,7 @@ _mat(m), _lon(l)
 }
 
 // θ(1)
-contenidor::contenidor(const contenidor &u) throw(error):
-_mat(u._mat), _lon(u._lon)
+contenidor::contenidor(const contenidor &u) throw(error)
 {
   // PRE: True
   // POST: El p.i es una copia exacta de u

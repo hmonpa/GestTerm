@@ -10,7 +10,7 @@
 #include "contenidor.hpp"
 #include "ubicacio.hpp"
 #include "cataleg.hpp"
-//#include "terminal.hpp"
+#include "terminal.hpp"
 
 using util::nat;
 using util::byte;
@@ -94,7 +94,7 @@ void* user_init(gen_driver& dr) {
       throw error(gen_driver::WrongNumArgs, gen_driver::nom_mod,
 		  gen_driver::WrongNumArgsMsg);
     }
-  }/*
+  }
   else if (tid == "terminal") {
     if (dr.nargs()==5) {
       if ((util::toint(dr.args(3)) < 0) or (util::toint(dr.args(4)) < 0) or
@@ -129,7 +129,7 @@ void* user_init(gen_driver& dr) {
       throw error(gen_driver::WrongNumArgs,gen_driver::nom_mod,
 		  gen_driver::WrongNumArgsMsg);
     }
-  }*/
+  }
   throw error(gen_driver::WrongTypeArgs,gen_driver::nom_mod,
 	      gen_driver::WrongTypeArgsMsg);
 }
@@ -139,7 +139,7 @@ void* user_init(gen_driver& dr) {
 template <> const char* TypeTraits<contenidor>::name = "contenidor";
 template <> const char* TypeTraits<ubicacio>::name = "ubicacio";
 template <> const char* TypeTraits<cataleg<int> >::name = "cataleg<int>";
-//template <> const char* TypeTraits<terminal>::name = "terminal";
+template <> const char* TypeTraits<terminal>::name = "terminal";
 
 /*-------------------------< CONTENIDOR >--------------------------*/
 
@@ -316,7 +316,7 @@ void tracta_quants(gen_driver& dr) {
 
 
 /*------------------------------< TERMINAL >-----------------------*/
-/*
+
 void tracta_on(gen_driver& dr) {
   terminal *t = dr.object<terminal>();
   string s = dr.args(1);
@@ -413,7 +413,7 @@ void tracta_mapa(gen_driver& dr) {
     dr.get_ostream() << endl;
   }
 }
-*/
+
 
 /*------------------------------< MAIN >-----------------------*/
 
@@ -438,7 +438,7 @@ int main(){
   d.add_call(">=", tracta_major_igual, "any", "any");
 
   // cataleg<int>
-  
+
   d.add_call("assig", tracta_assig<int>, "cataleg<int>", "string int");
   d.add_call("val", tracta_consulta<int>, "cataleg<int>", "string");
   d.add_call("existeix", tracta_existeix<int>, "cataleg<int>", "string");
@@ -446,7 +446,7 @@ int main(){
   d.add_call("quants", tracta_quants<int>, "cataleg<int>");
 
   //terminal
-  /*
+
   d.add_call("on", tracta_on, "terminal", "string");
   d.add_call("long_terminal", tracta_longitud_terminal, "terminal", "string");
   d.add_call("contenidor_ocupa", tracta_contenidor_ocupa, "terminal", "ubicacio");
@@ -461,12 +461,12 @@ int main(){
   d.add_call("retira_c", tracta_retira_contenidor, "any", "string");
   d.add_call("retira_contenidor", tracta_retira_contenidor, "any", "string");
   d.add_call("mapa", tracta_mapa, "any");
-  */
+
   // instal�lacio de tipus
   d.install_type<contenidor>();
   d.install_type<ubicacio>();
   d.install_type<cataleg<int> >();
-//  d.install_type<terminal>();
+  d.install_type<terminal>();
 
   d.go();
 }

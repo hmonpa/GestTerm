@@ -148,7 +148,7 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
   {
     node *p = _head;
     bool trobat = false;
-
+    Cu co_ub;                         // Creació objecte tipus Cu (Struct que conté un camp contenidor i un camp ubicació)
     nat longi = c.longitud() / 10;
 
     while (p != NULL and not trobat)
@@ -159,12 +159,15 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
       }
       if (longi == 1)
       {
-        //_ct.assig(c.matricula(),  {c, p->_u});
-        _ct.assig(c.matricula(), std::make_pair(c, p->_u));
+        co_ub.c = c;
+        co_ub.u = p->_u;
+        _ct.assig(c.matricula(), co_ub);
+        //_ct.assig(c.matricula(), std::make_pair(c, p->_u));
         // Se inserta contenedor en su ubicación del área de almacenaje (matriz)
         int i = p->_u.filera();
         int j = p->_u.placa();
         int k = p->_u.pis();
+        //_ct.assig(c.matricula(), std::make_pair(c, p->_u));
         est_am[i][j][k] = c;
 
         opsgrua++;
@@ -183,6 +186,7 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
         nat i = 1;
         node* inici = p;
         node* p2;
+
         while (i < longi and not trobat){
           // Caso 1: estamos en la base
           if (inici->_u.pis() == 0)
@@ -221,19 +225,25 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
 
             //_ct.assig(c.matricula(), {c, inici->_u});
             //_ct.assig(c.matricula(), {c, p2->_u});
-            _ct.assig(c.matricula(), std::make_pair(c, inici->_u));
-            _ct.assig(c.matricula(), std::make_pair<contenidor,ubicacio>(c, p2->_u));
+
+
             // Se inserta contenedor en su ubicación del área de almacenaje (matriz)
             int i = inici->_u.filera();
             int j = inici->_u.placa();
             int k = inici->_u.pis();
             est_am[i][j][k] = c;
-
+            co_ub.c = c;
+            co_ub.u = inici->_u;
+            _ct.assig(c.matricula(), co_ub);
+            //_ct.assig(c.matricula(), std::make_pair(c, inici->_u));
             i = p2->_u.filera();
             j = p2->_u.placa();
             k = p2->_u.pis();
             est_am[i][j][k] = c;
 
+            co_ub.u = p2->_u;
+            _ct.assig(c.matricula(), co_ub);
+            //_ct.assig(c.matricula(), std::make_pair(c, p2->_u));
             opsgrua++;
 
             inici->_lliu = false;
@@ -247,9 +257,16 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
             //_ct.assig(c.matricula(), {c, inici->_u});
             //_ct.assig(c.matricula(), {c, p2->_u});
             //_ct.assig(c.matricula(), {c, p->_u});
-            _ct.assig(c.matricula(), std::make_pair(c, inici->_u));
-            _ct.assig(c.matricula(), std::make_pair(c, p2->_u));
-            _ct.assig(c.matricula(), std::make_pair(c, p->_u));
+            co_ub.c = c;
+            co_ub.u = inici->_u;
+            _ct.assig(c.matricula(), co_ub);
+            co_ub.u = p2->_u;
+            _ct.assig(c.matricula(), co_ub);
+            co_ub.u = p->_u;
+            _ct.assig(c.matricula(), co_ub);
+            //_ct.assig(c.matricula(), std::make_pair(c, inici->_u));
+            //_ct.assig(c.matricula(), std::make_pair(c, p2->_u));
+            //_ct.assig(c.matricula(), std::make_pair(c, p->_u));
             // Se inserta contenedor en su ubicación del área de almacenaje (matriz)
             int i = inici->_u.filera();
             int j = inici->_u.placa();
@@ -286,9 +303,10 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
           // longi != 1, per tant, ens em sortit de les dimensions
           if (longi != 1){
             ubicacio u_ae(-1,0,0);          // Ubicacio especial àrea espera
-            //_ct.assig(c.matricula(), {c, u_ae});
-            _ct.assig(c.matricula(), std::make_pair(c, u_ae));   // S'afegeix al catàleg de contenidors la matricula amb la ubicació d'àrea espera
-            _area_espera.push_front(c.matricula());       // S'afegeix objecte contenidor a l'àrea d'espera
+            co_ub.u = u_ae;
+            _ct.assig(c.matricula(), co_ub);
+            //_ct.assig(c.matricula(), std::make_pair(c, u_ae));   // S'afegeix al catàleg de contenidors la matricula amb la ubicació d'àrea espera
+            _area_espera.push_front(c.matricula());               // S'afegeix objecte contenidor a l'àrea d'espera
           }
         }
       }
@@ -331,12 +349,14 @@ terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
   //       Retorna un error en cas contrari
 
 
-  if ((_n != 0) and (_m != 0) and (_h != 0) and _h <= HMAX and (st == FIRST_FIT || st == LLIURE))
+  if ((_n != 0) and (_m != 0) and (_h != 0) and (_h <= HMAX) and (st == FIRST_FIT || st == LLIURE))
   {
+
     _n = n;
     _m = m;
     _h = h;
 
+    //cataleg _ct = new cataleg(mida);
     inicialitza_am(_n, _m, _h);
     crea_llista_lliures(_n, _m, _h);
 
@@ -453,7 +473,7 @@ ubicacio terminal::on(const string &m) const throw()
 
   if (_ct.existeix(m))
   {
-    ubicacio u = _ct[m].second;
+    u = _ct[m].u;
   }
 
   return u;
@@ -467,7 +487,7 @@ nat terminal::longitud(const string &m) const throw(error)
 
   if (_ct.existeix(m))
   {
-    contenidor c = _ct[m].first;
+    contenidor c = _ct[m].c;
     nat lon = c.longitud();
     return lon;
   }
@@ -489,7 +509,6 @@ void terminal::contenidor_ocupa(const ubicacio &u, string &m) const throw(error)
   if (((i >= 0) and (j >= 0) and (k >= 0)) || ((i <= _n) and (j <= _m) and (k <= _h)))
   {
     m = est_am[i][j][k].matricula();
-    std::cout << m << '\n';
   }
   else
   {
