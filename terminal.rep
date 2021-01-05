@@ -12,15 +12,11 @@ struct Cu {                           // Tipo Cu: Contiene un campo contenedor y
 };
 // ----- Estructures de dades -----
 // 1. Catàleg de contenidors de la terminal (Àrees d'emmagatzematge i espera)
-cataleg<Cu> _ct;
-
-//typedef std::pair<contenidor,ubicacio> cu;
-//cataleg<cu> *_ct;      // Guarda els contenidors presents a la terminal,
-                         // sent Clau = Matricula, i Valor = Cu (Struct format per un camp contenidor i un camp ubicació)
+cataleg<Cu> _ct;          // Guarda els contenidors presents a la terminal,
+                          // sent Clau = Matricula, i Valor = Cu (Struct format per un camp contenidor i un camp ubicació)
 
 // 2. Àrea d'emmagatzematge: Tridimensional array
-//contenidor est_am[0][0][0];
-contenidor ***est_am;
+string ***est_am;
 
 
 // 3. Llista enllaçada: Guarda ubicacions lliures de l'àrea d'emmagatzematge
@@ -37,7 +33,7 @@ node *_head;                          // Punter al primer element de la llista d
 
 
 // 4. Àrea espera: Guarda matricules de contenidos que no poden ser col·locats a l'àrea d'emmagatzematge
-list<string> _area_espera;
+list<string> l;
 
 nat opsgrua;
 

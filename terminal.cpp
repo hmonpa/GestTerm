@@ -63,19 +63,20 @@ void terminal::inicialitza_am(int n, int m, int h)
   // PRE:
   // POST:
 
-  //***est_am = new contenidor**[n];
-
+  est_am = new string**[n];
   for (int i=0; i<n; i++)
   {
-  //  est_am[i] = new contenidor*[m];
+    est_am[i] = new string*[m]();
+
     for (int j=0; j<m; j++)
     {
+      est_am[i][j] = new string[h]();
 
       for (int k=0; k<h; k++)
       {
-        est_am[i][j][k] = contenidor(" ", 10);
-        //est_am[i][j][k].matricula() = ' ';
-        //est_am[i][j][k].longitud() = 0;
+        string buit = " ";
+        //est_am[i][j][k] = new string();
+        est_am[i][j][k] = buit;
       }
     }
   }
@@ -86,21 +87,15 @@ void terminal::borra_am()
   // PRE:
   // POST:
 
-  //est_am = new contenidor**[n];
-
   for (int i=0; i<_n; i++)
   {
-    //est_am[i] = new contenidor*[m];
     for (int j=0; j<_m; j++)
     {
-
-      for (int k=0; k<_h; k++)
-      {
-        // PENDT: REVISAR
-        delete[] est_am;
-      }
+      delete[] est_am[i][j];
     }
+    delete[] est_am[i];
   }
+  delete[] est_am;
 }
 
 //
@@ -108,10 +103,10 @@ void terminal::crea_llista_lliures(int n, int m, int h)
 {
   // PRE:
   // POST:
-
+  std::cout << n << m << h << '\n';
   node *act = NULL;
   node *prev = NULL;
-
+  int cont = 0;
   for (int i=0; i<n; i++)
   {
     for (int j=0; j<m; j++)
@@ -120,22 +115,29 @@ void terminal::crea_llista_lliures(int n, int m, int h)
       {
         if (prev == NULL){
           _head = new node;
+          _head->_u = ubicacio(i,j,k);
+          act = _head;
           act->_ant = NULL;
         }
-        act = _head;
-        act->_u = ubicacio(i,j,k);
-        act->_lliu = true;            // Se inicializan las posiciones a TRUE = Están libres todas inicialmente
-        act->_seg = NULL;
-
-        if (prev != NULL){
+        else{
+          act = new node;
+          act->_u = ubicacio(i,j,k);
           prev->_seg = act;
           act->_ant = prev;
         }
+        act->_lliu = true;            // Se inicializan las posiciones a TRUE = Están libres todas inicialmente
+        act->_seg = NULL;
         prev = act;
+
+        //std::cout << "Elemento " << cont << " " << act->_u.filera() << act->_u.placa() << act->_u.pis() << '\n';
+        //std::cout << "Campo boleano elemento " << cont << " esta en: " << act->_lliu << '\n';
+
+        cont++;
       }
     }
   }
-  prev->_seg = NULL;
+  //prev->_seg = NULL;
+  std::cout << "Elementos en la lista enlazada: " << cont << '\n';
 }
 
 //
@@ -168,7 +170,7 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
         int j = p->_u.placa();
         int k = p->_u.pis();
         //_ct.assig(c.matricula(), std::make_pair(c, p->_u));
-        est_am[i][j][k] = c;
+        est_am[i][j][k] = c.matricula();
 
         opsgrua++;
 
@@ -231,7 +233,7 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
             int i = inici->_u.filera();
             int j = inici->_u.placa();
             int k = inici->_u.pis();
-            est_am[i][j][k] = c;
+            est_am[i][j][k] = c.matricula();
             co_ub.c = c;
             co_ub.u = inici->_u;
             _ct.assig(c.matricula(), co_ub);
@@ -239,7 +241,7 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
             i = p2->_u.filera();
             j = p2->_u.placa();
             k = p2->_u.pis();
-            est_am[i][j][k] = c;
+            est_am[i][j][k] = c.matricula();
 
             co_ub.u = p2->_u;
             _ct.assig(c.matricula(), co_ub);
@@ -271,17 +273,17 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
             int i = inici->_u.filera();
             int j = inici->_u.placa();
             int k = inici->_u.pis();
-            est_am[i][j][k] = c;
+            est_am[i][j][k] = c.matricula();
 
             i = p2->_u.filera();
             j = p2->_u.placa();
             k = p2->_u.pis();
-            est_am[i][j][k] = c;
+            est_am[i][j][k] = c.matricula();
 
             i = p->_u.filera();
             j = p->_u.placa();
             k = p->_u.pis();
-            est_am[i][j][k] = c;
+            est_am[i][j][k] = c.matricula();
 
             opsgrua++;
 
@@ -306,7 +308,7 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
             co_ub.u = u_ae;
             _ct.assig(c.matricula(), co_ub);
             //_ct.assig(c.matricula(), std::make_pair(c, u_ae));   // S'afegeix al catàleg de contenidors la matricula amb la ubicació d'àrea espera
-            _area_espera.push_front(c.matricula());               // S'afegeix objecte contenidor a l'àrea d'espera
+            l.push_front(c.matricula());               // S'afegeix objecte contenidor a l'àrea d'espera
           }
         }
       }
@@ -348,7 +350,6 @@ terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
   // POST: Crea una terminal vàlida, y una llista enllaçada d'ubicacions lliures
   //       Retorna un error en cas contrari
 
-
   if ((_n != 0) and (_m != 0) and (_h != 0) and (_h <= HMAX) and (st == FIRST_FIT || st == LLIURE))
   {
 
@@ -372,7 +373,7 @@ terminal::terminal(nat n, nat m, nat h, estrategia st) throw(error):
   {
       throw error(NumPlacesIncorr);
   }
-  else if (h == 0)
+  else if (h == 0 or h >= HMAX)
   {
       throw error(AlcadaMaxIncorr);
   }
@@ -395,9 +396,10 @@ terminal::terminal(const terminal& b) throw(error):
   // POST:
 
   inicialitza_am(_n, _m, _h);
+
   crea_llista_lliures(_n, _m, _h);
   _ct = b._ct;
-  _area_espera = b._area_espera;
+  l = b.l;
 }
 
 //
@@ -469,11 +471,12 @@ ubicacio terminal::on(const string &m) const throw()
   // PRE:
   // POST:
 
+  std::cout << _ct.existeix(m) << '\n';
   ubicacio u = ubicacio(-1,-1,-1);
 
   if (_ct.existeix(m))
   {
-    u = _ct[m].u;
+      u = _ct[m].u;
   }
 
   return u;
@@ -506,9 +509,11 @@ void terminal::contenidor_ocupa(const ubicacio &u, string &m) const throw(error)
   int i = u.filera();
   int j = u.placa();
   int k = u.pis();
-  if (((i >= 0) and (j >= 0) and (k >= 0)) || ((i <= _n) and (j <= _m) and (k <= _h)))
+  //std::cout << "dimesiones terminal: " << _n << " X " << _m << " X " << _h << " ";
+  //std::cout << "ubicacion actual: " << i << " X " << j << " X " << k << " ";
+  if (((i >= 0) and (j >= 0) and (k >= 0)) and ((i <= _n) and (j <= _m) and (k <= _h)))
   {
-    m = est_am[i][j][k].matricula();
+    m = est_am[i][j][k];
   }
   else
   {
@@ -524,43 +529,52 @@ nat terminal::fragmentacio() const throw()
 
     node *p = _head;
     nat frag = 0;
+
     node* aux = NULL;
     while (p != NULL)
     {
       aux = p;
       int i = 0;
-      while (aux != NULL and i < _h)
+      if (_m == 1)
       {
-        aux = aux->_seg;
+        if (p->_lliu == true) frag++;
+        while (p != NULL and i < _h) p = p->_seg;
       }
-      if (aux->_u.placa() == _m)      // Si aux està a la ultima plaça de la filera...
+      else
       {
-        if (p->_lliu == false and aux->_lliu == true){   // Es compara la penultima plaça i la ultima, si hi ha un forat a la ultima, frag++
-          if (p->_u.filera() == aux->_u.filera()){
-            frag++;
-          }
-          while (p != NULL and p->_u.pis() != 0)      // Trobada una fragmentació o sent fileres diferents, passem a la següent plaça
-          {
-            p = p->_seg;
-          }
-        }
-        else {
-          p = p->_seg;
-        }
-      }
-      else {                        // Si aux no està a la ultima plaça de la filera
-        if (p->_lliu == true and aux->_lliu == false) // Es comparen dues places consecutives, si hi ha un forat a la primera d'elles, frag++
+        while (aux->_seg != NULL and i < _h)
         {
-          if (p->_u.filera() == aux->_u.filera()){
-            frag++;
+          aux = aux->_seg;
+        }
+        if (aux->_u.placa() == _m)      // Si aux està a la ultima plaça de la filera...
+        {
+          if (p->_lliu == false and aux->_lliu == true){   // Es compara la penultima plaça i la ultima, si hi ha un forat a la ultima, frag++
+            if (p->_u.filera() == aux->_u.filera()){
+              frag++;
+            }
+            while (p != NULL and p->_u.pis() != 0)      // Trobada una fragmentació o sent fileres diferents, passem a la següent plaça
+            {
+              p = p->_seg;
+            }
           }
-          while (p != NULL and p->_u.pis() != 0)      // Trobada una fragmentació o sent fileres diferents, passem a la següent plaça
-          {
+          else {
             p = p->_seg;
           }
         }
-        else {
-          p = p->_seg;
+        else {                        // Si aux no està a la ultima plaça de la filera
+          if (p->_lliu == true and aux->_lliu == false) // Es comparen dues places consecutives, si hi ha un forat a la primera d'elles, frag++
+          {
+            if (p->_u.filera() == aux->_u.filera()){
+              frag++;
+            }
+            while (p != NULL and p->_u.pis() != 0)      // Trobada una fragmentació o sent fileres diferents, passem a la següent plaça
+            {
+              p = p->_seg;
+            }
+          }
+          else {
+            p = p->_seg;
+          }
         }
       }
     }
@@ -582,10 +596,17 @@ void terminal::area_espera(list<string> &l) const throw()
   // PRE:
   // POST:
 
+  //std::cout << l.size() << '\n';
+
+  //list<string> l2;
+  //l2.push_front(" ");
+
+ //l = l2;
+ //std::cout << l.size() << '\n';
   // TO DO :
   // Método de ordenación de la lista l (merge preferiblemente)
   // Bucle que recorra con un iterador desde l.begin hasta l.end y printee los elementos de la lista l
-  for (std::list<string>::iterator it=l.begin(); it!=l.end(); it++)
+  for (list<string>::iterator it=l.begin(); it!=l.end(); it++)
   {
     std::cout << *it << '\n';
   }
