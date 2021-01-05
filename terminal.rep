@@ -34,7 +34,7 @@ node *_head;                          // Punter al primer element de la llista d
 
 
 // 4. Àrea espera: Guarda matricules de contenidos que no poden ser col·locats a l'àrea d'emmagatzematge
-list<string> l;
+list<string> _area_espera;
 
 nat opsgrua;
 
@@ -51,7 +51,7 @@ void mergesort(list<string> &l);
 void merge(list<string> l1, list<string> l2);
 
 // Estrategia FIRST_FIT
-void insereix_ff(Cu co_ub, nat h) throw(error);         // Insereix contenidor seguint la estrategia FIRST_FIT
+void insereix_ff(Cu co_ub) throw(error);         // Insereix contenidor seguint la estrategia FIRST_FIT
 void retira_ff(const string &m) throw(error);               // Retira contenidor seguint la estrategia FIRST_FIT
 
 // Estrategia LLIURE
