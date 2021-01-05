@@ -4,11 +4,12 @@ nat _m;                               // Plaçes per filera
 nat _h;                               // Alçada màxima d'apilament
 estrategia _st;                       // Estrategia utilizada
 
-struct Cu {                           // Tipo Cu: Contiene un campo contenedor y otro ubicacion
-  Cu(): c(" ", 10), u(0,0,0){}        // Inicializador por defecto del tipo Cu
 
+struct Cu {                           // Tipo Cu: Contiene un campo contenedor y otro ubicacion
   contenidor c;
   ubicacio u;
+
+  Cu(): c("A10", 10), u(0,0,0){}        // Inicializador por defecto del tipo Cu
 };
 // ----- Estructures de dades -----
 // 1. Catàleg de contenidors de la terminal (Àrees d'emmagatzematge i espera)
@@ -28,7 +29,7 @@ struct node {
   node *_seg;                         // Punter al següent node
   node *_ant;                         // Punter a l'anterior
 };
-
+nat _size;
 node *_head;                          // Punter al primer element de la llista d'ubicacions lliures
 
 
@@ -50,7 +51,7 @@ void mergesort(list<string> &l);
 void merge(list<string> l1, list<string> l2);
 
 // Estrategia FIRST_FIT
-void insereix_ff(contenidor c, nat h) throw(error);         // Insereix contenidor seguint la estrategia FIRST_FIT
+void insereix_ff(Cu co_ub, nat h) throw(error);         // Insereix contenidor seguint la estrategia FIRST_FIT
 void retira_ff(const string &m) throw(error);               // Retira contenidor seguint la estrategia FIRST_FIT
 
 // Estrategia LLIURE

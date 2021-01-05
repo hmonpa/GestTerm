@@ -63,6 +63,8 @@ void terminal::inicialitza_am(int n, int m, int h)
   // PRE:
   // POST:
 
+//  string buit = "___";
+  string buit = "___";
   est_am = new string**[n];
   for (int i=0; i<n; i++)
   {
@@ -74,7 +76,6 @@ void terminal::inicialitza_am(int n, int m, int h)
 
       for (int k=0; k<h; k++)
       {
-        string buit = " ";
         //est_am[i][j][k] = new string();
         est_am[i][j][k] = buit;
       }
@@ -106,7 +107,7 @@ void terminal::crea_llista_lliures(int n, int m, int h)
   std::cout << n << m << h << '\n';
   node *act = NULL;
   node *prev = NULL;
-  int cont = 0;
+  _size = 0;
   for (int i=0; i<n; i++)
   {
     for (int j=0; j<m; j++)
@@ -128,49 +129,63 @@ void terminal::crea_llista_lliures(int n, int m, int h)
         act->_lliu = true;            // Se inicializan las posiciones a TRUE = Están libres todas inicialmente
         act->_seg = NULL;
         prev = act;
-
+        _size++;
         //std::cout << "Elemento " << cont << " " << act->_u.filera() << act->_u.placa() << act->_u.pis() << '\n';
         //std::cout << "Campo boleano elemento " << cont << " esta en: " << act->_lliu << '\n';
 
-        cont++;
       }
     }
   }
   //prev->_seg = NULL;
-  std::cout << "Elementos en la lista enlazada: " << cont << '\n';
+  //std::cout << "Elementos en la lista enlazada: " << _size << '\n';
 }
 
 //
-void terminal::insereix_ff(contenidor c, nat h) throw(error)
+void terminal::insereix_ff(Cu co_ub, nat h) throw(error)
 {
   // PRE:
   // POST:
-
-  if (not _ct.existeix(c.matricula()))
+  //std::cout << "Matricula de c: " << co_ub.c.matricula() << " y numero de pisos: " << h << '\n';
+  if (not _ct.existeix(co_ub.c.matricula()))
   {
+    nat longi = co_ub.c.longitud() / 10;
+    //std::cout << "Ubicaciones que ocupará c: " << longi << '\n';
+
     node *p = _head;
     bool trobat = false;
-    Cu co_ub;                         // Creació objecte tipus Cu (Struct que conté un camp contenidor i un camp ubicació)
-    nat longi = c.longitud() / 10;
 
+    if (longi > _size){
+      ubicacio u_ae(-1,0,0);          // Ubicacio especial àrea espera
+      co_ub.u = u_ae;
+      _ct.assig(co_ub.c.matricula(), co_ub);
+      l.push_front(co_ub.c.matricula());
+    }
+    else{
     while (p != NULL and not trobat)
     {
-      while (p->_lliu != true)
+      /*while (p != NULL and p->_lliu != true)
       {
         p = p->_seg;
-      }
+      }*/
+      //std::cout << "Puntero actual: " << p->_u.filera() << p->_u.placa() << p->_u.pis()  << '\n';
       if (longi == 1)
       {
-        co_ub.c = c;
+        while (p != NULL and p->_lliu != true){
+          p=p->_seg;
+        }
+        if (p == NULL) trobat = true;
+        else
+        {
         co_ub.u = p->_u;
-        _ct.assig(c.matricula(), co_ub);
+        _ct.assig(co_ub.c.matricula(), co_ub);
+        p->_lliu = false;
         //_ct.assig(c.matricula(), std::make_pair(c, p->_u));
         // Se inserta contenedor en su ubicación del área de almacenaje (matriz)
         int i = p->_u.filera();
         int j = p->_u.placa();
         int k = p->_u.pis();
         //_ct.assig(c.matricula(), std::make_pair(c, p->_u));
-        est_am[i][j][k] = c.matricula();
+        est_am[i][j][k] = co_ub.c.matricula();
 
         opsgrua++;
 
@@ -183,24 +198,28 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
         //p->_ant = NULL;
         //_head = p;
         trobat = true;
+        p=p->_seg;
+        }
       }
       else {
         nat i = 1;
         node* inici = p;
         node* p2;
-
-        while (i < longi and not trobat){
+        //std::cout << "Puntero actual inici: " << inici->_u.filera() << inici->_u.placa() << inici->_u.pis()  << '\n';
+        while (p!= NULL and i < longi and not trobat){
           // Caso 1: estamos en la base
           if (inici->_u.pis() == 0)
           {
             nat z = 0;
+
             while (p!=NULL and z < h) // Fem el salt cap a la següent plaça
             {
+              //std::cout << "Puntero siguiente: " << p->_seg->_u.filera() << p->_seg->_u.placa() << p->_seg->_u.pis()  << '\n';
               p = p->_seg;
               z++;
             }
-            if (z != h) trobat = true;
-            if (not trobat)
+            if (z != h) trobat = true; // ES NULL
+            if (not trobat)             // z == h
             {
               if ((inici->_u.filera() == p->_u.filera()) and (inici->_lliu == true and p->_lliu == true)){
                 p2 = p;
@@ -224,27 +243,25 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
           // 1- Insercions al catàleg de contenidors:
           // Contenidor de 20 peus -> Insercions al catàleg d'ubicacions
           if (longi == 2){
-
             //_ct.assig(c.matricula(), {c, inici->_u});
             //_ct.assig(c.matricula(), {c, p2->_u});
-
 
             // Se inserta contenedor en su ubicación del área de almacenaje (matriz)
             int i = inici->_u.filera();
             int j = inici->_u.placa();
             int k = inici->_u.pis();
-            est_am[i][j][k] = c.matricula();
-            co_ub.c = c;
+            est_am[i][j][k] = co_ub.c.matricula();
+            //co_ub.c = c;
             co_ub.u = inici->_u;
-            _ct.assig(c.matricula(), co_ub);
+            _ct.assig(co_ub.c.matricula(), co_ub);
             //_ct.assig(c.matricula(), std::make_pair(c, inici->_u));
             i = p2->_u.filera();
             j = p2->_u.placa();
             k = p2->_u.pis();
-            est_am[i][j][k] = c.matricula();
+            est_am[i][j][k] = co_ub.c.matricula();
 
             co_ub.u = p2->_u;
-            _ct.assig(c.matricula(), co_ub);
+            _ct.assig(co_ub.c.matricula(), co_ub);
             //_ct.assig(c.matricula(), std::make_pair(c, p2->_u));
             opsgrua++;
 
@@ -259,13 +276,13 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
             //_ct.assig(c.matricula(), {c, inici->_u});
             //_ct.assig(c.matricula(), {c, p2->_u});
             //_ct.assig(c.matricula(), {c, p->_u});
-            co_ub.c = c;
+            //co_ub.c = c;
             co_ub.u = inici->_u;
-            _ct.assig(c.matricula(), co_ub);
+            _ct.assig(co_ub.c.matricula(), co_ub);
             co_ub.u = p2->_u;
-            _ct.assig(c.matricula(), co_ub);
+            _ct.assig(co_ub.c.matricula(), co_ub);
             co_ub.u = p->_u;
-            _ct.assig(c.matricula(), co_ub);
+            _ct.assig(co_ub.c.matricula(), co_ub);
             //_ct.assig(c.matricula(), std::make_pair(c, inici->_u));
             //_ct.assig(c.matricula(), std::make_pair(c, p2->_u));
             //_ct.assig(c.matricula(), std::make_pair(c, p->_u));
@@ -273,17 +290,17 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
             int i = inici->_u.filera();
             int j = inici->_u.placa();
             int k = inici->_u.pis();
-            est_am[i][j][k] = c.matricula();
+            est_am[i][j][k] = co_ub.c.matricula();
 
             i = p2->_u.filera();
             j = p2->_u.placa();
             k = p2->_u.pis();
-            est_am[i][j][k] = c.matricula();
+            est_am[i][j][k] = co_ub.c.matricula();
 
             i = p->_u.filera();
             j = p->_u.placa();
             k = p->_u.pis();
-            est_am[i][j][k] = c.matricula();
+            est_am[i][j][k] = co_ub.c.matricula();
 
             opsgrua++;
 
@@ -301,22 +318,32 @@ void terminal::insereix_ff(contenidor c, nat h) throw(error)
           //    1- S'ha afegit un contenidor de 10 peus (això es fa directament dins del bucle i es força la sortida amb el booleà)
           //    2- Buscnt ubicacions adjacents per a un contenidor de 20 o 30 peus, ens hem sortit
           //    de les dimensions de l'àrea d'emmagatzematge
-
+          ubicacio u_ae(-1,0,0);
+          if (not _ct.existeix(co_ub.c.matricula()))
+          {
+            co_ub.u = u_ae;
+            _ct.assig(co_ub.c.matricula(), co_ub);
+            l.push_front(co_ub.c.matricula());
+          }
           // longi != 1, per tant, ens em sortit de les dimensions
           if (longi != 1){
-            ubicacio u_ae(-1,0,0);          // Ubicacio especial àrea espera
+                      // Ubicacio especial àrea espera
             co_ub.u = u_ae;
-            _ct.assig(c.matricula(), co_ub);
+            _ct.assig(co_ub.c.matricula(), co_ub);
             //_ct.assig(c.matricula(), std::make_pair(c, u_ae));   // S'afegeix al catàleg de contenidors la matricula amb la ubicació d'àrea espera
-            l.push_front(c.matricula());               // S'afegeix objecte contenidor a l'àrea d'espera
+            l.push_front(co_ub.c.matricula());               // S'afegeix objecte contenidor a l'àrea d'espera
+          }
+          else{
+            p=p->_seg;
           }
         }
       }
     }
   }
+  }
   else
   {
-    throw error(MatriculaInexistent);
+    throw error(MatriculaDuplicada);
   }
 }
 
@@ -436,7 +463,10 @@ terminal::~terminal() throw()
 
 void terminal::insereix_contenidor(const contenidor &c) throw(error)
 {
-  if (_st == FIRST_FIT) insereix_ff(c, _h);
+  Cu co_ub;
+  co_ub.c = c;
+  //std::cout << "Cambio de información en el objeto co_ub, campo c: " << co_ub.c.matricula() << '\n';
+  if (_st == FIRST_FIT) insereix_ff(co_ub, _h);
   //if (_st == LLIURE) insereix_ll(c);
 
   // TO DO:
@@ -471,7 +501,7 @@ ubicacio terminal::on(const string &m) const throw()
   // PRE:
   // POST:
 
-  std::cout << _ct.existeix(m) << '\n';
+  //std::cout << _ct.existeix(m) << '\n';
   ubicacio u = ubicacio(-1,-1,-1);
 
   if (_ct.existeix(m))
@@ -514,6 +544,7 @@ void terminal::contenidor_ocupa(const ubicacio &u, string &m) const throw(error)
   if (((i >= 0) and (j >= 0) and (k >= 0)) and ((i <= _n) and (j <= _m) and (k <= _h)))
   {
     m = est_am[i][j][k];
+    if (m == "___") m = "";
   }
   else
   {
