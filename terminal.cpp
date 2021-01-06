@@ -138,7 +138,7 @@ void terminal::crea_llista_lliures(int n, int m, int h)
       }
     }
   }
-  std::cout << "\n\n";
+  std::cout << "\n Tamano total de la lista: " << _size << "\n\n";
   //prev->_seg = NULL;
   //std::cout << "Elementos en la lista enlazada: " << _size << '\n';
 }
@@ -156,19 +156,16 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
     node *p = _head;
     node* inici = p;
     node* p2;
+    nat i = 0;
 
     // El contenedor necesita más ubicaciones que tanaño del área de almacenaje
     if (longi > _size)
     {
-      ubicacio u_ae(-1,0,0);          // Ubicacion especial àrea espera
-      co_ub.u = u_ae;
-      _ct.assig(co_ub.c.matricula(), co_ub);
-      _area_espera.push_front(co_ub.c.matricula());
       trobat = true;
     }
 
     // RECORRIDO EN BUSCA DE UBICACIONES PARA LOS CONTENEDORES
-    while (p != NULL and not trobat)
+    while (p != NULL and i < longi and not trobat)
     {
       // EL CONTENEDOR ES DE 10 PIES
       if (longi == 1)
@@ -192,6 +189,7 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
           int j = p->_u.placa();
           int k = p->_u.pis();
           est_am[i][j][k] = co_ub.c.matricula();
+          //std::cout << "10 PIES: Ub del mapa almacenaje:   " << est_am[i][j][k] << '\n';
           std::cout << "Colocado en " << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
           opsgrua++;
 
@@ -203,62 +201,78 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
       // EL CONTENEDOR ES DE 20 o 30 PIES
       else
       {
-        nat i = 1;
-        while (p!= NULL and i < longi and not trobat)
+        // BUSCA NODO PARA EMPEZAR QUE ESTE LIBRE
+        while (p != NULL and p->_lliu != true)
         {
-          while (p != NULL and p->_lliu != true)
-          {
-            p=p->_seg;
-          }
-          if (p == NULL)
-          {
-            trobat = true;
-          }
-          else
-          {
-            inici = p;
-            int filera_act = inici->_u.filera();
-            int pis_act = inici->_u.pis();
+          p = p->_seg;
+        }
+        if (p == NULL) trobat = true;
 
-            p = p->_seg;
+        inici = p;
+        i++;
+        int filera_act = inici->_u.filera();
+        int pis_act = inici->_u.pis();
+        while (i < longi and not trobat)
+        {
+            //p = p->_seg;
             while (p != NULL and p->_u.pis() != pis_act and p->_u.filera() == filera_act) // Fem el salt cap a la següent plaça
             {
                 p = p->_seg;
             }
+
             if (p == NULL)
             {
               trobat = true; // ES NULL
             }
             else                                    // Se ha encontrado una posible ubicación
             {
+              //std::cout << "Primera lliure: " << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
             // El principio del contenedor NO está en la base
               if (inici->_u.pis() != 0)
               {
+              //  std::cout << "INICI Fuera de la base " << inici->_u.pis() << " esta libre? " << inici->_lliu << '\n';
                 if (p->_ant->_lliu == true)       // El de debajo nuestro no está ocupado, por tanto, no podemos colocar en el aire
                 {
                   inici = inici->_seg;
+                  filera_act = inici->_u.filera();
+                  pis_act = inici->_u.pis();
                   p = inici;
-                  i = 1;
+                  p2 = p;
+                  i = 0;
+                }
+                else
+                {
+                  if ((inici->_u.filera() == p->_u.filera()) and (inici->_lliu == true and p->_lliu == true))
+                  {
+                    i++;
+                    if(i == 2) p2 = p;
+                  }
                 }
               }
               // El principio del contenedor SI está en la base
               else
               {
+                //std::cout << "Inici EN LA BASE: " << inici->_u.pis() << " esta libre? " << inici->_lliu  << '\n';
+                //std::cout << "Inici ocupa" << inici->_u.filera() << " " << inici->_u.placa() << " " << inici->_u.pis() << "\n";
                 if ((inici->_u.filera() == p->_u.filera()) and (inici->_lliu == true and p->_lliu == true))
                 {
-                  p2 = p;
+                  //std::cout << "P ocupa: " << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
                   i++;
+                  if(i == 2) p2 = p;
+                  //std::cout << "Contador i :   " << i << '\n';
                 }
                 else
                 {
                   inici = inici->_seg;
+                  inici->_u.filera();
+                  inici->_u.pis();
                   p = inici;
-                  i = 1;
+                  p2 = p;
+                  i = 0;
                 }
               }
             }
           }
-        }
       }
     }
     // FIN DEL BUCLE -- INSERCIONES
@@ -273,7 +287,8 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
           int j = inici->_u.placa();
           int k = inici->_u.pis();
           est_am[i][j][k] = co_ub.c.matricula();
-
+          std::cout << "20 PIES: Ub del mapa almacenaje:1 " << est_am[i][j][k] << '\n';
+                    std::cout << "Ocupando: " << inici->_u.filera() << " " << inici->_u.placa() << " " << inici->_u.pis() << "\n";
           co_ub.u = inici->_u;
           _ct.assig(co_ub.c.matricula(), co_ub);
 
@@ -281,6 +296,8 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
           j = p2->_u.placa();
           k = p2->_u.pis();
           est_am[i][j][k] = co_ub.c.matricula();
+          std::cout << "20 PIES: Ub del mapa almacenaje:2 " << est_am[i][j][k] << '\n';
+                    std::cout << "Ocupando: " << p2->_u.filera() << " " << p2->_u.placa() << " " << p2->_u.pis() << "\n";
 
           co_ub.u = p2->_u;
           _ct.assig(co_ub.c.matricula(), co_ub);
@@ -305,18 +322,25 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
           int i = inici->_u.filera();
           int j = inici->_u.placa();
           int k = inici->_u.pis();
+
           est_am[i][j][k] = co_ub.c.matricula();
+          std::cout << "30 PIES: Ub del mapa almacenaje:1 " << est_am[i][j][k] << '\n';
+          std::cout << "Ocupando: " << inici->_u.filera() << " " << inici->_u.placa() << " " << inici->_u.pis() << "\n";
 
           i = p2->_u.filera();
           j = p2->_u.placa();
           k = p2->_u.pis();
           est_am[i][j][k] = co_ub.c.matricula();
+          std::cout << "30 PIES: Ub del mapa almacenaje:2 " << est_am[i][j][k] << '\n';
+                    std::cout << "Ocupando: " << p2->_u.filera() << " " << p2->_u.placa() << " " << p2->_u.pis() << "\n";
 
           i = p->_u.filera();
           j = p->_u.placa();
           k = p->_u.pis();
           est_am[i][j][k] = co_ub.c.matricula();
+          std::cout << "30 PIES: Ub del mapa almacenaje:3 " << est_am[i][j][k] << '\n';
 
+                    std::cout << "Ocupando: " << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
           opsgrua++;
 
           inici->_lliu = false;
