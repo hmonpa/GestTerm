@@ -214,7 +214,7 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
         int pis_act = inici->_u.pis();
         while (i < longi and not trobat)
         {
-            //p = p->_seg;
+            p = p->_seg;
             while (p != NULL and p->_u.pis() != pis_act and p->_u.filera() == filera_act) // Fem el salt cap a la següent plaça
             {
                 p = p->_seg;
