@@ -110,7 +110,7 @@ void terminal::crea_llista_lliures(int n, int m, int h)
   node *prev = NULL;
   _size = 0;
 
-  std::cout << "\n ---- Lista de ubicaciones libres: ----" << '\n';
+  //std::cout << "\n ---- Lista de ubicaciones libres: ----" << '\n';
   for (int i=0; i<n; i++)
   {
     for (int j=0; j<m; j++)
@@ -248,15 +248,16 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
             }
           }
       }
-  }
+    }
     // FIN DEL BUCLE -- INSERCIONES
 
     // TROBAT = FALSE -> SE AÑADE AL CATALEG Y AL AREA DE ALMACENAJE
     if (not trobat)
     {
-      // 1- Insercions al catàleg de contenidors:
-      // Contenidor de 20 peus -> Insercions al catàleg d'ubicacions
-      if (longi == 2){
+        // 1- Insercions al catàleg de contenidors:
+        // Contenidor de 20 peus -> Insercions al catàleg d'ubicacions
+      if (longi == 2)
+      {
         int i = inici->_u.filera();
         int j = inici->_u.placa();
         int k = inici->_u.pis();
@@ -285,7 +286,8 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
         // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
       }
       // Contenidor 30 peus -> Insercions al catàleg de contenidors
-      else if (longi == 3){
+      else if (longi == 3)
+      {
         co_ub.u = inici->_u;
         _ct.assig(co_ub.c.matricula(), co_ub);
         co_ub.u = p2->_u;
@@ -299,14 +301,14 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
 
         est_am[i][j][k] = co_ub.c.matricula();
         //std::cout << "30 PIES: Ub del mapa almacenaje:1 " << est_am[i][j][k] << '\n';
-      //std::cout << "Ocupando: " << inici->_u.filera() << " " << inici->_u.placa() << " " << inici->_u.pis() << "\n";
+        //std::cout << "Ocupando: " << inici->_u.filera() << " " << inici->_u.placa() << " " << inici->_u.pis() << "\n";
 
         i = p2->_u.filera();
         j = p2->_u.placa();
         k = p2->_u.pis();
         est_am[i][j][k] = co_ub.c.matricula();
         //std::cout << "30 PIES: Ub del mapa almacenaje:2 " << est_am[i][j][k] << '\n';
-        //          std::cout << "Ocupando: " << p2->_u.filera() << " " << p2->_u.placa() << " " << p2->_u.pis() << "\n";
+        //std::cout << "Ocupando: " << p2->_u.filera() << " " << p2->_u.placa() << " " << p2->_u.pis() << "\n";
 
         i = p->_u.filera();
         j = p->_u.placa();
@@ -314,7 +316,7 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
         est_am[i][j][k] = co_ub.c.matricula();
         //std::cout << "30 PIES: Ub del mapa almacenaje:3 " << est_am[i][j][k] << '\n';
 
-          //        std::cout << "Ocupando: " << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
+        //std::cout << "Ocupando: " << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
         opsgrua++;
 
         inici->_lliu = false;
@@ -507,6 +509,25 @@ ubicacio terminal::on(const string &m) const throw()
   if (_ct.existeix(m))
   {
       u = _ct[m].u;
+      if (u != ubicacio(-1,0,0))
+      {
+        int i = u.filera();
+        int j = u.placa();
+        int k = u.pis();
+        string mat = est_am[i][j][k];
+        bool trobat = false;
+        while (not trobat)
+        {
+          if (j-1 >= 0)
+          {
+            if (est_am[i][j-1][k] == mat) j--;
+            else trobat = true;
+          }
+          else trobat = true;
+        }
+        u = ubicacio(i,j,k);
+      }
+
   }
 
   return u;
