@@ -144,6 +144,224 @@ void terminal::crea_llista_lliures(int n, int m, int h)
 }
 
 //
+void terminal::retira_ff(string m) throw(error)
+{
+  // PRE:
+  // POST:
+
+  if (_ct.existeix(m))
+  {
+    Cu co_ub;
+    co_ub.c = _ct[m].c;
+    co_ub.u = _ct[m].u;
+
+    std::cout << co_ub.c.matricula() << '\n';
+    std::cout << co_ub.u.filera() << co_ub.u.placa() << co_ub.u.pis() << '\n';
+
+    // CD1 : Está en el área de espera
+    if (co_ub.u == ubicacio(-1,0,0))
+    {
+      _area_espera.remove(co_ub.c.matricula());
+      _ct.elimina(co_ub.c.matricula());
+
+    }
+    else
+    {
+      // Está en el área de almacenaje
+      int i = co_ub.u.filera();
+      int j = co_ub.u.placa();
+      int k = co_ub.u.pis();
+      int cont = 0;                 // Número de contenedores enviados al área de espera
+      nat pismax = _h;
+      nat longi = co_ub.c.longitud() / 10;
+
+      // CD1: Sólo tiene una ubicación, por tanto, sólo hay que mirar si hay algo debajo de esa
+      if (longi == 1)
+      {
+        std::cout << "Reviso posiciones: " << est_am[i][j][k+1] << '\n';
+        if (k == _h || est_am[i][j][k+1] == "")       // CD1.1: Estamos en arriba del todo, o no hay nada encima
+        {
+          _ct.elimina(co_ub.c.matricula());
+          if (_h == 1) est_am[i][j][k] == "___";
+          else est_am[i][j][k] == "";
+        }
+        else                                          // CD1.2: Hay contenedores encima
+        {
+          while (pismax != k)
+          {
+            while (est_am[i][j][pismax] == "")    // Bucle por si hay posiciones vacias encima
+            {
+              pismax--;
+            }
+            _area_espera.push_front(co_ub.c.matricula());
+            est_am[i][j][pismax] == "";
+            cont++;
+            pismax--;
+          }
+          _ct.elimina(co_ub.c.matricula());
+          if (_h == 1) est_am[i][j][k] == "___";
+          else est_am[i][j][k] == "";
+        }
+      }
+      // CD2: El contenedor tiene varias ubicaciones
+      else
+      {
+        if (longi == 2)
+        {
+          int jj = 0;
+          if (est_am[i][j+1][k] == co_ub.c.matricula())         // Buscamos posicion adyacente
+          {
+            jj = j+1;
+          }
+          else if (est_am[i][j-1][k] == co_ub.c.matricula())
+          {
+            jj = j-1;
+          }
+          if (k == _h)                                        // CD2.1: Estamos en el piso más alto
+          {
+            _ct.elimina(co_ub.c.matricula());
+
+            if (_h == 1) est_am[i][j][k] == "___";
+            else est_am[i][j][k] == "";
+          }
+          else if (est_am[i][j][k+1] == "" and est_am[i][jj][k+1] == "")       // CD2.2: No hay nada encima
+          {
+            _ct.elimina(co_ub.c.matricula());
+
+            if (_h == 1) est_am[i][j][k] == "___";
+            else est_am[i][j][k] == "";
+          }
+          else                                                // CD3: Hay contenedores encima
+          {
+            while (pismax != k)
+            {
+              while (est_am[i][j][pismax] == "" and est_am[i][jj][pismax] == "") // Bucle por si hay posiciones vacias encima
+              {
+                pismax--;
+              }
+              if (est_am[i][j][pismax] == est_am[i][jj][pismax])      // contienen el mismo contenedor
+              {
+                _area_espera.push_front(co_ub.c.matricula());
+                est_am[i][j][pismax] == "";
+                cont++;
+              }
+              else
+              {
+                if (est_am[i][j][pismax] != "")
+                {
+                  _area_espera.push_front(co_ub.c.matricula());
+                  est_am[i][j][pismax] == "";
+                  cont++;
+                }
+                if (est_am[i][jj][pismax] != "")
+                {
+                  _area_espera.push_front(co_ub.c.matricula());
+                  est_am[i][jj][pismax] == "";
+                  cont++;
+                }
+              }
+              pismax--;
+            }
+
+            _ct.elimina(co_ub.c.matricula());
+
+            if (_h == 1) est_am[i][j][k] == "___";
+            else est_am[i][j][k] == "";
+          }
+      }
+      if (longi == 3)
+      {
+        int jj = 0;
+        int jjj = 0;
+        int compt = 0;
+        while (compt < longi)                                 // Buscamos posiciones adyacentes
+        {
+          while (est_am[i][j+1][k] == co_ub.c.matricula())
+          {
+            compt++;
+            if (compt == 1) jjj = j+1;
+            if (compt == 2) jj = j+1;
+            j++;
+          }
+          while (est_am[i][j-1][k] == co_ub.c.matricula())
+          {
+            compt++;
+            if (compt == 1) jj = j-1;
+            if (compt == 2) jjj = j-1;
+            j--;
+          }
+        }
+        if (k == _h)                                        // CD3.1: Estamos en el piso más alto
+        {
+          _ct.elimina(co_ub.c.matricula());
+
+          if (_h == 1) est_am[i][j][k] == "___";
+          else est_am[i][j][k] == "";
+        }
+        else if (est_am[i][j][k+1] == "" and est_am[i][jj][k+1] == "" and est_am[i][jjj][k+1] == "")       // CD2.2: No hay nada encima
+        {
+          while (_ct.existeix(co_ub.c.matricula()))         // DUDA: Cuando introducimos en el catalogo contendores grades metemos 2 o 3
+          {
+            _ct.elimina(co_ub.c.matricula());
+          }
+          if (_h == 1) est_am[i][j][k] == "___";
+          else est_am[i][j][k] == "";
+        }
+        else                                                // CD3: Hay contenedores encima
+        {
+          while (pismax != k)
+          {
+            while (est_am[i][j][pismax] == "" and est_am[i][jj][pismax] == "" and est_am[i][jjj][pismax] == "") // Bucle por si hay posiciones vacias encima
+            {
+              pismax--;
+            }
+            if ((est_am[i][j][pismax] == est_am[i][jj][pismax]) and (est_am[i][jj][pismax] == est_am[i][jjj][pismax]))      // contienen el mismo contenedor
+            {
+              _area_espera.push_front(co_ub.c.matricula());
+              est_am[i][j][pismax] == "";
+              cont++;
+            }
+            else
+            {
+              if (est_am[i][j][pismax] != "")
+              {
+                _area_espera.push_front(co_ub.c.matricula());
+                est_am[i][j][pismax] == "";
+                cont++;
+              }
+              if (est_am[i][jj][pismax] != "")
+              {
+                _area_espera.push_front(co_ub.c.matricula());
+                est_am[i][jj][pismax] == "";
+                cont++;
+              }
+              if (est_am[i][jjj][pismax] != "")
+              {
+                _area_espera.push_front(co_ub.c.matricula());
+                est_am[i][jjj][pismax] == "";
+                cont++;
+              }
+            }
+            pismax--;
+          }
+          while (_ct.existeix(co_ub.c.matricula()))         // DUDA: Cuando introducimos en el catalogo contendores grades metemos 2 o 3
+          {
+            _ct.elimina(co_ub.c.matricula());
+          }
+          if (_h == 1) est_am[i][j][k] == "___";
+          else est_am[i][j][k] == "";
+      }
+      }
+    }
+  }
+  }
+  else
+  {
+    throw error(MatriculaInexistent);
+  }
+}
+
+//
 void terminal::insereix_ff(Cu co_ub) throw(error)
 {
   // PRE:
@@ -275,7 +493,7 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
         //          std::cout << "Ocupando: " << p2->_u.filera() << " " << p2->_u.placa() << " " << p2->_u.pis() << "\n";
 
         co_ub.u = p2->_u;
-        _ct.assig(co_ub.c.matricula(), co_ub);
+        //_ct.assig(co_ub.c.matricula(), co_ub);
 
         opsgrua++;
 
@@ -291,9 +509,9 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
         co_ub.u = inici->_u;
         _ct.assig(co_ub.c.matricula(), co_ub);
         co_ub.u = p2->_u;
-        _ct.assig(co_ub.c.matricula(), co_ub);
+        //_ct.assig(co_ub.c.matricula(), co_ub);
         co_ub.u = p->_u;
-        _ct.assig(co_ub.c.matricula(), co_ub);
+        //_ct.assig(co_ub.c.matricula(), co_ub);
 
         int i = inici->_u.filera();
         int j = inici->_u.placa();
@@ -471,30 +689,15 @@ void terminal::insereix_contenidor(const contenidor &c) throw(error)
   std::cout << '\n' << "Elements ara mateix al catàleg: " << _ct.quants() << '\n';
   //if (_st == LLIURE) insereix_ll(c);
 
-  // TO DO:
-  /*if (c existe) Error duplicidad
-    else
-          1- le busca una ubicacion en la lista de ubicacions lliures
-              1.1- la encuentra:
-                    1.1.1 añade al catalogo ct <K = Matricula y V= struct Cu = <Contenedor, Ubicación>>
-                    1.1.2 Marca las ubicaciones de la lista como FALSE en caso de ser ocupadas por un contenedor
-                    1.1.3 Añade a la matriz el contenedor en la ubicación indicada
-                    En caso de ser un contenedor de 20 o 30 pies, se harán 2 o 3 addiciones al catalogo ct (el mismo contenedor 2 o 3 veces con sus 2 o 3 ubicaciones),
-                    se tendrán que marcar como false 2 o 3 ubicaciones de la lista de lliures y se añadirán a la matriz 2 o 3 ubicaciones y se les añdirá el mismo contenedor
-
-                    1.1.4 recorre área de espera de inicio a fin, e intenta hacer un insereix(c) de todos los contenedores almacenados
-                      1.1.4.1 Consigue añadir contenedor: vuelve al paso 1.1.1.
-                      1.1.4.2 No consigue añadir contenedor: sale del método insereix y el área de espera se queda intacta.
-              1.2- no encuentra sitio:
-                    1.2.1 se añade contenedor al área de espera
-
-  */
 }
 
+//
 void terminal::retira_contenidor(const string &m) throw(error)
 {
-  // TO DO:
-  string m2 = m;
+  // PRE:
+  // POST:
+  if (_st == FIRST_FIT) retira_ff(m);
+
 }
 
 //
@@ -503,7 +706,6 @@ ubicacio terminal::on(const string &m) const throw()
   // PRE:
   // POST:
 
-  //std::cout << _ct.existeix(m) << '\n';
   ubicacio u = ubicacio(-1,-1,-1);
 
   if (_ct.existeix(m))
@@ -527,7 +729,6 @@ ubicacio terminal::on(const string &m) const throw()
         }
         u = ubicacio(i,j,k);
       }
-
   }
 
   return u;
