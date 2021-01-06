@@ -156,214 +156,184 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
     node *p = _head;
     node* inici = p;
     node* p2;
-    nat i = 0;
+
 
     // El contenedor necesita más ubicaciones que tanaño del área de almacenaje
     if (longi > _size)
     {
       trobat = true;
     }
-
     // RECORRIDO EN BUSCA DE UBICACIONES PARA LOS CONTENEDORES
-    while (p != NULL and i < longi and not trobat)
+
+    // EL CONTENEDOR ES DE 10 PIES
+    if (longi == 1)
     {
-      // EL CONTENEDOR ES DE 10 PIES
-      if (longi == 1)
+      while (not trobat and p->_lliu != true)      // Busca una libre
       {
-        while (p != NULL and p->_lliu != true)      // Busca una libre
-        {
-          p=p->_seg;
-        }
-        if (p == NULL)
-        {
-          trobat = true;
-        }
-        else                                        // Si no, es que ha encontrado una libre como es de 10 pies, se asigna directamente
-        {
-          co_ub.u = p->_u;
-          _ct.assig(co_ub.c.matricula(), co_ub);      // Asigna al catálogo el contenedor
-          p->_lliu = false;                           // Marca la ubicación como ocupada
-
-          // Se inserta contenedor en su ubicación del área de almacenaje (matriz)
-          int i = p->_u.filera();
-          int j = p->_u.placa();
-          int k = p->_u.pis();
-          est_am[i][j][k] = co_ub.c.matricula();
-          //std::cout << "10 PIES: Ub del mapa almacenaje:   " << est_am[i][j][k] << '\n';
-          std::cout << "Colocado en " << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
-          opsgrua++;
-
-          // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
-          // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
-          trobat = true;
-        }
+        if (p->_seg == NULL) trobat = true;
+        else p=p->_seg;
       }
-      // EL CONTENEDOR ES DE 20 o 30 PIES
-      else
+      if (not trobat)                                        // Si no, es que ha encontrado una libre como es de 10 pies, se asigna directamente
       {
-        // BUSCA NODO PARA EMPEZAR QUE ESTE LIBRE
-        while (p != NULL and p->_lliu != true)
-        {
-          p = p->_seg;
-        }
-        if (p == NULL) trobat = true;
+        co_ub.u = p->_u;
+        _ct.assig(co_ub.c.matricula(), co_ub);      // Asigna al catálogo el contenedor
+        p->_lliu = false;                           // Marca la ubicación como ocupada
 
-        inici = p;
-        i++;
-        int filera_act = inici->_u.filera();
-        int pis_act = inici->_u.pis();
-        while (i < longi and not trobat)
-        {
-            p = p->_seg;
-            while (p != NULL and p->_u.pis() != pis_act and p->_u.filera() == filera_act) // Fem el salt cap a la següent plaça
-            {
-                p = p->_seg;
-            }
+        // Se inserta contenedor en su ubicación del área de almacenaje (matriz)
+        int i = p->_u.filera();
+        int j = p->_u.placa();
+        int k = p->_u.pis();
+        est_am[i][j][k] = co_ub.c.matricula();
+        //std::cout << "10 PIES: Ub del mapa almacenaje:   " << est_am[i][j][k] << '\n';
+        std::cout << "Colocado en " << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
+        opsgrua++;
+        trobat = true;
+        // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
+        // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
+      }
+    }
+    // EL CONTENEDOR ES DE 20 o 30 PIES
+    else
+    // BÚSQUEDA DEL PRIMER HUECO LIBRE VÁLIDO
+    {
+      while (p->_lliu != true and not trobat)           // --- BUCLE QUE HACE QUE FUNCIONE PERO QUE REVIENTA EL PC ---
+      {
+        if (p->_seg == NULL) trobat = true;
+        else p = p->_seg;
+      }
 
-            if (p == NULL)
+      inici = p;
+      nat i = 1;
+      int filera_act = inici->_u.filera();
+      int pis_act = inici->_u.pis();
+
+      while (p != NULL and i < longi and not trobat)
+      {
+          if (p->_seg == NULL) trobat = true;
+          else p = p->_seg;
+          while (not trobat and p->_u.pis() != pis_act and p->_u.filera() == filera_act) // Fem el salt cap a la següent plaça
+          {
+              if (p->_seg == NULL) trobat = true;
+              else p = p->_seg;
+          }
+          // El principio del contenedor NO está en la base
+          if (inici->_u.pis() != 0)
+          {
+            if (p->_ant->_lliu == true)       // Comprobamos si el de debajo nuestro está libre, si es así, no ponemos en el aire
             {
-              trobat = true; // ES NULL
+              inici = inici->_seg;
+              filera_act = inici->_u.filera();
+              pis_act = inici->_u.pis();
+              p = inici;
+              p2 = p;
+              i = 0;
             }
-            else                                    // Se ha encontrado una posible ubicación
-            {
-              //std::cout << "Primera lliure: " << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
-            // El principio del contenedor NO está en la base
-              if (inici->_u.pis() != 0)
-              {
-              //  std::cout << "INICI Fuera de la base " << inici->_u.pis() << " esta libre? " << inici->_lliu << '\n';
-                if (p->_ant->_lliu == true)       // El de debajo nuestro no está ocupado, por tanto, no podemos colocar en el aire
-                {
-                  inici = inici->_seg;
-                  filera_act = inici->_u.filera();
-                  pis_act = inici->_u.pis();
-                  p = inici;
-                  p2 = p;
-                  i = 0;
-                }
-                else
-                {
-                  if ((inici->_u.filera() == p->_u.filera()) and (inici->_lliu == true and p->_lliu == true))
-                  {
-                    i++;
-                    if(i == 2) p2 = p;
-                  }
-                }
-              }
-              // El principio del contenedor SI está en la base
-              else
-              {
-                //std::cout << "Inici EN LA BASE: " << inici->_u.pis() << " esta libre? " << inici->_lliu  << '\n';
-                //std::cout << "Inici ocupa" << inici->_u.filera() << " " << inici->_u.placa() << " " << inici->_u.pis() << "\n";
-                if ((inici->_u.filera() == p->_u.filera()) and (inici->_lliu == true and p->_lliu == true))
-                {
-                  //std::cout << "P ocupa: " << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
-                  i++;
-                  if(i == 2) p2 = p;
-                  //std::cout << "Contador i :   " << i << '\n';
-                }
-                else
-                {
-                  inici = inici->_seg;
-                  inici->_u.filera();
-                  inici->_u.pis();
-                  p = inici;
-                  p2 = p;
-                  i = 0;
-                }
-              }
-            }
+          }
+          if ((inici->_u.filera() == p->_u.filera()) and (inici->_lliu == true and p->_lliu == true))
+          {
+            i++;
+            if(i == 2) p2 = p;
+          }
+          else
+          {
+            inici = inici->_seg;
+            inici->_u.filera();
+            inici->_u.pis();
+            p = inici;
+            p2 = p;
+            i = 0;
           }
       }
     }
     // FIN DEL BUCLE -- INSERCIONES
 
-      // TROBAT = FALSE -> SE AÑADE AL CATALEG Y AL AREA DE ALMACENAJE
-      if (not trobat)
-      {
-        // 1- Insercions al catàleg de contenidors:
-        // Contenidor de 20 peus -> Insercions al catàleg d'ubicacions
-        if (longi == 2){
-          int i = inici->_u.filera();
-          int j = inici->_u.placa();
-          int k = inici->_u.pis();
-          est_am[i][j][k] = co_ub.c.matricula();
-          std::cout << "20 PIES: Ub del mapa almacenaje:1 " << est_am[i][j][k] << '\n';
-                    std::cout << "Ocupando: " << inici->_u.filera() << " " << inici->_u.placa() << " " << inici->_u.pis() << "\n";
-          co_ub.u = inici->_u;
-          _ct.assig(co_ub.c.matricula(), co_ub);
+    // TROBAT = FALSE -> SE AÑADE AL CATALEG Y AL AREA DE ALMACENAJE
+    if (not trobat)
+    {
+      // 1- Insercions al catàleg de contenidors:
+      // Contenidor de 20 peus -> Insercions al catàleg d'ubicacions
+      if (longi == 2){
+        int i = inici->_u.filera();
+        int j = inici->_u.placa();
+        int k = inici->_u.pis();
+        est_am[i][j][k] = co_ub.c.matricula();
+        std::cout << "20 PIES: Ub del mapa almacenaje:1 " << est_am[i][j][k] << '\n';
+                  std::cout << "Ocupando: " << inici->_u.filera() << " " << inici->_u.placa() << " " << inici->_u.pis() << "\n";
+        co_ub.u = inici->_u;
+        _ct.assig(co_ub.c.matricula(), co_ub);
 
-          i = p2->_u.filera();
-          j = p2->_u.placa();
-          k = p2->_u.pis();
-          est_am[i][j][k] = co_ub.c.matricula();
-          std::cout << "20 PIES: Ub del mapa almacenaje:2 " << est_am[i][j][k] << '\n';
-                    std::cout << "Ocupando: " << p2->_u.filera() << " " << p2->_u.placa() << " " << p2->_u.pis() << "\n";
+        i = p2->_u.filera();
+        j = p2->_u.placa();
+        k = p2->_u.pis();
+        est_am[i][j][k] = co_ub.c.matricula();
+        std::cout << "20 PIES: Ub del mapa almacenaje:2 " << est_am[i][j][k] << '\n';
+                  std::cout << "Ocupando: " << p2->_u.filera() << " " << p2->_u.placa() << " " << p2->_u.pis() << "\n";
 
-          co_ub.u = p2->_u;
-          _ct.assig(co_ub.c.matricula(), co_ub);
+        co_ub.u = p2->_u;
+        _ct.assig(co_ub.c.matricula(), co_ub);
 
-          opsgrua++;
+        opsgrua++;
 
-          inici->_lliu = false;
-          p2->_lliu = false;
+        inici->_lliu = false;
+        p2->_lliu = false;
 
-          // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
-          // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
-        }
-        // Contenidor 30 peus -> Insercions al catàleg de contenidors
-        else if (longi == 3){
-          co_ub.u = inici->_u;
-          _ct.assig(co_ub.c.matricula(), co_ub);
-          co_ub.u = p2->_u;
-          _ct.assig(co_ub.c.matricula(), co_ub);
-          co_ub.u = p->_u;
-          _ct.assig(co_ub.c.matricula(), co_ub);
-
-          int i = inici->_u.filera();
-          int j = inici->_u.placa();
-          int k = inici->_u.pis();
-
-          est_am[i][j][k] = co_ub.c.matricula();
-          std::cout << "30 PIES: Ub del mapa almacenaje:1 " << est_am[i][j][k] << '\n';
-          std::cout << "Ocupando: " << inici->_u.filera() << " " << inici->_u.placa() << " " << inici->_u.pis() << "\n";
-
-          i = p2->_u.filera();
-          j = p2->_u.placa();
-          k = p2->_u.pis();
-          est_am[i][j][k] = co_ub.c.matricula();
-          std::cout << "30 PIES: Ub del mapa almacenaje:2 " << est_am[i][j][k] << '\n';
-                    std::cout << "Ocupando: " << p2->_u.filera() << " " << p2->_u.placa() << " " << p2->_u.pis() << "\n";
-
-          i = p->_u.filera();
-          j = p->_u.placa();
-          k = p->_u.pis();
-          est_am[i][j][k] = co_ub.c.matricula();
-          std::cout << "30 PIES: Ub del mapa almacenaje:3 " << est_am[i][j][k] << '\n';
-
-                    std::cout << "Ocupando: " << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
-          opsgrua++;
-
-          inici->_lliu = false;
-          p2->_lliu = false;
-          p->_lliu = false;
-
-          // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
-          // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
-        }
+        // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
+        // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
       }
-      // TROBAT = TRUE -> DIRECTO AL CATALEG Y AL ÁREA DE ESPERA
-      else
-      {
-          if (not _ct.existeix(co_ub.c.matricula()))
-          {
-            ubicacio u_ae(-1,0,0);
-            co_ub.u = u_ae;
-            _ct.assig(co_ub.c.matricula(), co_ub);
-            _area_espera.push_front(co_ub.c.matricula());
-            std::cout << "Colocado en el área de espera \n";
-          }
+      // Contenidor 30 peus -> Insercions al catàleg de contenidors
+      else if (longi == 3){
+        co_ub.u = inici->_u;
+        _ct.assig(co_ub.c.matricula(), co_ub);
+        co_ub.u = p2->_u;
+        _ct.assig(co_ub.c.matricula(), co_ub);
+        co_ub.u = p->_u;
+        _ct.assig(co_ub.c.matricula(), co_ub);
+
+        int i = inici->_u.filera();
+        int j = inici->_u.placa();
+        int k = inici->_u.pis();
+
+        est_am[i][j][k] = co_ub.c.matricula();
+        std::cout << "30 PIES: Ub del mapa almacenaje:1 " << est_am[i][j][k] << '\n';
+        std::cout << "Ocupando: " << inici->_u.filera() << " " << inici->_u.placa() << " " << inici->_u.pis() << "\n";
+
+        i = p2->_u.filera();
+        j = p2->_u.placa();
+        k = p2->_u.pis();
+        est_am[i][j][k] = co_ub.c.matricula();
+        std::cout << "30 PIES: Ub del mapa almacenaje:2 " << est_am[i][j][k] << '\n';
+                  std::cout << "Ocupando: " << p2->_u.filera() << " " << p2->_u.placa() << " " << p2->_u.pis() << "\n";
+
+        i = p->_u.filera();
+        j = p->_u.placa();
+        k = p->_u.pis();
+        est_am[i][j][k] = co_ub.c.matricula();
+        std::cout << "30 PIES: Ub del mapa almacenaje:3 " << est_am[i][j][k] << '\n';
+
+                  std::cout << "Ocupando: " << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
+        opsgrua++;
+
+        inici->_lliu = false;
+        p2->_lliu = false;
+        p->_lliu = false;
+
+        // PENDIENTE: Por cada vez que se inserta en el área de almacenaje, las ubicaciones libres cambin,
+        // y hay que revisar el área de espera para ver si podemos insertar algun contenedor aqui.
       }
     }
+    // TROBAT = TRUE -> DIRECTO AL CATALEG Y AL ÁREA DE ESPERA
+    else
+    {
+        if (not _ct.existeix(co_ub.c.matricula()))
+        {
+          ubicacio u_ae(-1,0,0);
+          co_ub.u = u_ae;
+          _ct.assig(co_ub.c.matricula(), co_ub);
+          _area_espera.push_front(co_ub.c.matricula());
+          std::cout << "Colocado en el área de espera \n";
+        }
+    }
+  }
   else
   {
     throw error(MatriculaDuplicada);
