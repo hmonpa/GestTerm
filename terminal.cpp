@@ -172,18 +172,26 @@ void terminal::retira_ff(string m) throw(error)
       int j = co_ub.u.placa();
       int k = co_ub.u.pis();
       int cont = 0;                 // Número de contenedores enviados al área de espera
-      nat pismax = _h;
+      nat pismax = _h-1;
       nat longi = co_ub.c.longitud() / 10;
-
       // CD1: Sólo tiene una ubicación, por tanto, sólo hay que mirar si hay algo debajo de esa
       if (longi == 1)
       {
-        std::cout << "Reviso posiciones: " << est_am[i][j][k+1] << '\n';
-        if (k == _h || est_am[i][j][k+1] == "")       // CD1.1: Estamos en arriba del todo, o no hay nada encima
+
+        //std::cout << "Reviso posiciones: " << est_am[i][j][k+1] << '\n';
+        if (k+1 == _h)  // CD1.1: Estamos en arriba del todo,
+        {
+            _ct.elimina(co_ub.c.matricula());
+            if (_h == 1) est_am[i][j][k] = "___";
+            else est_am[i][j][k] = "";
+
+            //std::cout << _h << " " << est_am[i][j][k] <<  " " << '\n';
+        }
+        else if (k+1 != _h and est_am[i][j][k+1] == "")   // CD1.2:NO hay nada encima
         {
           _ct.elimina(co_ub.c.matricula());
-          if (_h == 1) est_am[i][j][k] == "___";
-          else est_am[i][j][k] == "";
+          if (_h == 1) est_am[i][j][k] = "___";
+          else est_am[i][j][k] = "";
         }
         else                                          // CD1.2: Hay contenedores encima
         {
@@ -208,33 +216,45 @@ void terminal::retira_ff(string m) throw(error)
       {
         if (longi == 2)
         {
+
           int jj = 0;
           if (est_am[i][j+1][k] == co_ub.c.matricula())         // Buscamos posicion adyacente
           {
             jj = j+1;
+            std::cout << "adyacente a la derecha" << '\n';
           }
           else if (est_am[i][j-1][k] == co_ub.c.matricula())
           {
             jj = j-1;
+            std::cout << "adyacente a la izquierda" << '\n';
           }
-          if (k == _h)                                        // CD2.1: Estamos en el piso más alto
+          if (k+1 == _h)                                        // CD2.1: Estamos en el piso más alto
           {
             _ct.elimina(co_ub.c.matricula());
 
-            if (_h == 1) est_am[i][j][k] == "___";
-            else est_am[i][j][k] == "";
+            if (_h == 1)
+            {
+              est_am[i][j][k] = "___";
+              est_am[i][jj][k] = "___";
+            }
+            else
+            {
+              est_am[i][j][k] = "";
+              est_am[i][jj][k] = "";
+            }
           }
-          else if (est_am[i][j][k+1] == "" and est_am[i][jj][k+1] == "")       // CD2.2: No hay nada encima
+          else if (k+1 != _h and est_am[i][j][k+1] == "" and est_am[i][jj][k+1] == "")       // CD2.2: No hay nada encima
           {
             _ct.elimina(co_ub.c.matricula());
 
-            if (_h == 1) est_am[i][j][k] == "___";
-            else est_am[i][j][k] == "";
+            if (_h == 1) est_am[i][j][k] = "___";
+            else est_am[i][j][k] = "";
           }
           else                                                // CD3: Hay contenedores encima
           {
             while (pismax != k)
             {
+              std::cout << "Pis màxim: " << pismax << '\n';
               while (est_am[i][j][pismax] == "" and est_am[i][jj][pismax] == "") // Bucle por si hay posiciones vacias encima
               {
                 pismax--;
@@ -242,7 +262,8 @@ void terminal::retira_ff(string m) throw(error)
               if (est_am[i][j][pismax] == est_am[i][jj][pismax])      // contienen el mismo contenedor
               {
                 _area_espera.push_front(co_ub.c.matricula());
-                est_am[i][j][pismax] == "";
+                est_am[i][j][pismax] = "";
+                est_am[i][jj][pismax] = "";
                 cont++;
               }
               else
@@ -250,13 +271,13 @@ void terminal::retira_ff(string m) throw(error)
                 if (est_am[i][j][pismax] != "")
                 {
                   _area_espera.push_front(co_ub.c.matricula());
-                  est_am[i][j][pismax] == "";
+                  est_am[i][j][pismax] = "";
                   cont++;
                 }
                 if (est_am[i][jj][pismax] != "")
                 {
                   _area_espera.push_front(co_ub.c.matricula());
-                  est_am[i][jj][pismax] == "";
+                  est_am[i][jj][pismax] = "";
                   cont++;
                 }
               }
@@ -264,9 +285,16 @@ void terminal::retira_ff(string m) throw(error)
             }
 
             _ct.elimina(co_ub.c.matricula());
-
-            if (_h == 1) est_am[i][j][k] == "___";
-            else est_am[i][j][k] == "";
+            if (_h == 1)
+            {
+              est_am[i][j][k] = "___";
+              est_am[i][jj][k] = "___";
+            }
+            else
+            {
+              est_am[i][j][k] = "";
+              est_am[i][jj][k] = "___";
+            }
           }
       }
       if (longi == 3)
@@ -274,29 +302,35 @@ void terminal::retira_ff(string m) throw(error)
         int jj = 0;
         int jjj = 0;
         int compt = 0;
+
         while (compt < longi)                                 // Buscamos posiciones adyacentes
         {
-          while (est_am[i][j+1][k] == co_ub.c.matricula())
+          int j2 = j;
+          std::cout << "compt: " << compt << " longi : " << longi << '\n';
+          while (j2+1 != _m and est_am[i][j2+1][k] == co_ub.c.matricula())
           {
+            std::cout << "derecha ocupada " << est_am[i][j+1][k] << '\n';
             compt++;
-            if (compt == 1) jjj = j+1;
-            if (compt == 2) jj = j+1;
-            j++;
+            if (compt == 1) jjj = j2+1;
+            if (compt == 2) jj = j2+1;
+            j2++;
           }
-          while (est_am[i][j-1][k] == co_ub.c.matricula())
+          while (j+1 != _m and est_am[i][j-1][k] == co_ub.c.matricula())
           {
+            std::cout << "izq ocupada " << est_am[i][j+1][k] << '\n';
             compt++;
-            if (compt == 1) jj = j-1;
-            if (compt == 2) jjj = j-1;
+            if (compt == 1) jj = j2-1;
+            if (compt == 2) jjj = j2-1;
             j--;
           }
         }
-        if (k == _h)                                        // CD3.1: Estamos en el piso más alto
+        if (k+1 == _h)                                        // CD3.1: Estamos en el piso más alto
         {
+
           _ct.elimina(co_ub.c.matricula());
 
-          if (_h == 1) est_am[i][j][k] == "___";
-          else est_am[i][j][k] == "";
+          if (_h == 1) est_am[i][j][k] = "___";
+          else est_am[i][j][k] = "";
         }
         else if (est_am[i][j][k+1] == "" and est_am[i][jj][k+1] == "" and est_am[i][jjj][k+1] == "")       // CD2.2: No hay nada encima
         {
