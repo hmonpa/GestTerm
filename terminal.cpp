@@ -133,13 +133,12 @@ void terminal::crea_llista_lliures(int n, int m, int h)
         act->_seg = NULL;
         prev = act;
         _size++;
-        std::cout << act->_u.filera() << act->_u.placa() << act->_u.pis();
-        std::cout << "- " << act->_lliu << "  ";
+        //std::cout << act->_u.filera() << act->_u.placa() << act->_u.pis();
+        //std::cout << "- " << act->_lliu << "  ";
       }
     }
   }
-  std::cout << "\n Tamano total de la lista: " << _size << "\n\n";
-  //prev->_seg = NULL;
+  //std::cout << "\n Tamano total de la lista: " << _size << "\n\n";
   //std::cout << "Elementos en la lista enlazada: " << _size << '\n';
 }
 
@@ -155,8 +154,8 @@ void terminal::retira_ff(string m) throw(error)
     co_ub.c = _ct[m].c;
     co_ub.u = _ct[m].u;
 
-    std::cout << co_ub.c.matricula() << '\n';
-    std::cout << co_ub.u.filera() << co_ub.u.placa() << co_ub.u.pis() << '\n';
+    //std::cout << co_ub.c.matricula() << '\n';
+    //std::cout << co_ub.u.filera() << co_ub.u.placa() << co_ub.u.pis() << '\n';
 
     // CD1 : Está en el área de espera
     if (co_ub.u == ubicacio(-1,0,0))
@@ -177,14 +176,12 @@ void terminal::retira_ff(string m) throw(error)
       // CD1: Sólo tiene una ubicación, por tanto, sólo hay que mirar si hay algo debajo de esa
       if (longi == 1)
       {
-
         //std::cout << "Reviso posiciones: " << est_am[i][j][k+1] << '\n';
         if (k+1 == _h)  // CD1.1: Estamos en arriba del todo,
         {
             _ct.elimina(co_ub.c.matricula());
             if (_h == 1) est_am[i][j][k] = "___";
             else est_am[i][j][k] = "";
-
             //std::cout << _h << " " << est_am[i][j][k] <<  " " << '\n';
         }
         else if (k+1 != _h and est_am[i][j][k+1] == "")   // CD1.2:NO hay nada encima
@@ -221,12 +218,10 @@ void terminal::retira_ff(string m) throw(error)
           if (est_am[i][j+1][k] == co_ub.c.matricula())         // Buscamos posicion adyacente
           {
             jj = j+1;
-            std::cout << "adyacente a la derecha" << '\n';
           }
           else if (est_am[i][j-1][k] == co_ub.c.matricula())
           {
             jj = j-1;
-            std::cout << "adyacente a la izquierda" << '\n';
           }
           if (k+1 == _h)                                        // CD2.1: Estamos en el piso más alto
           {
@@ -254,7 +249,6 @@ void terminal::retira_ff(string m) throw(error)
           {
             while (pismax != k)
             {
-              std::cout << "Pis màxim: " << pismax << '\n';
               while (est_am[i][j][pismax] == "" and est_am[i][jj][pismax] == "") // Bucle por si hay posiciones vacias encima
               {
                 pismax--;
@@ -302,22 +296,20 @@ void terminal::retira_ff(string m) throw(error)
         int jj = 0;
         int jjj = 0;
         int compt = 0;
-
+        std::cout << k << '\n';
         while (compt < longi)                                 // Buscamos posiciones adyacentes
         {
           int j2 = j;
-          std::cout << "compt: " << compt << " longi : " << longi << '\n';
-          while (j2+1 != _m and est_am[i][j2+1][k] == co_ub.c.matricula())
+          while (j2+1 != _m-1 and est_am[i][j2+1][k] == co_ub.c.matricula())
           {
-            std::cout << "derecha ocupada " << est_am[i][j+1][k] << '\n';
             compt++;
             if (compt == 1) jjj = j2+1;
             if (compt == 2) jj = j2+1;
             j2++;
           }
-          while (j+1 != _m and est_am[i][j-1][k] == co_ub.c.matricula())
+          j2 = j;
+          while (j2-1 >= 0 and est_am[i][j-1][k] == co_ub.c.matricula())
           {
-            std::cout << "izq ocupada " << est_am[i][j+1][k] << '\n';
             compt++;
             if (compt == 1) jj = j2-1;
             if (compt == 2) jjj = j2-1;
@@ -326,11 +318,20 @@ void terminal::retira_ff(string m) throw(error)
         }
         if (k+1 == _h)                                        // CD3.1: Estamos en el piso más alto
         {
-
           _ct.elimina(co_ub.c.matricula());
 
-          if (_h == 1) est_am[i][j][k] = "___";
-          else est_am[i][j][k] = "";
+          if (_h == 1)
+          {
+            est_am[i][j][k] = "___";
+            est_am[i][jj][k] = "___";
+            est_am[i][jjj][k] = "___";
+          }
+          else
+          {
+            est_am[i][j][k] = "";
+            est_am[i][jj][k] = "";
+            est_am[i][jjj][k] = "";
+          }
         }
         else if (est_am[i][j][k+1] == "" and est_am[i][jj][k+1] == "" and est_am[i][jjj][k+1] == "")       // CD2.2: No hay nada encima
         {
@@ -338,8 +339,18 @@ void terminal::retira_ff(string m) throw(error)
           {
             _ct.elimina(co_ub.c.matricula());
           }
-          if (_h == 1) est_am[i][j][k] == "___";
-          else est_am[i][j][k] == "";
+          if (_h == 1)
+          {
+            est_am[i][j][k] = "___";
+            est_am[i][jj][k] = "___";
+            est_am[i][jjj][k] = "___";
+          }
+          else
+          {
+            est_am[i][j][k] = "";
+            est_am[i][jj][k] = "";
+            est_am[i][jjj][k] = "";
+          }
         }
         else                                                // CD3: Hay contenedores encima
         {
@@ -382,9 +393,19 @@ void terminal::retira_ff(string m) throw(error)
           {
             _ct.elimina(co_ub.c.matricula());
           }
-          if (_h == 1) est_am[i][j][k] == "___";
-          else est_am[i][j][k] == "";
-      }
+          if (_h == 1)
+          {
+            est_am[i][j][k] = "___";
+            est_am[i][jj][k] = "___";
+            est_am[i][jjj][k] = "___";
+          }
+          else
+          {
+            est_am[i][j][k] = "";
+            est_am[i][jj][k] = "";
+            est_am[i][jjj][k] = "";
+          }
+        }
       }
     }
   }
@@ -465,13 +486,15 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
         {
             if (i == 0)           // Buscamos el primer libre de nuevo, en caso de que la primera búsqueda haya sido mala
             {
-              while (p!=NULL and not trobat and p->_lliu != true )
+              p = inici->_seg;
+              while (p!=NULL and not trobat and p->_lliu != true)
               {
                 if (p->_seg == NULL) trobat = true;
                 p = p->_seg;
               }
               i = 1;
               inici = p;
+              //std::cout << "Inici: " << inici->_u.filera() << " " << inici->_u.placa() << " " << inici->_u.pis() << "\n";
               filera_act = inici->_u.filera();
               pis_act = inici->_u.pis();
             }
@@ -490,15 +513,23 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
                 {
                   if (p->_ant->_lliu == true) i = 0;    // Comprobamos si el de debajo nuestro está libre, si es así, no ponemos en el aire
                 }
-                if ((inici->_u.filera() == p->_u.filera()) and (inici->_lliu == true and p->_lliu == true))
+                if (i != 0)
                 {
-                  i++;
-                  if (i == 2) p2 = p;
+                  if ((inici->_u.filera() == p->_u.filera()) and (inici->_lliu == true and p->_lliu == true))
+                  {
+                    i++;
+                    if (i == 2)
+                    {
+                      p2 = p;
+                      //std::cout << "P2: " << p2->_u.filera() << " " << p2->_u.placa() << " " << p2->_u.pis() << "\n";
+                    }
+                  }
+                  else i = 0;
                 }
-                else i = 0;
               }
             }
           }
+          //if (p != NULL) std::cout << "P: " << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
       }
     }
     // FIN DEL BUCLE -- INSERCIONES
@@ -720,7 +751,7 @@ void terminal::insereix_contenidor(const contenidor &c) throw(error)
   co_ub.c = c;
   //std::cout << "Cambio de información en el objeto co_ub, campo c: " << co_ub.c.matricula() << '\n';
   if (_st == FIRST_FIT) insereix_ff(co_ub);
-  std::cout << '\n' << "Elements ara mateix al catàleg: " << _ct.quants() << '\n';
+  //std::cout << '\n' << "Elements ara mateix al catàleg: " << _ct.quants() << '\n';
   //if (_st == LLIURE) insereix_ll(c);
 
 }
