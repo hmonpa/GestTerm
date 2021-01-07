@@ -8,7 +8,7 @@ node_hash **_taula;               // Taula de punters a node
 nat _mida;                        // Mida de la taula
 nat _quants;                      // Nombre d'elements del catàleg
 
-static nat const alpha = 0.75;    /* Factor de càrrega = _quants / _mida
+static float const alpha = 0.75;  /* Factor de càrrega = _quants / _mida
                                    ... si es tracta d'un valor considerablement petit,
                                    podem assumir que el cost mitjà de totes les operacions
                                    del diccionari (menys la constructora -> θ(n)), tenen cost constant -> θ(1)

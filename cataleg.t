@@ -252,11 +252,11 @@ void cataleg<Valor>::assig(const string &k, const Valor &v) throw(error)
       ++_quants;                                        // Nou element a la taula
     }
 
-  /*  float fc_actual = (float)_quants / (float)_mida;    // Fàctor de càrrega actual = fc_actual
+    float fc_actual = (float)_quants / (float)_mida;    // Fàctor de càrrega actual = fc_actual
     if (fc_actual > alpha)                              // ... es comprova si es major a 0.75
     {
       redispersio(true);                                // ... en cas afirmatiu, fem redispersió doblant la mida de la taula
-    }*/
+    }
   }
   else
   {
@@ -302,11 +302,11 @@ void cataleg<Valor>::elimina(const string &k) throw(error)
     delete p;
     _quants--;
 
-  /*  float fc_actual = (float)_quants / (float)_mida;    // Fàctor de càrrega actual = fc_actual
+    float fc_actual = (float)_quants / (float)_mida;    // Fàctor de càrrega actual = fc_actual
     if (fc_actual < (alpha/3))                          // ... es comprova si es 3 cops mes petit que 0.75
     {
       redispersio(false);                               // ... en cas afirmatiu, fem redispersió partint la mida de la taula
-    }*/
+    }
   }
   else
   {
