@@ -117,13 +117,15 @@ void terminal::crea_llista_lliures(int n, int m, int h)
     {
       for (int k=0; k<h; k++)
       {
-        if (prev == NULL){
+        if (prev == NULL)
+        {
           _head = new node;
           _head->_u = ubicacio(i,j,k);
           act = _head;
           act->_ant = NULL;
         }
-        else{
+        else
+        {
           act = new node;
           act->_u = ubicacio(i,j,k);
           prev->_seg = act;
@@ -140,6 +142,60 @@ void terminal::crea_llista_lliures(int n, int m, int h)
   }
   //std::cout << "\n Tamano total de la lista: " << _size << "\n\n";
   //std::cout << "Elementos en la lista enlazada: " << _size << '\n';
+}
+
+// Líneal (Worst case)
+void terminal::actualitza_lliures(node* n, nat js)
+{
+  // PRE: n es el _head y js es la plaza más a la derecha (depende de las plazas que ocupe)
+  // POST: Recorre la lista hasta el centinela (js = siguiente plaça)
+
+  bool acaba = false;
+  int i = n->_u.filera();
+  int j = n->_u.placa();
+  int k = n->_u.pis();
+  while (n != NULL and not acaba)
+  {
+    if (j == js) acaba = true;
+    //else
+    //{
+      if (est_am[i][j][k] == "___" or est_am[i][j][k] == "") n->_lliu = true;
+      else n->_lliu = false;
+
+      if (i == _n-1 and j == _m-1 and k ==_h-1) acaba = true;
+      else if (j == _m-1 and k == _h-1)
+      {
+        i++;
+        j=0;
+        k=0;
+      }
+      else if (k == _h-1)
+      {
+        j++;
+        k=0;
+      }
+      else k++;
+      n = n->_seg;
+    //}
+  }
+}
+
+//
+int terminal::maxim_dos(int a, int b)
+{
+  //
+  //
+
+  return a > b ? a : b;
+}
+
+//
+int terminal::maxim_tres(int a, int b, int c)
+{
+  //
+  //
+
+  return maxim_dos(maxim_dos(a,b), c);
 }
 
 //
@@ -177,18 +233,23 @@ void terminal::retira_ff(string m) throw(error)
       if (longi == 1)
       {
         //std::cout << "Reviso posiciones: " << est_am[i][j][k+1] << '\n';
-        if (k+1 == _h)  // CD1.1: Estamos en arriba del todo,
+        if (k == _h-1)  // CD1.1: Estamos en arriba del todo,
         {
             _ct.elimina(co_ub.c.matricula());
             if (_h == 1) est_am[i][j][k] = "___";
             else est_am[i][j][k] = "";
+
+            actualitza_lliures(_head, j);
+
             //std::cout << _h << " " << est_am[i][j][k] <<  " " << '\n';
         }
-        else if (k+1 != _h and est_am[i][j][k+1] == "")   // CD1.2:NO hay nada encima
+        else if (k != _h-1 and est_am[i][j][k+1] == "")   // CD1.2:NO hay nada encima
         {
           _ct.elimina(co_ub.c.matricula());
           if (_h == 1) est_am[i][j][k] = "___";
           else est_am[i][j][k] = "";
+
+          actualitza_lliures(_head, j);
         }
         else                                          // CD1.2: Hay contenedores encima
         {
@@ -200,12 +261,23 @@ void terminal::retira_ff(string m) throw(error)
             }
             _area_espera.push_front(co_ub.c.matricula());
             est_am[i][j][pismax] == "";
+
             cont++;
             pismax--;
           }
           _ct.elimina(co_ub.c.matricula());
           if (_h == 1) est_am[i][j][k] == "___";
           else est_am[i][j][k] == "";
+
+          actualitza_lliures(_head, j);
+          for (nat i=0; i<cont; i++)
+          {
+            string pri = _area_espera.front();
+            Cu co_ub;
+            co_ub.c.matricula() = pri;
+            insereix_ff(co_ub);
+          }
+
         }
       }
       // CD2: El contenedor tiene varias ubicaciones
@@ -213,7 +285,6 @@ void terminal::retira_ff(string m) throw(error)
       {
         if (longi == 2)
         {
-
           int jj = 0;
           if (est_am[i][j+1][k] == co_ub.c.matricula())         // Buscamos posicion adyacente
           {
@@ -237,13 +308,26 @@ void terminal::retira_ff(string m) throw(error)
               est_am[i][j][k] = "";
               est_am[i][jj][k] = "";
             }
+            int maxim = maxim_dos(j, jj);
+            actualitza_lliures(_head, maxim);
           }
           else if (k+1 != _h and est_am[i][j][k+1] == "" and est_am[i][jj][k+1] == "")       // CD2.2: No hay nada encima
           {
             _ct.elimina(co_ub.c.matricula());
 
-            if (_h == 1) est_am[i][j][k] = "___";
-            else est_am[i][j][k] = "";
+            if (_h == 1)
+            {
+              est_am[i][j][k] = "___";
+              est_am[i][jj][k] = "___";
+            }
+            else
+            {
+              est_am[i][j][k] = "";
+              est_am[i][jj][k] = "";
+            }
+            int maxim = maxim_dos(j, jj);
+            actualitza_lliures(_head, maxim+1);
+
           }
           else                                                // CD3: Hay contenedores encima
           {
@@ -289,14 +373,24 @@ void terminal::retira_ff(string m) throw(error)
               est_am[i][j][k] = "";
               est_am[i][jj][k] = "___";
             }
+            int maxim = maxim_dos(j, jj);
+            actualitza_lliures(_head, maxim+1);
+            for (nat i=0; i<cont; i++)
+            {
+              string pri = _area_espera.front();
+              Cu co_ub;
+              co_ub.c.matricula() = pri;
+              insereix_ff(co_ub);
+            }
           }
       }
+
       if (longi == 3)
       {
         int jj = 0;
         int jjj = 0;
         int compt = 0;
-        std::cout << k << '\n';
+        //std::cout << k << '\n';
         while (compt < longi)                                 // Buscamos posiciones adyacentes
         {
           int j2 = j;
@@ -332,13 +426,16 @@ void terminal::retira_ff(string m) throw(error)
             est_am[i][jj][k] = "";
             est_am[i][jjj][k] = "";
           }
+
+          // Buscar centinela
+          int maxim = maxim_tres(j, jj, jjj);
+          actualitza_lliures(_head, maxim+1);
         }
         else if (est_am[i][j][k+1] == "" and est_am[i][jj][k+1] == "" and est_am[i][jjj][k+1] == "")       // CD2.2: No hay nada encima
         {
-          while (_ct.existeix(co_ub.c.matricula()))         // DUDA: Cuando introducimos en el catalogo contendores grades metemos 2 o 3
-          {
-            _ct.elimina(co_ub.c.matricula());
-          }
+
+          _ct.elimina(co_ub.c.matricula());
+
           if (_h == 1)
           {
             est_am[i][j][k] = "___";
@@ -351,6 +448,10 @@ void terminal::retira_ff(string m) throw(error)
             est_am[i][jj][k] = "";
             est_am[i][jjj][k] = "";
           }
+
+          int maxim = maxim_tres(j, jj, jjj);
+          actualitza_lliures(_head, maxim+1);
+
         }
         else                                                // CD3: Hay contenedores encima
         {
@@ -389,10 +490,9 @@ void terminal::retira_ff(string m) throw(error)
             }
             pismax--;
           }
-          while (_ct.existeix(co_ub.c.matricula()))         // DUDA: Cuando introducimos en el catalogo contendores grades metemos 2 o 3
-          {
-            _ct.elimina(co_ub.c.matricula());
-          }
+
+          _ct.elimina(co_ub.c.matricula());
+
           if (_h == 1)
           {
             est_am[i][j][k] = "___";
@@ -404,6 +504,16 @@ void terminal::retira_ff(string m) throw(error)
             est_am[i][j][k] = "";
             est_am[i][jj][k] = "";
             est_am[i][jjj][k] = "";
+          }
+
+          int maxim = maxim_tres(j, jj, jjj);
+          actualitza_lliures(_head, maxim+1);
+          for (nat i=0; i<cont; i++)
+          {
+            string pri = _area_espera.front();
+            Cu co_ub;
+            co_ub.c.matricula() = pri;
+            insereix_ff(co_ub);
           }
         }
       }
@@ -422,14 +532,13 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
   // PRE:
   // POST:
 
-  if (not _ct.existeix(co_ub.c.matricula()))
+  if (not _ct.existeix(co_ub.c.matricula()) or _ct[co_ub.c.matricula()].u == ubicacio(-1,0,0))
   {
     nat longi = co_ub.c.longitud() / 10;
     bool trobat = false;    // Se pone a TRUE para indicar que hemos llegado al final del área de almacenaje
     node *p = _head;
     node* inici;
     node* p2;
-
 
     // El contenedor necesita más ubicaciones que tanaño del área de almacenaje
     if (longi > _size)
@@ -476,6 +585,7 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
       }
       if (not trobat)
       {
+        //std::cout << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
         inici = p;
         int filera_act = inici->_u.filera();
         int pis_act = inici->_u.pis();
@@ -491,6 +601,7 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
               {
                 if (p->_seg == NULL) trobat = true;
                 p = p->_seg;
+
               }
               i = 1;
               inici = p;
@@ -518,6 +629,7 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
                   if ((inici->_u.filera() == p->_u.filera()) and (inici->_lliu == true and p->_lliu == true))
                   {
                     i++;
+                    //std::cout << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
                     if (i == 2)
                     {
                       p2 = p;
@@ -537,6 +649,7 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
     // TROBAT = FALSE -> SE AÑADE AL CATALEG Y AL AREA DE ALMACENAJE
     if (not trobat)
     {
+
         // 1- Insercions al catàleg de contenidors:
         // Contenidor de 20 peus -> Insercions al catàleg d'ubicacions
       if (longi == 2)
@@ -613,7 +726,12 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
     // TROBAT = TRUE -> DIRECTO AL CATALEG Y AL ÁREA DE ESPERA
     else
     {
-        if (not _ct.existeix(co_ub.c.matricula()))
+        if (_ct.existeix(co_ub.c.matricula()))
+        {
+          _ct.elimina(co_ub.c.matricula());
+          _ct.assig(co_ub.c.matricula(), co_ub);
+        }
+        else
         {
           ubicacio u_ae(-1,0,0);
           co_ub.u = u_ae;
@@ -846,55 +964,103 @@ nat terminal::fragmentacio() const throw()
   // POST:
 
     node *p = _head;
+
+    int i = p->_u.filera();
+    int j = p->_u.placa();
+    int k = p->_u.pis();
+
     nat frag = 0;
 
-    node* aux = NULL;
     while (p != NULL)
     {
-      aux = p;
-      int i = 0;
-      if (_m == 1)
-      {
-        if (p->_lliu == true) frag++;
-        while (p != NULL and i < _h) p = p->_seg;
-      }
-      else
-      {
-        while (aux->_seg != NULL and i < _h)
+        //std::cout << i << j << k << '\n';
+
+        // Sólo se comprueba si se esta en la base o hay algo debajo
+        if (k == 0 or (est_am[i][j][k-1] != "" and est_am[i][j][k-1] != "___"))
         {
-          aux = aux->_seg;
-        }
-        if (aux->_u.placa() == _m)      // Si aux està a la ultima plaça de la filera...
-        {
-          if (p->_lliu == false and aux->_lliu == true){   // Es compara la penultima plaça i la ultima, si hi ha un forat a la ultima, frag++
-            if (p->_u.filera() == aux->_u.filera()){
-              frag++;
-            }
-            while (p != NULL and p->_u.pis() != 0)      // Trobada una fragmentació o sent fileres diferents, passem a la següent plaça
-            {
-              p = p->_seg;
-            }
-          }
-          else {
-            p = p->_seg;
-          }
-        }
-        else {                        // Si aux no està a la ultima plaça de la filera
-          if (p->_lliu == true and aux->_lliu == false) // Es comparen dues places consecutives, si hi ha un forat a la primera d'elles, frag++
+          // Caso 1: Sólo hay una plaza
+          if (j == 0 and j == _m-1)
           {
-            if (p->_u.filera() == aux->_u.filera()){
-              frag++;
-            }
-            while (p != NULL and p->_u.pis() != 0)      // Trobada una fragmentació o sent fileres diferents, passem a la següent plaça
+            if (est_am[i][j][k] == "___" or est_am[i][j][k] == "") frag++;
+          }
+          // Caso 2: Esquina izquierda
+          else if (j == 0 and j != _m-1)
+          {
+            if (est_am[i][j][k] == "___" or est_am[i][j][k] == "")
             {
-              p = p->_seg;
+              if (est_am[i][j+1][k] != "___" and est_am[i][j+1][k] != "") frag++;
             }
           }
-          else {
-            p = p->_seg;
+          // Caso 3: Esquina derecha:
+          else if (j != 0 and j == _m-1)
+          {
+            if (est_am[i][j][k] == "___" or est_am[i][j][k] == "")
+            {
+              if (k!=0)
+              {
+                if (est_am[i][j-1][k-1] == "___" or est_am[i][j-1][k-1] == "")
+                {
+                  if (est_am[i][j-1][k] == "___" or est_am[i][j-1][k] == "") frag++;
+                }
+                else if (est_am[i][j-1][k-1] != "___" and est_am[i][j-1][k-1] != "")
+                {
+                  if (est_am[i][j-1][k] != "___" and est_am[i][j-1][k] != "") frag++;
+                }
+              }
+              else
+              {
+                if (est_am[i][j-1][k] != "___" and est_am[i][j-1][k] != "") frag++;
+              }
+            }
+          }
+          // Por el medio de la matriz
+          else
+          {
+            if (j >= 0 and j <= _m-1)
+            {
+              if (est_am[i][j][k] == "___" or est_am[i][j][k] == "")
+              {
+                if ((est_am[i][j-1][k] != "" and est_am[i][j-1][k] != "___") and (est_am[i][j+1][k] != "" and est_am[i][j+1][k] != "___")) frag++;
+                if ((est_am[i][j-1][k] == "" or est_am[i][j-1][k] == "___") and (est_am[i][j+1][k] != "" and est_am[i][j+1][k] != "___"))
+                {
+                  if (k!=0)
+                  {
+                    if (est_am[i][j-1][k-1] == "___" or est_am[i][j-1][k-1] == "") frag++;
+                  }
+                }
+                if ((est_am[i][j+1][k] == "" or est_am[i][j+1][k] == "___") and (est_am[i][j-1][k] != "" and est_am[i][j-1][k] != "___"))
+                {
+                  if (k!=0)
+                  {
+                    if (est_am[i][j+1][k-1] == "___" or est_am[i][j+1][k-1] == "") frag++;
+                  }
+                }
+                if ((est_am[i][j-1][k] == "" or est_am[i][j-1][k] == "___") and (est_am[i][j+1][k] == "" or est_am[i][j+1][k] == "___"))
+                {
+                  if (k!=0)
+                  {
+                    if ((est_am[i][j-1][k-1] == "___" or est_am[i][j-1][k-1] == "") and (est_am[i][j+1][k-1] == "___" or est_am[i][j+1][k-1] == "")) frag++;
+                  }
+                }
+              }
+            }
           }
         }
-      }
+        // Iteracion de las posiciones
+        if (j == _m-1 and k == _h-1)
+        {
+          i++;
+          j=0;
+          k=0;
+        }
+        else if (k == _h-1)
+        {
+          j++;
+          k=0;
+        }
+        else k++;
+
+        p = p->_seg;
     }
     return frag;
 }
