@@ -44,6 +44,7 @@ void inicialitza_am(int n, int m, int h);
 void borra_am();
 void crea_llista_lliures(int n, int m, int h);
 void borra_llista_lliures(node* &n);
+bool revisa(string m, bool existeix);
 
 // HABRÁ QUE HACER UN MÉTODO QUE DESPUÉS DEL RETIRA, RECORRA LA LISTA DE UBICACIONES libres
 // COMPARANDO CON LA MATRIZ Y MARCANDOLAS COMO LIBRE O NO LIBRE
