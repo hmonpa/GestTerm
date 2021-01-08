@@ -199,28 +199,44 @@ int terminal::maxim_tres(int a, int b, int c)
 }
 
 
-void terminal::recorre()
+void terminal::recorre(int cont)
 {
   // PRE:
   // POST: Recorre el área de espera para intentar insertar contenedores
-
+  std::cout << cont;
   Cu co_ub;
   if (not _area_espera.empty())
   {
-    for (list<string>::iterator it=_area_espera.begin(); it!=_area_espera.end(); it++)
-    {
-
-      co_ub.c = _ct[*it].c;
-      co_ub.u = _ct[*it].u;
-      insereix_ff(co_ub);
-
-      co_ub.u = _ct[*it].u;
-
-      if(co_ub.u != ubicacio(-1,0,0))
+    if (cont != 0){
+      for (list<string>::iterator it=_area_espera.begin(); it!=_area_espera.end(); it++)
       {
-        list<string>::iterator it2 = it;
-        it++;
-        _area_espera.remove(*it2);
+        co_ub.c = _ct[*it].c;
+        co_ub.u = _ct[*it].u;
+        insereix_ff(co_ub);
+
+        co_ub.u = _ct[*it].u;
+
+        if(co_ub.u != ubicacio(-1,0,0))
+        {
+          list<string>::iterator it2 = it;
+          _area_espera.remove(*it2);
+        }
+      }
+    }
+    else {
+      for (list<string>::reverse_iterator it=_area_espera.rbegin(); it!=_area_espera.rend(); it++)
+      {
+        co_ub.c = _ct[*it].c;
+        co_ub.u = _ct[*it].u;
+
+        insereix_ff(co_ub);
+
+        co_ub.u = _ct[*it].u;
+        if(co_ub.u != ubicacio(-1,0,0))
+        {
+          list<string>::reverse_iterator it2 = it;
+          _area_espera.remove(*it2);
+        }
       }
     }
   }
@@ -359,7 +375,7 @@ void terminal::retira_ff(string m) throw(error)
               {
                 pismax--;
               }
-              if (est_am[i][j][pismax] == est_am[i][jj][pismax])      // contienen el mismo contenedor
+              if (pismax != k and (est_am[i][j][pismax] == est_am[i][jj][pismax]))      // contienen el mismo contenedor
               {
                 _area_espera.push_front(co_ub.c.matricula());
                 opsgrua++;
@@ -369,14 +385,14 @@ void terminal::retira_ff(string m) throw(error)
               }
               else
               {
-                if (est_am[i][j][pismax] != "")
+                if (est_am[i][j][pismax] != "" and est_am[i][jj][pismax] == "")
                 {
                   _area_espera.push_front(co_ub.c.matricula());
                   opsgrua++;
                   est_am[i][j][pismax] = "";
                   cont++;
                 }
-                if (est_am[i][jj][pismax] != "")
+                if (est_am[i][jj][pismax] != "" and est_am[i][j][pismax] == "")
                 {
                   _area_espera.push_front(co_ub.c.matricula());
                   opsgrua++;
@@ -409,7 +425,7 @@ void terminal::retira_ff(string m) throw(error)
 
         if (j+2 != _m and est_am[i][j][k] == est_am[i][j+2][k]) jj = j+2;
         else if (j+1 != _m and est_am[i][j][k] == est_am[i][j+1][k]) jj = j+1;
-        else jj = j;
+        else if (j+1 != _m) jj = j;
 
         if (k+1 == _h)                                        // CD3.1: Estamos en el piso más alto
         {
@@ -462,35 +478,62 @@ void terminal::retira_ff(string m) throw(error)
             {
               pismax--;
             }
-            if ((est_am[i][jj-2][pismax] == est_am[i][jj-1][pismax]) and (est_am[i][jj-1][pismax] == est_am[i][jj][pismax]))      // contienen el mismo contenedor
+            if ( pismax != k and (est_am[i][jj-2][pismax] == est_am[i][jj-1][pismax]) and (est_am[i][jj-1][pismax] == est_am[i][jj][pismax]))      // contienen el mismo contenedor
             {
-              _area_espera.push_front(co_ub.c.matricula());
+              _area_espera.push_front(est_am[i][jj][pismax]);
+              _ct[co_ub.c.matricula()].u = ubicacio(-1,0,0);
               opsgrua++;
-              est_am[i][jj-2][pismax] == "";
+
+              est_am[i][jj-2][pismax] = "";
+              est_am[i][jj-1][pismax] = "";
+              est_am[i][jj][pismax] = "";
               cont++;
+              std::cout << i << jj-2 << pismax << " " << est_am[i][jj-2][pismax] << '\n';
             }
             else
             {
               if (est_am[i][jj-2][pismax] != "")
               {
-                _area_espera.push_front(co_ub.c.matricula());
-                opsgrua++;
-                est_am[i][jj-2][pismax] == "";
+                if (jj-3 >= 0 and est_am[i][jj-3][pismax] != "")
+                {
+                  if (jj-4 >= 0 and est_am[i][jj-4][pismax] != ""){
+                    _area_espera.push_front(est_am[i][jj-4][pismax]);
+                    est_am[i][jj-4][pismax] = "";
+                    opsgrua++;
+                  }
+                  _area_espera.push_front(est_am[i][jj-3][pismax]);
+                  est_am[i][jj-3][pismax] = "";
+                }
+                _area_espera.push_front(est_am[i][jj-2][pismax]);
+                _ct[co_ub.c.matricula()].u = ubicacio(-1,0,0);
+                est_am[i][jj-2][pismax] = "";
                 cont++;
+                opsgrua++;
               }
               if (est_am[i][jj-1][pismax] != "")
               {
-                _area_espera.push_front(co_ub.c.matricula());
+                _area_espera.push_front(est_am[i][jj-1][pismax]);
+                _ct[co_ub.c.matricula()].u = ubicacio(-1,0,0);
                 opsgrua++;
-                est_am[i][jj-1][pismax] == "";
+                est_am[i][jj-1][pismax] = "";
                 cont++;
               }
               if (est_am[i][jj][pismax] != "")
               {
-                _area_espera.push_front(co_ub.c.matricula());
-                opsgrua++;
-                est_am[i][jj][pismax] == "";
+                if (jj+1 < _m and est_am[i][jj+1][pismax] != "")
+                {
+                  if (jj+2 < _m and est_am[i][jj+2][pismax] != ""){
+                    _area_espera.push_front(est_am[i][jj+2][pismax]);
+                    est_am[i][jj+1][pismax] = "";
+                    opsgrua++;
+                  }
+                  _area_espera.push_front(est_am[i][jj+1][pismax]);
+                  est_am[i][jj+1][pismax] = "";
+                }
+                _area_espera.push_front(est_am[i][jj][pismax]);
+                est_am[i][jj][pismax] = "";
                 cont++;
+                opsgrua++;
               }
             }
             pismax--;
@@ -517,8 +560,10 @@ void terminal::retira_ff(string m) throw(error)
         }
       }
     }
+    _area_espera.unique();
+    //recorre(cont);
   }
-  recorre();
+
   }
   else
   {
@@ -727,6 +772,7 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
           _ct.assig(co_ub.c.matricula(), co_ub);
           _area_espera.push_front(co_ub.c.matricula());
         }
+        _area_espera.sort();
     }
   }
   else
