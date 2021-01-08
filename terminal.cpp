@@ -198,6 +198,34 @@ int terminal::maxim_tres(int a, int b, int c)
   return maxim_dos(maxim_dos(a,b), c);
 }
 
+
+void terminal::recorre()
+{
+  // PRE:
+  // POST: Recorre el área de espera para intentar insertar contenedores
+
+  Cu co_ub;
+  if (not _area_espera.empty())
+  {
+    for (list<string>::iterator it=_area_espera.begin(); it!=_area_espera.end(); it++)
+    {
+
+      co_ub.c = _ct[*it].c;
+      co_ub.u = _ct[*it].u;
+      insereix_ff(co_ub);
+
+      co_ub.u = _ct[*it].u;
+
+      if(co_ub.u != ubicacio(-1,0,0))
+      {
+        list<string>::iterator it2 = it;
+        it++;
+        _area_espera.remove(*it2);
+      }
+    }
+  }
+
+}
 //
 void terminal::retira_ff(string m) throw(error)
 {
@@ -216,9 +244,9 @@ void terminal::retira_ff(string m) throw(error)
     // CD1 : Está en el área de espera
     if (co_ub.u == ubicacio(-1,0,0))
     {
-      _area_espera.remove(co_ub.c.matricula());
-      _ct.elimina(co_ub.c.matricula());
 
+      _ct.elimina(co_ub.c.matricula());
+      _area_espera.remove(co_ub.c.matricula());
     }
     else
     {
@@ -260,6 +288,7 @@ void terminal::retira_ff(string m) throw(error)
               pismax--;
             }
             _area_espera.push_front(co_ub.c.matricula());
+            opsgrua++;
             est_am[i][j][pismax] == "";
 
             cont++;
@@ -270,13 +299,6 @@ void terminal::retira_ff(string m) throw(error)
           else est_am[i][j][k] == "";
 
           actualitza_lliures(_head, j);
-          for (nat i=0; i<cont; i++)
-          {
-            string pri = _area_espera.front();
-            Cu co_ub;
-            co_ub.c.matricula() = pri;
-            insereix_ff(co_ub);
-          }
 
         }
       }
@@ -340,6 +362,7 @@ void terminal::retira_ff(string m) throw(error)
               if (est_am[i][j][pismax] == est_am[i][jj][pismax])      // contienen el mismo contenedor
               {
                 _area_espera.push_front(co_ub.c.matricula());
+                opsgrua++;
                 est_am[i][j][pismax] = "";
                 est_am[i][jj][pismax] = "";
                 cont++;
@@ -349,12 +372,14 @@ void terminal::retira_ff(string m) throw(error)
                 if (est_am[i][j][pismax] != "")
                 {
                   _area_espera.push_front(co_ub.c.matricula());
+                  opsgrua++;
                   est_am[i][j][pismax] = "";
                   cont++;
                 }
                 if (est_am[i][jj][pismax] != "")
                 {
                   _area_espera.push_front(co_ub.c.matricula());
+                  opsgrua++;
                   est_am[i][jj][pismax] = "";
                   cont++;
                 }
@@ -375,81 +400,57 @@ void terminal::retira_ff(string m) throw(error)
             }
             int maxim = maxim_dos(j, jj);
             actualitza_lliures(_head, maxim+1);
-            for (nat i=0; i<cont; i++)
-            {
-              string pri = _area_espera.front();
-              Cu co_ub;
-              co_ub.c.matricula() = pri;
-              insereix_ff(co_ub);
-            }
           }
       }
 
       if (longi == 3)
       {
         int jj = 0;
-        int jjj = 0;
-        int compt = 0;
-        //std::cout << k << '\n';
-        while (compt < longi)                                 // Buscamos posiciones adyacentes
-        {
-          int j2 = j;
-          while (j2+1 != _m-1 and est_am[i][j2+1][k] == co_ub.c.matricula())
-          {
-            compt++;
-            if (compt == 1) jjj = j2+1;
-            if (compt == 2) jj = j2+1;
-            j2++;
-          }
-          j2 = j;
-          while (j2-1 >= 0 and est_am[i][j-1][k] == co_ub.c.matricula())
-          {
-            compt++;
-            if (compt == 1) jj = j2-1;
-            if (compt == 2) jjj = j2-1;
-            j--;
-          }
-        }
+
+        if (j+2 != _m and est_am[i][j][k] == est_am[i][j+2][k]) jj = j+2;
+        else if (j+1 != _m and est_am[i][j][k] == est_am[i][j+1][k]) jj = j+1;
+        else jj = j;
+
         if (k+1 == _h)                                        // CD3.1: Estamos en el piso más alto
         {
           _ct.elimina(co_ub.c.matricula());
 
           if (_h == 1)
           {
-            est_am[i][j][k] = "___";
+            est_am[i][jj-2][k] = "___";
+            est_am[i][jj-1][k] = "___";
             est_am[i][jj][k] = "___";
-            est_am[i][jjj][k] = "___";
           }
           else
           {
-            est_am[i][j][k] = "";
+            est_am[i][jj-2][k] = "";
+            est_am[i][jj-1][k] = "";
             est_am[i][jj][k] = "";
-            est_am[i][jjj][k] = "";
           }
 
           // Buscar centinela
-          int maxim = maxim_tres(j, jj, jjj);
+          int maxim = maxim_tres(jj-2, jj-1, jj);
           actualitza_lliures(_head, maxim+1);
         }
-        else if (est_am[i][j][k+1] == "" and est_am[i][jj][k+1] == "" and est_am[i][jjj][k+1] == "")       // CD2.2: No hay nada encima
+        else if (est_am[i][jj-2][k+1] == "" and est_am[i][jj-1][k+1] == "" and est_am[i][jj][k+1] == "")       // CD2.2: No hay nada encima
         {
 
           _ct.elimina(co_ub.c.matricula());
 
           if (_h == 1)
           {
-            est_am[i][j][k] = "___";
+            est_am[i][jj-2][k] = "___";
+            est_am[i][jj-1][k] = "___";
             est_am[i][jj][k] = "___";
-            est_am[i][jjj][k] = "___";
           }
           else
           {
-            est_am[i][j][k] = "";
+            est_am[i][jj-2][k] = "";
+            est_am[i][jj-1][k] = "";
             est_am[i][jj][k] = "";
-            est_am[i][jjj][k] = "";
           }
 
-          int maxim = maxim_tres(j, jj, jjj);
+          int maxim = maxim_tres(jj-2, jj-1, jj);
           actualitza_lliures(_head, maxim+1);
 
         }
@@ -457,34 +458,38 @@ void terminal::retira_ff(string m) throw(error)
         {
           while (pismax != k)
           {
-            while (est_am[i][j][pismax] == "" and est_am[i][jj][pismax] == "" and est_am[i][jjj][pismax] == "") // Bucle por si hay posiciones vacias encima
+            while (est_am[i][jj-2][pismax] == "" and est_am[i][jj-1][pismax] == "" and est_am[i][jj][pismax] == "") // Bucle por si hay posiciones vacias encima
             {
               pismax--;
             }
-            if ((est_am[i][j][pismax] == est_am[i][jj][pismax]) and (est_am[i][jj][pismax] == est_am[i][jjj][pismax]))      // contienen el mismo contenedor
+            if ((est_am[i][jj-2][pismax] == est_am[i][jj-1][pismax]) and (est_am[i][jj-1][pismax] == est_am[i][jj][pismax]))      // contienen el mismo contenedor
             {
               _area_espera.push_front(co_ub.c.matricula());
-              est_am[i][j][pismax] == "";
+              opsgrua++;
+              est_am[i][jj-2][pismax] == "";
               cont++;
             }
             else
             {
-              if (est_am[i][j][pismax] != "")
+              if (est_am[i][jj-2][pismax] != "")
               {
                 _area_espera.push_front(co_ub.c.matricula());
-                est_am[i][j][pismax] == "";
+                opsgrua++;
+                est_am[i][jj-2][pismax] == "";
+                cont++;
+              }
+              if (est_am[i][jj-1][pismax] != "")
+              {
+                _area_espera.push_front(co_ub.c.matricula());
+                opsgrua++;
+                est_am[i][jj-1][pismax] == "";
                 cont++;
               }
               if (est_am[i][jj][pismax] != "")
               {
                 _area_espera.push_front(co_ub.c.matricula());
+                opsgrua++;
                 est_am[i][jj][pismax] == "";
-                cont++;
-              }
-              if (est_am[i][jjj][pismax] != "")
-              {
-                _area_espera.push_front(co_ub.c.matricula());
-                est_am[i][jjj][pismax] == "";
                 cont++;
               }
             }
@@ -495,30 +500,25 @@ void terminal::retira_ff(string m) throw(error)
 
           if (_h == 1)
           {
-            est_am[i][j][k] = "___";
+            est_am[i][jj-2][k] = "___";
+            est_am[i][jj-1][k] = "___";
             est_am[i][jj][k] = "___";
-            est_am[i][jjj][k] = "___";
           }
           else
           {
-            est_am[i][j][k] = "";
             est_am[i][jj][k] = "";
-            est_am[i][jjj][k] = "";
+            est_am[i][jj-1][k] = "";
+            est_am[i][jj-2][k] = "";
           }
 
-          int maxim = maxim_tres(j, jj, jjj);
+          int maxim = maxim_tres(jj-2, jj-1, jj);
           actualitza_lliures(_head, maxim+1);
-          for (nat i=0; i<cont; i++)
-          {
-            string pri = _area_espera.front();
-            Cu co_ub;
-            co_ub.c.matricula() = pri;
-            insereix_ff(co_ub);
-          }
+
         }
       }
     }
   }
+  recorre();
   }
   else
   {
@@ -531,7 +531,8 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
 {
   // PRE:
   // POST:
-
+  //std::cout << co_ub.c.matricula() << " " << co_ub.c.longitud() << '\n';
+  //std::cout << co_ub.u.filera() << co_ub.u.placa() << co_ub.u.pis() << '\n';
   if (not _ct.existeix(co_ub.c.matricula()) or _ct[co_ub.c.matricula()].u == ubicacio(-1,0,0))
   {
     nat longi = co_ub.c.longitud() / 10;
@@ -578,14 +579,15 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
     else
     // BÚSQUEDA DEL PRIMER HUECO LIBRE VÁLIDO, FUERA DEL BUCLE
     {
+
       while (p != NULL and not trobat and p->_lliu != true)      // Busca la primera libre
       {
         if (p->_seg == NULL) trobat = true;
         p = p->_seg;
       }
+
       if (not trobat)
       {
-        //std::cout << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
         inici = p;
         int filera_act = inici->_u.filera();
         int pis_act = inici->_u.pis();
@@ -596,30 +598,31 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
         {
             if (i == 0)           // Buscamos el primer libre de nuevo, en caso de que la primera búsqueda haya sido mala
             {
-              p = inici->_seg;
+              if (p->_seg != NULL) p = inici->_seg;
               while (p!=NULL and not trobat and p->_lliu != true)
               {
                 if (p->_seg == NULL) trobat = true;
-                p = p->_seg;
-
+                else p = p->_seg;
               }
+
               i = 1;
               inici = p;
-              //std::cout << "Inici: " << inici->_u.filera() << " " << inici->_u.placa() << " " << inici->_u.pis() << "\n";
               filera_act = inici->_u.filera();
               pis_act = inici->_u.pis();
             }
             if (p == NULL) trobat = true;
             else
             {
-              p = p->_seg;
-              while (p!=NULL and (p->_u.pis() != pis_act and p->_u.filera() == filera_act)) // Fem el salt cap a la següent plaça
+              if (p->_seg != NULL) p = p->_seg;
+              else trobat = true;
+              while (p->_seg!=NULL and (p->_u.pis() != pis_act and p->_u.filera() == filera_act) and not trobat) // Fem el salt cap a la següent plaça
               {
                 p = p->_seg;
               }
-              if (p == NULL) trobat = true;
-              else
-              {
+
+              //if (p->_seg == NULL) trobat = true;
+              //else
+              //{
                 if (inici->_u.pis() != 0)
                 {
                   if (p->_ant->_lliu == true) i = 0;    // Comprobamos si el de debajo nuestro está libre, si es así, no ponemos en el aire
@@ -629,19 +632,13 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
                   if ((inici->_u.filera() == p->_u.filera()) and (inici->_lliu == true and p->_lliu == true))
                   {
                     i++;
-                    //std::cout << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
-                    if (i == 2)
-                    {
-                      p2 = p;
-                      //std::cout << "P2: " << p2->_u.filera() << " " << p2->_u.placa() << " " << p2->_u.pis() << "\n";
-                    }
+                    if (i == 2) p2 = p;
                   }
                   else i = 0;
                 }
-              }
+              //}
             }
           }
-          //if (p != NULL) std::cout << "P: " << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
       }
     }
     // FIN DEL BUCLE -- INSERCIONES
@@ -649,17 +646,20 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
     // TROBAT = FALSE -> SE AÑADE AL CATALEG Y AL AREA DE ALMACENAJE
     if (not trobat)
     {
-
         // 1- Insercions al catàleg de contenidors:
         // Contenidor de 20 peus -> Insercions al catàleg d'ubicacions
       if (longi == 2)
       {
+        if (_ct.existeix(co_ub.c.matricula()))
+        {
+          //_area_espera.remove(co_ub.c.matricula());
+          _ct.elimina(co_ub.c.matricula());
+        }
+
         int i = inici->_u.filera();
         int j = inici->_u.placa();
         int k = inici->_u.pis();
         est_am[i][j][k] = co_ub.c.matricula();
-        //std::cout << "20 PIES: Ub del mapa almacenaje:1 " << est_am[i][j][k] << '\n';
-        //std::cout << "Ocupando: " << inici->_u.filera() << " " << inici->_u.placa() << " " << inici->_u.pis() << "\n";
         co_ub.u = inici->_u;
         _ct.assig(co_ub.c.matricula(), co_ub);
 
@@ -667,11 +667,7 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
         j = p2->_u.placa();
         k = p2->_u.pis();
         est_am[i][j][k] = co_ub.c.matricula();
-        //std::cout << "20 PIES: Ub del mapa almacenaje:2 " << est_am[i][j][k] << '\n';
-        //          std::cout << "Ocupando: " << p2->_u.filera() << " " << p2->_u.placa() << " " << p2->_u.pis() << "\n";
-
         co_ub.u = p2->_u;
-        //_ct.assig(co_ub.c.matricula(), co_ub);
 
         opsgrua++;
 
@@ -684,6 +680,10 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
       // Contenidor 30 peus -> Insercions al catàleg de contenidors
       else if (longi == 3)
       {
+        if (_ct.existeix(co_ub.c.matricula()))
+        {
+          _ct.elimina(co_ub.c.matricula());
+        }
         co_ub.u = inici->_u;
         _ct.assig(co_ub.c.matricula(), co_ub);
         co_ub.u = p2->_u;
@@ -694,25 +694,19 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
         int i = inici->_u.filera();
         int j = inici->_u.placa();
         int k = inici->_u.pis();
-
         est_am[i][j][k] = co_ub.c.matricula();
-        //std::cout << "30 PIES: Ub del mapa almacenaje:1 " << est_am[i][j][k] << '\n';
-        //std::cout << "Ocupando: " << inici->_u.filera() << " " << inici->_u.placa() << " " << inici->_u.pis() << "\n";
 
         i = p2->_u.filera();
         j = p2->_u.placa();
         k = p2->_u.pis();
         est_am[i][j][k] = co_ub.c.matricula();
-        //std::cout << "30 PIES: Ub del mapa almacenaje:2 " << est_am[i][j][k] << '\n';
-        //std::cout << "Ocupando: " << p2->_u.filera() << " " << p2->_u.placa() << " " << p2->_u.pis() << "\n";
+
 
         i = p->_u.filera();
         j = p->_u.placa();
         k = p->_u.pis();
         est_am[i][j][k] = co_ub.c.matricula();
-        //std::cout << "30 PIES: Ub del mapa almacenaje:3 " << est_am[i][j][k] << '\n';
 
-        //std::cout << "Ocupando: " << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
         opsgrua++;
 
         inici->_lliu = false;
@@ -726,18 +720,12 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
     // TROBAT = TRUE -> DIRECTO AL CATALEG Y AL ÁREA DE ESPERA
     else
     {
-        if (_ct.existeix(co_ub.c.matricula()))
-        {
-          _ct.elimina(co_ub.c.matricula());
-          _ct.assig(co_ub.c.matricula(), co_ub);
-        }
-        else
+        if (not _ct.existeix(co_ub.c.matricula()))
         {
           ubicacio u_ae(-1,0,0);
           co_ub.u = u_ae;
           _ct.assig(co_ub.c.matricula(), co_ub);
           _area_espera.push_front(co_ub.c.matricula());
-          //std::cout << "Colocado en el área de espera \n";
         }
     }
   }
