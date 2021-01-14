@@ -145,7 +145,7 @@ void terminal::crea_llista_lliures(int n, int m, int h)
 }
 
 // Líneal (Worst case)
-void terminal::actualitza_lliures(node* n, nat js)
+void terminal::actualitza_lliures(node* n)
 {
   // PRE: n es el _head y js es la plaza más a la derecha (depende de las plazas que ocupe)
   // POST: Recorre la lista hasta el centinela (js = siguiente plaça)
@@ -156,7 +156,7 @@ void terminal::actualitza_lliures(node* n, nat js)
   int k = n->_u.pis();
   while (n != NULL and not acaba)
   {
-    if (j == js) acaba = true;
+    //if (j == js) acaba = true;
     //else
     //{
       if (est_am[i][j][k] == "___" or est_am[i][j][k] == "") n->_lliu = true;
@@ -203,21 +203,26 @@ void terminal::recorre(int cont)
 {
   // PRE:
   // POST: Recorre el área de espera para intentar insertar contenedores
-  
+
   Cu co_ub;
+  //_area_espera.unique();
+  bool acaba = false;
   if (not _area_espera.empty())
   {
     if (cont != 0){
-      for (list<string>::iterator it=_area_espera.begin(); it!=_area_espera.end(); it++)
+      for (list<string>::iterator it=_area_espera.begin(); it!=_area_espera.end() and not acaba; it++)
       {
-        
+
         co_ub.c = _ct[*it].c;
         co_ub.u = _ct[*it].u;
-        //std::cout << "Recorre:" << co_ub.c.matricula() << " " << co_ub.u.filera() << co_ub.u.placa() << co_ub.u.pis() << '\n';
+
+        //std::cout << "LISTA ACTUAL:\n";
         //for (list<string>::iterator it=_area_espera.begin(); it!=_area_espera.end(); it++) std::cout << (*it) << '\n';
+
         insereix_ff(co_ub);
-
-
+        if (_area_espera.empty()) acaba = true;
+        //std::cout << "LISTA ACTUAL POS INSER:\n";
+        //for (list<string>::iterator it=_area_espera.begin(); it!=_area_espera.end(); it++) std::cout << (*it) << '\n';
         /*co_ub.u = _ct[*it].u;
 
         if(co_ub.u != ubicacio(-1,0,0))
@@ -228,16 +233,18 @@ void terminal::recorre(int cont)
       }
     }
     else {
-      for (list<string>::reverse_iterator it=_area_espera.rbegin(); it!=_area_espera.rend(); it++)
+      for (list<string>::reverse_iterator it=_area_espera.rbegin(); it!=_area_espera.rend() and not acaba; it++)
       {
         co_ub.c = _ct[*it].c;
         co_ub.u = _ct[*it].u;
 
-        insereix_ff(co_ub);
-        //std::cout << "recorre" << '\n';
-        //co_ub.u = _ct[*it].u;
+        //std::cout << "LISTA ACTUAL:\n";
         //for (list<string>::reverse_iterator it=_area_espera.rbegin(); it!=_area_espera.rend(); it++) std::cout << (*it) << '\n';
-
+        insereix_ff(co_ub);
+        if (_area_espera.empty()) acaba = true;
+        //if (_ct.existeix(*it) and _ct[*it].u != ubicacio(-1,0,0)) _area_espera.remove(*it);
+        //std::cout << "LISTA ACTUAL POST INSER:\n";
+        //for (list<string>::reverse_iterator it=_area_espera.rbegin(); it!=_area_espera.rend(); it++) std::cout << (*it) << '\n';
 
         /*if(co_ub.u != ubicacio(-1,0,0))
         {
@@ -250,6 +257,70 @@ void terminal::recorre(int cont)
   }
 
 }
+
+/*void terminal::dist_izquierda(int i, int j, int k)
+{
+  int dist_izq = 0;
+  bool fi = false;
+  while (not final and j-dist_izq >= 0)
+  {
+    if (est_am[i][j-dist_esq][k]=="" and (k==0 or est_am[i][j-dist_izq][k-1]!="")) dist_izq++;
+    else fi = true;
+  }
+  return dist_izq;
+}
+
+void terminal::dist_derecha(int i, int j, int k)
+{
+  int dist_der = 0;
+  bool fi = false;
+  while (not final and j+dist_der < _m)
+  {
+    if (est_am[i][j+dist_der][k]=="" and (k==0 or est_am[i][j+dist_der][k-1]!="")) dist_der++;
+    else fi = true;
+  }
+  return dist_der;
+}
+
+void terminal::regenera(ubicacio u, nat longi)
+{
+  int i = u.filera();
+  int j = u.placa();
+  int k = u.pis();
+  int dist_der = dist_derecha(i, j+longi, k);
+  int dist_izq = dist_izquierda(i, j-1, k);
+  if (k+1 < _h)
+  {
+
+  }
+}*/
+
+/*void terminal::funcion(ubicacio u, nat longi)
+{
+  int i = u.filera();
+  int j = u.placa();
+  int k = u.pis();
+
+  for (nat ii=0; ii<longi and k+1<_h; ii++)
+  {
+    string mat = est_am[i][j+ii][k+1];
+    if (mat != "")
+    {
+      ubicacio pos = _ct[mat].u;
+      int length = _ct[mat].c.longitud();
+      funcion(pos, length);
+    }
+  }
+  string matri = est_am[i][j][k];
+  matri = "";
+  _area_espera.push_front(matri);
+  regenera(u, longi);
+  Cu co_ub;
+  co_ub.c = _ct[matri].c;
+  co_ub.u = _ct[matri].u;
+
+}*/
+
 //
 void terminal::retira_ff(string m) throw(error)
 {
@@ -276,8 +347,9 @@ void terminal::retira_ff(string m) throw(error)
       int i = co_ub.u.filera();
       int j = co_ub.u.placa();
       int k = co_ub.u.pis();
-      int cont = 0;                 // Número de contenedores enviados al área de espera
-      nat pismax = _h-1;
+
+      //int cont = 0;                 // Número de contenedores enviados al área de espera
+      //nat pismax = _h-1;
       nat longi = co_ub.c.longitud() / 10;
       // CD1: Sólo tiene una ubicación, por tanto, sólo hay que mirar si hay algo debajo de esa
       if (longi == 1)
@@ -291,42 +363,122 @@ void terminal::retira_ff(string m) throw(error)
             if (_h == 1) est_am[i][j][k] = "___";
             else est_am[i][j][k] = "";
 
-            actualitza_lliures(_head, j);
+            actualitza_lliures(_head);
 
             //std::cout << _h << " " << est_am[i][j][k] <<  " " << '\n';
         }
-        else if (k != _h-1 and est_am[i][j][k+1] == "")   // CD1.2:NO hay nada encima
+        // CD1.2:NO hay nada encima
+        else if (k != _h-1 and est_am[i][j][k+1] == "")
         {
           _ct.elimina(co_ub.c.matricula());
           //std::cout << "Se retira " << co_ub.c.matricula() << '\n';
-   
+
           if (_h == 1) est_am[i][j][k] = "___";
           else est_am[i][j][k] = "";
 
-          actualitza_lliures(_head, j+1);
+          actualitza_lliures(_head);
         }
-        else                                          // CD1.2: Hay contenedores encima
+        // CD1.2: Hay contenedores encima
+        else
         {
-          while (pismax != k)
-          {
-            while (est_am[i][j][pismax] == "")    // Bucle por si hay posiciones vacias encima
-            {
-              pismax--;
-            }
+          int cont_der = 0;
+          int cont_izq = 0;
+          int kk = k;
 
-            _area_espera.push_front(co_ub.c.matricula());       // incorrecto
-            opsgrua++;
-            est_am[i][j][pismax] == "";
-            actualitza_lliures(_head, j);
-            cont++;
-            pismax--;
+          while (kk+1 < _h) // Mientras no llegue arriba del todo
+          {
+            string mat1 = est_am[i][j][kk+1];
+            int ii = 0;
+            int jj = j;
+            if (mat1 != "")
+            {
+              // PRIMERA ITERACIÓN (O VARIAS, DEPENDE DE SI SOLO SE RETIRA ESTRICTAMENTE EL DE ENCMA)
+              if (cont_izq == 0 and cont_der == 0)
+              {
+                while(jj+1 <= _m-1 and mat1 == est_am[i][jj+1][kk+1])
+                {
+                  cont_der++;
+                  jj++;
+                }
+                jj = j;
+                while (jj-1 >= 0 and mat1 == est_am[i][jj-1][kk+1])
+                {
+                  std::cout << est_am[i][jj-1][kk+1] << "\n\n";
+                  cont_izq++;
+                  jj--;
+                }
+                _area_espera.push_front(mat1);
+                jj = j;
+
+                while (ii <= cont_der-1)
+                {
+                  est_am[i][jj+1][kk+1]="";
+                  ii++;
+                  jj++;
+                }
+                ii = 0;
+                jj = j;
+                while (ii <= cont_izq-1)
+                {
+                  est_am[i][jj-1][kk+1]="";
+                  ii++;
+                  jj--;
+                }
+                jj = j;
+                est_am[i][jj][kk+1]="";
+              }
+              // EN LA PRIMERA ITERACIÓN SE HAN RETIRADO VARIOS DEL LADO
+              else
+              {
+                std::cout << "Cont izq " << cont_izq << " y cont der: " << cont_der << '\n';
+                ii = 0;
+                jj = j+1;
+                while (ii <= cont_der-1)
+                {
+                  _area_espera.push_front(est_am[i][jj][kk+1]);
+                  est_am[i][jj][kk+1]="";
+
+                    jj++;
+                    ii++;
+                }
+                jj = j;
+                while (jj+1 <= _m-1 and est_am[i][jj][kk+1] == est_am[i][jj+1][kk+1])
+                {
+                  _area_espera.push_front(est_am[i][jj][kk+1]);
+                  est_am[i][jj][kk+1]="";
+                  cont_der++;
+                }
+
+                ii = 0;
+                jj = j-1;
+                while (ii <= cont_izq-1)
+                {
+                  _area_espera.push_front(est_am[i][jj][kk+1]);
+                  est_am[i][jj][kk+1]="";
+
+                  jj--;
+                  ii++;
+                }
+                jj = j;
+
+                while (jj-1 >= 0 and est_am[i][jj][kk+1] == est_am[i][jj-1][kk+1])
+                {
+                  _area_espera.push_front(est_am[i][jj][kk+1]);
+                  est_am[i][jj][kk+1]="";
+                  cont_izq++;
+                }
+                jj = j;
+                _area_espera.push_front(est_am[i][jj][kk+1]);
+                est_am[i][jj][kk+1]="";
+              }
+            }
+            kk++;
           }
           _ct.elimina(co_ub.c.matricula());
-
-          if (_h == 1) est_am[i][j][k] == "___";
-          else est_am[i][j][k] == "";
-
-          actualitza_lliures(_head, j);
+          if (kk==0) est_am[i][j][k]="___";
+          else est_am[i][j][k]="";
+          actualitza_lliures(_head);
+        //  _area_espera.sort();
 
         }
       }
@@ -335,16 +487,18 @@ void terminal::retira_ff(string m) throw(error)
       {
         if (longi == 2)
         {
-          std::cout << co_ub.c.matricula() << '\n';
-          int jj = 0;
-          if (est_am[i][j+1][k] == co_ub.c.matricula())         // Buscamos posicion adyacente
+          //std::cout << co_ub.c.matricula() << '\n';
+          int j2 = 0;
+          if (est_am[i][j+1][k] == co_ub.c.matricula())         // Buscamos posicion adyacentes
           {
-            jj = j+1;
+            j2 = j+1;
           }
           else if (est_am[i][j-1][k] == co_ub.c.matricula())
           {
-            jj = j-1;
+            j2 = j-1;
           }
+          // j y jj son las placas que ocupa nuestro contenedor a retirar
+
           if (k+1 == _h)                                        // CD2.1: Estamos en el piso más alto
           {
 
@@ -353,246 +507,354 @@ void terminal::retira_ff(string m) throw(error)
             if (_h == 1)
             {
               est_am[i][j][k] = "___";
-              est_am[i][jj][k] = "___";
+              est_am[i][j2][k] = "___";
             }
             else
             {
               est_am[i][j][k] = "";
-              est_am[i][jj][k] = "";
+              est_am[i][j2][k] = "";
             }
-            int maxim = maxim_dos(j, jj);
-            actualitza_lliures(_head, maxim);
+            //int maxim = maxim_dos(j, jj);
+            actualitza_lliures(_head);
           }
-          else if (k+1 != _h and est_am[i][j][k+1] == "" and est_am[i][jj][k+1] == "")       // CD2.2: No hay nada encima
+          else if (k+1 != _h and est_am[i][j][k+1] == "" and est_am[i][j2][k+1] == "")       // CD2.2: No hay nada encima
           {
             _ct.elimina(co_ub.c.matricula());
 
             if (_h == 1)
             {
               est_am[i][j][k] = "___";
-              est_am[i][jj][k] = "___";
+              est_am[i][j2][k] = "___";
             }
             else
             {
               est_am[i][j][k] = "";
-              est_am[i][jj][k] = "";
+              est_am[i][j2][k] = "";
             }
-            int maxim = maxim_dos(j, jj);
-            actualitza_lliures(_head, maxim+1);
+            //int maxim = maxim_dos(j, jj);
+            actualitza_lliures(_head);
 
           }
-          else                                                // CD3: Hay contenedores encima
+          else
+          // CD3: Hay contenedores encima
           {
-            while (pismax != k)
+            int cont_der = 0;
+            int cont_izq = 0;
+            int kk = k;
+
+            while (kk+1 < _h) // Mientras no llegue arriba del todo
             {
-              while (pismax != k and ((est_am[i][j][pismax] == "" and est_am[i][jj][pismax] == "") or (est_am[i][j][pismax] == "___" and est_am[i][jj][pismax] == "___"))) // Bucle por si hay posiciones vacias encima
+              string mat1 = est_am[i][j][kk+1];
+              string mat2 = est_am[i][j2][kk+1];
+              std::cout << "Encima1: " << mat1 << '\n';
+              std::cout << "Encima2: " << mat2 << '\n';
+              int ii = 0;
+              int jj = j;
+              if (mat1 != "" or mat2 != "")
               {
-                pismax--;
-                //std::cout << pismax << '\n';
-              }
-              if (pismax != k and (est_am[i][j][pismax] == est_am[i][jj][pismax]))      // contienen el mismo contenedor
-              {
-                //std::cout << k << " " << est_am[i][j][pismax] << " " << est_am[i][jj][pismax] << "eyyy1\n";
-                _area_espera.push_front(est_am[i][j][pismax]);
+                // PRIMERA ITERACIÓN (O VARIAS, DEPENDE DE SI SOLO SE RETIRA ESTRICTAMENTE EL DE ENCMA)
+                if (cont_izq == 0 and cont_der == 0)
+                {
+                  while(jj+1 <= _m-1 and mat2 == est_am[i][jj+1][kk+1])
+                  {
+                    std::cout << est_am[i][jj+1][kk+1] << '\n';
+                    cont_der++;
+                    jj++;
+                  }
+                  jj = j;
+                  while (jj-1 >= 0 and mat1 == est_am[i][jj-1][kk+1])
+                  {
+                    std::cout << est_am[i][jj-1][kk+1] << '\n';
+                    cont_izq++;
+                    jj--;
+                  }
+                  _area_espera.push_front(mat1);
+                  _area_espera.push_front(mat2);
+                  jj = j;
 
-                opsgrua++;
-                est_am[i][j][pismax] = "";
-                est_am[i][jj][pismax] = "";
-                cont++;
-              }
-              else
-              {
-                if (est_am[i][j][pismax] != "" and est_am[i][jj][pismax] == "")
-                {
-                  //std::cout << "eyyy2\n";
-                  _area_espera.push_front(est_am[i][j][pismax]);
-                  _ct[est_am[i][j][pismax]].u = ubicacio(-1,0,0);
-                  opsgrua++;
-                  est_am[i][j][pismax] = "";
-                  //cont++;
+                  while (ii <= cont_der-1)
+                  {
+                    est_am[i][jj+1][kk+1]="";
+                    ii++;
+                    jj++;
+                  }
+                  ii = 0;
+                  jj = j;
+                  while (ii <= cont_izq-1)
+                  {
+                    est_am[i][jj-1][kk+1]="";
+                    ii++;
+                    jj--;
+                  }
+                  jj = j;
+                  est_am[i][jj][kk+1]="";
                 }
-                if (est_am[i][jj][pismax] != "" and est_am[i][j][pismax] == "")
+                // EN LA PRIMERA ITERACIÓN SE HAN RETIRADO VARIOS DEL LADO
+                else
                 {
-                  //std::cout << "eyyy3\n";
-                  _area_espera.push_front(est_am[i][jj][pismax]);
-                  _ct[est_am[i][jj][pismax]].u = ubicacio(-1,0,0);
-                  opsgrua++;
-                  est_am[i][jj][pismax] = "";
-                  //cont++;
+                  ii = 0;
+                  jj = j+1;
+                  while (ii <= cont_der-1)
+                  {
+                    _area_espera.push_front(est_am[i][jj][kk+1]);
+                    est_am[i][jj][kk+1]="";
+
+                      jj++;
+                      ii++;
+                  }
+                  jj = j;
+                  while (jj+1 <= _m-1 and est_am[i][jj][kk+1] == est_am[i][jj+1][kk+1] and est_am[i][jj][kk+1] != "")
+                  {
+                    _area_espera.push_front(est_am[i][jj][kk+1]);
+                    est_am[i][jj][kk+1]="";
+                    cont_der++;
+                  }
+
+                  ii = 0;
+                  jj = j-1;
+                  while (ii <= cont_izq-1)
+                  {
+                    _area_espera.push_front(est_am[i][jj][kk+1]);
+                    est_am[i][jj][kk+1]="";
+
+                    jj--;
+                    ii++;
+                  }
+                  jj = j;
+
+                  while (jj-1 >= 0 and est_am[i][jj][kk+1] == est_am[i][jj-1][kk+1] and est_am[i][jj][kk+1] != "")
+                  {
+                    _area_espera.push_front(est_am[i][jj][kk+1]);
+                    est_am[i][jj][kk+1]="";
+                    cont_izq++;
+                  }
+                  jj = j;
+                  _area_espera.push_front(est_am[i][jj][kk+1]);
+                  est_am[i][jj][kk+1]="";
                 }
               }
-              if (pismax != k)pismax--;
+              kk++;
             }
-
             _ct.elimina(co_ub.c.matricula());
-            if (_h == 1)
-            {
-              est_am[i][j][k] = "___";
-              est_am[i][jj][k] = "___";
+            if (kk==0){
+              est_am[i][j][k]="___";
+              est_am[i][j2][k]="___";
             }
-            else
-            {
-              est_am[i][j][k] = "";
-              est_am[i][jj][k] = "___";
+            else{
+              est_am[i][j][k]="";
+              est_am[i][j2][k]="";
             }
-            int maxim = maxim_dos(j, jj);
-            actualitza_lliures(_head, maxim+1);
+            actualitza_lliures(_head);
+            _area_espera.sort();
           }
       }
-
+      // LONGITUD 3
       if (longi == 3)
       {
-        int jj = 0;
+        int j3 = 0;
+        int j2 = 0;
 
-        if (j+2 != _m and est_am[i][j][k] == est_am[i][j+2][k]) jj = j+2;
-        else if (j+1 != _m and est_am[i][j][k] == est_am[i][j+1][k]) jj = j+1;
-        else if (j+1 != _m) jj = j;
+        if (j+2 != _m and est_am[i][j][k] == est_am[i][j+2][k]) j3 = j+2;
+        else if (j+1 != _m and est_am[i][j][k] == est_am[i][j+1][k]) j3 = j+1;
+        else if (j+1 != _m) j3 = j;
+        // CD3.1: Estamos en el piso más alto
+        j2 = j3-1;
+        j = j2-1;
 
-        if (k+1 == _h)                                        // CD3.1: Estamos en el piso más alto
+        if (k+1 == _h)
         {
           _ct.elimina(co_ub.c.matricula());
 
           if (_h == 1)
           {
-            est_am[i][jj-2][k] = "___";
-            est_am[i][jj-1][k] = "___";
-            est_am[i][jj][k] = "___";
+            est_am[i][j3][k] = "___";
+            est_am[i][j2][k] = "___";
+            est_am[i][j][k] = "___";
           }
           else
           {
-            est_am[i][jj-2][k] = "";
-            est_am[i][jj-1][k] = "";
-            est_am[i][jj][k] = "";
+            est_am[i][j3][k] = "";
+            est_am[i][j2][k] = "";
+            est_am[i][j][k] = "";
           }
 
           // Buscar centinela
-          int maxim = maxim_tres(jj-2, jj-1, jj);
-          actualitza_lliures(_head, maxim+1);
+          //int maxim = maxim_tres(jj-2, jj-1, jj);
+          actualitza_lliures(_head);
         }
-        else if (est_am[i][jj-2][k+1] == "" and est_am[i][jj-1][k+1] == "" and est_am[i][jj][k+1] == "")       // CD2.2: No hay nada encima
+         // CD2.2: No hay nada encima
+        else if (est_am[i][j][k+1] == "" and est_am[i][j2][k+1] == "" and est_am[i][j3][k+1] == "")
         {
 
           _ct.elimina(co_ub.c.matricula());
 
           if (_h == 1)
           {
-            est_am[i][jj-2][k] = "___";
-            est_am[i][jj-1][k] = "___";
-            est_am[i][jj][k] = "___";
+            est_am[i][j3][k] = "___";
+            est_am[i][j2][k] = "___";
+            est_am[i][j][k] = "___";
           }
           else
           {
-            est_am[i][jj-2][k] = "";
-            est_am[i][jj-1][k] = "";
-            est_am[i][jj][k] = "";
+            est_am[i][j3][k] = "";
+            est_am[i][j2][k] = "";
+            est_am[i][j][k] = "";
           }
 
-          int maxim = maxim_tres(jj-2, jj-1, jj);
-          actualitza_lliures(_head, maxim+1);
+          //int maxim = maxim_tres(jj-2, jj-1, jj);
+          actualitza_lliures(_head);
 
         }
-        else                                                // CD3: Hay contenedores encima
+        // CD3: Hay contenedores encima
+        else
         {
-          while (pismax != k)
-          {
-            while (est_am[i][jj-2][pismax] == "" and est_am[i][jj-1][pismax] == "" and est_am[i][jj][pismax] == "") // Bucle por si hay posiciones vacias encima
-            {
-              pismax--;
-            }
-            if ( pismax != k and (est_am[i][jj-2][pismax] == est_am[i][jj-1][pismax]) and (est_am[i][jj-1][pismax] == est_am[i][jj][pismax]))      // contienen el mismo contenedor
-            {
-              _area_espera.push_front(est_am[i][jj][pismax]);
-              //std::cout << "Se retira " << co_ub.c.matricula() << '\n';
-              //std::cout << "Se manda al AEM a " << est_am[i][jj][pismax] << '\n';
-              //td::cout << _ct[est_am[i][jj][pismax]].u.filera() << _ct[est_am[i][jj][pismax]].u.placa() << _ct[est_am[i][jj][pismax]].u.pis() << '\n';
-              opsgrua++;
+            int cont_der = 0;
+            int cont_izq = 0;
+            int kk = k;
 
-              est_am[i][jj-2][pismax] = "";
-              est_am[i][jj-1][pismax] = "";
-              est_am[i][jj][pismax] = "";
-              cont++;
-              //std::cout << i << jj-2 << pismax << " " << est_am[i][jj-2][pismax] << '\n';
-            }
-            else
+            while (kk+1 < _h) // Mientras no llegue arriba del todo
             {
-              if (est_am[i][jj-2][pismax] != "")
+              string mat1 = est_am[i][j][kk+1];
+              string mat2 = est_am[i][j2][kk+1];
+              string mat3 = est_am[i][j3][kk+1];
+              std::cout << "Encima1: " << mat1 << '\n';
+              std::cout << "Encima2: " << mat2 << '\n';
+              std::cout << "Encima3: " << mat3 << '\n';
+              int ii = 0;
+              int jj = j;
+              int jjj = j3;
+              if (mat1 != "" or mat2 != "" or mat3 != "")
               {
-                if (jj-3 >= 0 and est_am[i][jj-3][pismax] != "")
+                // PRIMERA ITERACIÓN (O VARIAS, DEPENDE DE SI SOLO SE RETIRA ESTRICTAMENTE EL DE ENCMA)
+                if (cont_izq == 0 and cont_der == 0)
                 {
-                  if (jj-4 >= 0 and est_am[i][jj-4][pismax] != ""){
-                    _area_espera.push_front(est_am[i][jj-4][pismax]);
-
-                    est_am[i][jj-4][pismax] = "";
-                    opsgrua++;
+                  while(jjj+1 <= _m-1 and mat3 == est_am[i][jjj+1][kk+1])
+                  {
+                    std::cout << est_am[i][jj+1][kk+1] << '\n';
+                    cont_der++;
+                    jjj++;
                   }
-                  _area_espera.push_front(est_am[i][jj-3][pismax]);
-
-                  est_am[i][jj-3][pismax] = "";
+                  jj = j;
+                  while (jj-1 >= 0 and mat1 == est_am[i][jj-1][kk+1])
+                  {
+                    std::cout << est_am[i][jj-1][kk+1] << '\n';
+                    cont_izq++;
+                    jj--;
+                  }
+                  _area_espera.push_front(mat1);
+                  _area_espera.push_front(mat2);
+                  _area_espera.push_front(mat3);
+                  jj = j;
+                  jjj = j3;
+                  while (ii <= cont_der-1)
+                  {
+                    est_am[i][jjj+1][kk+1]="";
+                    ii++;
+                    jjj++;
+                  }
+                  ii = 0;
+                  jj = j;
+                  jjj = j3;
+                  while (ii <= cont_izq-1)
+                  {
+                    est_am[i][jj-1][kk+1]="";
+                    ii++;
+                    jj--;
+                  }
+                  jj = j;
+                  est_am[i][j][kk+1]="";
+                  est_am[i][j2][kk+1]="";
+                  est_am[i][j3][kk+1]="";
                 }
-                _area_espera.push_front(est_am[i][jj-2][pismax]);
-
-                est_am[i][jj-2][pismax] = "";
-                //cont++;
-                opsgrua++;
-              }
-              if (est_am[i][jj-1][pismax] != "")
-              {
-                _area_espera.push_front(est_am[i][jj-1][pismax]);
-
-                opsgrua++;
-                est_am[i][jj-1][pismax] = "";
-                //cont++;
-              }
-              if (est_am[i][jj][pismax] != "")
-              {
-                if (jj+1 < _m and est_am[i][jj+1][pismax] != "")
+                // EN LA PRIMERA ITERACIÓN SE HAN RETIRADO VARIOS DEL LADO
+                else
                 {
-                  if (jj+2 < _m and est_am[i][jj+2][pismax] != ""){
-                    _area_espera.push_front(est_am[i][jj+2][pismax]);
+                  ii = 0;
+                  jj = j3+1;
+                  while (ii <= cont_der-1)
+                  {
+                    _area_espera.push_front(est_am[i][jj][kk+1]);
+                    est_am[i][jj][kk+1]="";
 
-                    est_am[i][jj+1][pismax] = "";
-                    opsgrua++;
+                      jj++;
+                      ii++;
                   }
-                  _area_espera.push_front(est_am[i][jj+1][pismax]);
+                  jj = j3;
+                  while (jj+1 <= _m-1 and est_am[i][jj][kk+1] == est_am[i][jj+1][kk+1] and est_am[i][jj][kk+1]!="")
+                  {
+                    std::cout << "Recorro esquina derecha: " << est_am[i][jj][kk+1] << '\n';
+                    _area_espera.push_front(est_am[i][jj][kk+1]);
+                    est_am[i][jj][kk+1]="";
+                    cont_der++;
+                  }
 
-                  est_am[i][jj+1][pismax] = "";
+                  ii = 0;
+                  jj = j-1;
+                  while (ii <= cont_izq-1)
+                  {
+                    _area_espera.push_front(est_am[i][jj][kk+1]);
+                    est_am[i][jj][kk+1]="";
+
+                    jj--;
+                    ii++;
+                  }
+                  jj = j;
+
+                  while (jj-1 >= 0 and est_am[i][jj][kk+1] == est_am[i][jj-1][kk+1] and est_am[i][jj][kk+1] != "")
+                  {
+                    std::cout << "Recorro esquina izqa: " << est_am[i][jj][kk+1] << '\n';
+                    _area_espera.push_front(est_am[i][jj][kk+1]);
+                    est_am[i][jj][kk+1]="";
+                    cont_izq++;
+                  }
+                  jj = j;
+                  _area_espera.push_front(est_am[i][jj][kk+1]);
+                  est_am[i][jj][kk+1]="";
                 }
-                _area_espera.push_front(est_am[i][jj][pismax]);
-
-                est_am[i][jj][pismax] = "";
-                //cont++;
-                opsgrua++;
               }
+              kk++;
             }
-            pismax--;
-          }
+            _ct.elimina(co_ub.c.matricula());
+            if (kk==0){
+              est_am[i][j][k]="___";
+              est_am[i][j2][k]="___";
+              est_am[i][j3][k]="___";
+            }
+            else{
+              est_am[i][j][k]="";
+              est_am[i][j2][k]="";
+              est_am[i][j3][k]="";
+            }
+            actualitza_lliures(_head);
+            //_area_espera.unique();
 
-          _ct.elimina(co_ub.c.matricula());
+          //_ct.elimina(co_ub.c.matricula());
 
-          if (_h == 1)
+          /*if (_h == 1)
           {
-            est_am[i][jj-2][k] = "___";
-            est_am[i][jj-1][k] = "___";
-            est_am[i][jj][k] = "___";
+            est_am[i][j3][k] = "___";
+            est_am[i][j2][k] = "___";
+            est_am[i][j][k] = "___";
           }
           else
           {
-            est_am[i][jj][k] = "";
-            est_am[i][jj-1][k] = "";
-            est_am[i][jj-2][k] = "";
-          }
+            est_am[i][j3][k] = "";
+            est_am[i][j2][k] = "";
+            est_am[i][j][k] = "";
+          }*/
 
-          int maxim = maxim_tres(jj-2, jj-1, jj);
-          actualitza_lliures(_head, maxim+1);
+          //int maxim = maxim_tres(jj-2, jj-1, jj);
+          //actualitza_lliures(_head);
 
         }
       }
     }
+    _area_espera.remove("");
+    _area_espera.remove("___");
     _area_espera.unique();
-    recorre(cont);
+    recorre(0);
   }
-
-  }
+}
   else
   {
     throw error(MatriculaInexistent);
@@ -622,10 +884,10 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
   bool exis_aem = true;
 
   if (_ct.existeix(co_ub.c.matricula()))
-  { 
+  {
     exis_aem = revisa(co_ub.c.matricula(), exis_aem);
   }
-  else { 
+  else {
     exis_aem = false;
   }
 
@@ -648,6 +910,7 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
     // EL CONTENEDOR ES DE 10 PIES
     if (longi == 1)
     {
+
       while (not trobat and p->_lliu != true)      // Busca una libre
       {
         if (p->_seg == NULL) trobat = true;
@@ -675,14 +938,16 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
         //std::cout << "Colocado en " << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
         opsgrua++;
         trobat = true;
-        recorre(0);
+        actualitza_lliures(_head);
+        //actualitza_lliures(_head, j);
+        recorre(1);
       }
     }
     // EL CONTENEDOR ES DE 20 o 30 PIES
     else
     // BÚSQUEDA DEL PRIMER HUECO LIBRE VÁLIDO, FUERA DEL BUCLE
     {
-
+      std::cout << co_ub.c.matricula() << '\n';
       while (p != NULL and not trobat and p->_lliu != true)      // Busca la primera libre
       {
         if (p->_seg == NULL) trobat = true;
@@ -704,7 +969,7 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
               if (p->_seg != NULL){
 
                 p = inici->_seg;
-                
+
               }
               while (p!=NULL and not trobat and p->_lliu != true)
               {
@@ -733,13 +998,13 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
               //{
                 if (inici->_u.pis() != 0 or p->_u.pis() != 0)
                 {
-                  
+
                   if (p2 != NULL)
                   {
                     if (p->_ant->_lliu == true or inici->_ant->_lliu == true or p2->_ant->_lliu == true) i = 0;
                   }
                   if ((p->_ant->_lliu == true or inici->_ant->_lliu == true) and p->_u.filera() == filera_act){
-                    
+
                     i = 0;    // Comprobamos si el de debajo nuestro está libre, si es así, no ponemos en el aire
                   }
                 }
@@ -750,7 +1015,7 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
                     i++;
                     if (i == 2) p2 = p;
                   }
-                  else i = 0; 
+                  else i = 0;
                 }
               //}
             }
@@ -780,7 +1045,7 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
         co_ub.u = inici->_u;
         _ct.assig(co_ub.c.matricula(), co_ub);
         //std::cout << "Long 2: Se inserta " << co_ub.c.matricula() << '\n';
-        
+
         i = p2->_u.filera();
         j = p2->_u.placa();
         k = p2->_u.pis();
@@ -791,7 +1056,8 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
 
         inici->_lliu = false;
         p2->_lliu = false;
-        recorre(0);
+        actualitza_lliures(_head);
+        recorre(1);
       }
       // Contenidor 30 peus -> Insercions al catàleg de contenidors
       else if (longi == 3)
@@ -830,7 +1096,8 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
         inici->_lliu = false;
         p2->_lliu = false;
         p->_lliu = false;
-        recorre(0);
+        actualitza_lliures(_head);
+        recorre(1);
       }
     }
     // TROBAT = TRUE -> DIRECTO AL CATALEG Y AL ÁREA DE ESPERA
