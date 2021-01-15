@@ -22,7 +22,7 @@ string ***est_am;
 
 // 3. Llista enllaçada: Guarda ubicacions lliures de l'àrea d'emmagatzematge
 struct node {
-  node(): _u(0,0,0) {};
+  node(): _u(0,0,0) {};				  // Inicialització del tipus node
 
   ubicacio _u;                        // Cada node de la llista guarda un objecte ubicació
   bool _lliu;                         // Indica si la ubicació està lliure o no
@@ -45,10 +45,7 @@ void borra_am();
 void crea_llista_lliures(int n, int m, int h);
 void borra_llista_lliures(node* &n);
 
-bool revisa(string m, bool existeix);
 
-// HABRÁ QUE HACER UN MÉTODO QUE DESPUÉS DEL RETIRA, RECORRA LA LISTA DE UBICACIONES libres
-// COMPARANDO CON LA MATRIZ Y MARCANDOLAS COMO LIBRE O NO LIBRE
 void actualitza_lliures(node* n);
 void recorre(int cont);
 int maxim_dos(int a, int b);
@@ -56,7 +53,7 @@ int maxim_tres(int a, int b, int c);
 
 
 // Estrategia FIRST_FIT
-void insereix_ff(Cu co_ub) throw(error);         // Insereix contenidor seguint la estrategia FIRST_FIT
+void insereix_ff(Cu co_ub) throw(error);         	// Insereix contenidor seguint la estrategia FIRST_FIT
 void retira_ff(string m) throw(error);               // Retira contenidor seguint la estrategia FIRST_FIT
 
 // Estrategia LLIURE
