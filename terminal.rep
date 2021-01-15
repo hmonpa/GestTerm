@@ -45,9 +45,6 @@ void borra_am();
 void crea_llista_lliures(int n, int m, int h);
 void borra_llista_lliures(node* &n);
 
-void funcion(ubicacio u, nat longi);
-void regenera(ubicacio u, nat longi);
-
 bool revisa(string m, bool existeix);
 
 // HABRÁ QUE HACER UN MÉTODO QUE DESPUÉS DEL RETIRA, RECORRA LA LISTA DE UBICACIONES libres
@@ -57,9 +54,6 @@ void recorre(int cont);
 int maxim_dos(int a, int b);
 int maxim_tres(int a, int b, int c);
 
-// Ordenació àrea espera
-void mergesort(list<string> &l);
-void merge(list<string> l1, list<string> l2);
 
 // Estrategia FIRST_FIT
 void insereix_ff(Cu co_ub) throw(error);         // Insereix contenidor seguint la estrategia FIRST_FIT

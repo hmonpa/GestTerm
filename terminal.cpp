@@ -2,61 +2,6 @@
 // --------------------------- Mètodes privats ---------------------------
 
 
-// --- ORDENACIÓN -> TRADUCIDA DIRECTAMENTE DE MERGESORT DE ENTEROS, HAY QUE RETOCARLA ---
-/*
-//
-void terminal::merge(list<string> l1, list<string> l2)
-{
-  // PRE:
-  // POST:
-
-  nat cont1 = 0, cont2 = 0;
-  list<string> l(l1.size() + l2.size());
-
-  for (int i=0; i<l.size(); i++){
-      if (cont1 >= l1.size() and cont2 < l2.size()){
-          l(i) = l2(cont2);
-          cont2++;
-      }
-      else if (cont2 >= l2.size() and cont1 < l1.size()){
-          l(i) = l1(cont1);
-          cont1++;
-      }
-      else if (l1(cont1) < l2(cont2) and cont1 < l1.size()){
-          l(i) = l1(cont1);
-          cont1++;
-      }
-      else if (l1(cont1) > l2(cont2) and cont2 < l2.size()){
-          l(i) = l2(cont2);
-          cont2++;
-      }
-  }
-  return l;
-}
-
-//
-void terminal::mergesort(list<string> &l)
-{
-  // PRE:
-  // POST:
-
-    int mida = l.size();
-    list<string> l2(mida/2);
-    nat m = mida/2;
-    if (mida%2 != 0) m++;
-    list<string> l1(m);                               // Dos llistes de tamany "mida/2" (o un mida/2 i l'altre (mida/2)+1)
-
-    for (nat i=0; i<m; i++){
-        if (i < l2.size()){
-            l2(l2.size()-i-1) = l(mida-i-1);
-        }
-        l1(i) = l(i);
-    }
-    if (l1.size() > 1) mergesort(l1);            // Partir
-    if (l2.size() > 1) mergesort(l2);
-    l = merge(l1, l2);
-}*/
-
 //
 void terminal::inicialitza_am(int n, int m, int h)
 {
@@ -210,17 +155,22 @@ void terminal::recorre(int cont)
   if (not _area_espera.empty())
   {
     if (cont != 0){
+
       for (list<string>::iterator it=_area_espera.begin(); it!=_area_espera.end() and not acaba; it++)
       {
-
+        //
+        //if (_ct.existeix(*it)){
         co_ub.c = _ct[*it].c;
         co_ub.u = _ct[*it].u;
 
+        std::cout << "Intento de inserción de "<< co_ub.c.matricula() << '\n';
         //std::cout << "LISTA ACTUAL:\n";
         //for (list<string>::iterator it=_area_espera.begin(); it!=_area_espera.end(); it++) std::cout << (*it) << '\n';
 
         insereix_ff(co_ub);
-        if (_area_espera.empty()) acaba = true;
+        //if (_area_espera.empty()) acaba = true;
+      //}
+
         //std::cout << "LISTA ACTUAL POS INSER:\n";
         //for (list<string>::iterator it=_area_espera.begin(); it!=_area_espera.end(); it++) std::cout << (*it) << '\n';
         /*co_ub.u = _ct[*it].u;
@@ -230,18 +180,25 @@ void terminal::recorre(int cont)
           list<string>::iterator it2 = it;
           _area_espera.remove(*it2);
         }*/
+
       }
+      std::cout << "hhh\n";
     }
     else {
       for (list<string>::reverse_iterator it=_area_espera.rbegin(); it!=_area_espera.rend() and not acaba; it++)
       {
+        //if (_area_espera.empty()) acaba = true;
+        //if (_ct.existeix(*it)){
         co_ub.c = _ct[*it].c;
         co_ub.u = _ct[*it].u;
 
         //std::cout << "LISTA ACTUAL:\n";
-        //for (list<string>::reverse_iterator it=_area_espera.rbegin(); it!=_area_espera.rend(); it++) std::cout << (*it) << '\n';
+      //  for (list<string>::reverse_iterator it=_area_espera.rbegin(); it!=_area_espera.rend(); it++) std::cout << (*it) << '\n';
         insereix_ff(co_ub);
-        if (_area_espera.empty()) acaba = true;
+        //if (_area_espera.empty()) acaba = true;
+      //}
+
+
         //if (_ct.existeix(*it) and _ct[*it].u != ubicacio(-1,0,0)) _area_espera.remove(*it);
         //std::cout << "LISTA ACTUAL POST INSER:\n";
         //for (list<string>::reverse_iterator it=_area_espera.rbegin(); it!=_area_espera.rend(); it++) std::cout << (*it) << '\n';
@@ -251,75 +208,14 @@ void terminal::recorre(int cont)
           std::cout << "insertado en el am\n";
           list<string>::reverse_iterator it2 = it;
           _area_espera.remove(*it2);
-        }*/
+        }
       }
     }
   }
 
 }
+*/
 
-/*void terminal::dist_izquierda(int i, int j, int k)
-{
-  int dist_izq = 0;
-  bool fi = false;
-  while (not final and j-dist_izq >= 0)
-  {
-    if (est_am[i][j-dist_esq][k]=="" and (k==0 or est_am[i][j-dist_izq][k-1]!="")) dist_izq++;
-    else fi = true;
-  }
-  return dist_izq;
-}
-
-void terminal::dist_derecha(int i, int j, int k)
-{
-  int dist_der = 0;
-  bool fi = false;
-  while (not final and j+dist_der < _m)
-  {
-    if (est_am[i][j+dist_der][k]=="" and (k==0 or est_am[i][j+dist_der][k-1]!="")) dist_der++;
-    else fi = true;
-  }
-  return dist_der;
-}
-
-void terminal::regenera(ubicacio u, nat longi)
-{
-  int i = u.filera();
-  int j = u.placa();
-  int k = u.pis();
-  int dist_der = dist_derecha(i, j+longi, k);
-  int dist_izq = dist_izquierda(i, j-1, k);
-  if (k+1 < _h)
-  {
-
-  }
-}*/
-
-/*void terminal::funcion(ubicacio u, nat longi)
-{
-  int i = u.filera();
-  int j = u.placa();
-  int k = u.pis();
-
-  for (nat ii=0; ii<longi and k+1<_h; ii++)
-  {
-    string mat = est_am[i][j+ii][k+1];
-    if (mat != "")
-    {
-      ubicacio pos = _ct[mat].u;
-      int length = _ct[mat].c.longitud();
-      funcion(pos, length);
-    }
-  }
-  string matri = est_am[i][j][k];
-  matri = "";
-  _area_espera.push_front(matri);
-  regenera(u, longi);
-  Cu co_ub;
-  co_ub.c = _ct[matri].c;
-  co_ub.u = _ct[matri].u;
-
-}*/
 
 //
 void terminal::retira_ff(string m) throw(error)
@@ -358,6 +254,7 @@ void terminal::retira_ff(string m) throw(error)
         if (k == _h-1)  // CD1.1: Estamos en arriba del todo,
         {
             _ct.elimina(co_ub.c.matricula());
+            opsgrua++;
             //std::cout << "Se retira " << co_ub.c.matricula() << '\n';
 
             if (_h == 1) est_am[i][j][k] = "___";
@@ -371,6 +268,7 @@ void terminal::retira_ff(string m) throw(error)
         else if (k != _h-1 and est_am[i][j][k+1] == "")
         {
           _ct.elimina(co_ub.c.matricula());
+          opsgrua++;
           //std::cout << "Se retira " << co_ub.c.matricula() << '\n';
 
           if (_h == 1) est_am[i][j][k] = "___";
@@ -403,11 +301,12 @@ void terminal::retira_ff(string m) throw(error)
                 jj = j;
                 while (jj-1 >= 0 and mat1 == est_am[i][jj-1][kk+1])
                 {
-                  std::cout << est_am[i][jj-1][kk+1] << "\n\n";
+                  //std::cout << est_am[i][jj-1][kk+1] << "\n\n";
                   cont_izq++;
                   jj--;
                 }
                 _area_espera.push_front(mat1);
+                opsgrua++;
                 jj = j;
 
                 while (ii <= cont_der-1)
@@ -430,7 +329,7 @@ void terminal::retira_ff(string m) throw(error)
               // EN LA PRIMERA ITERACIÓN SE HAN RETIRADO VARIOS DEL LADO
               else
               {
-                std::cout << "Cont izq " << cont_izq << " y cont der: " << cont_der << '\n';
+                //std::cout << "Cont izq " << cont_izq << " y cont der: " << cont_der << '\n';
                 ii = 0;
                 jj = j+1;
                 while (ii <= cont_der-1)
@@ -475,10 +374,12 @@ void terminal::retira_ff(string m) throw(error)
             kk++;
           }
           _ct.elimina(co_ub.c.matricula());
+          opsgrua++;
           if (kk==0) est_am[i][j][k]="___";
           else est_am[i][j][k]="";
           actualitza_lliures(_head);
-        //  _area_espera.sort();
+
+          //_area_espera.sort();
 
         }
       }
@@ -503,6 +404,7 @@ void terminal::retira_ff(string m) throw(error)
           {
 
             _ct.elimina(co_ub.c.matricula());
+            opsgrua++;
               //std::cout << "Se retira " << co_ub.c.matricula() << '\n';
             if (_h == 1)
             {
@@ -520,7 +422,7 @@ void terminal::retira_ff(string m) throw(error)
           else if (k+1 != _h and est_am[i][j][k+1] == "" and est_am[i][j2][k+1] == "")       // CD2.2: No hay nada encima
           {
             _ct.elimina(co_ub.c.matricula());
-
+            opsgrua++;
             if (_h == 1)
             {
               est_am[i][j][k] = "___";
@@ -546,8 +448,8 @@ void terminal::retira_ff(string m) throw(error)
             {
               string mat1 = est_am[i][j][kk+1];
               string mat2 = est_am[i][j2][kk+1];
-              std::cout << "Encima1: " << mat1 << '\n';
-              std::cout << "Encima2: " << mat2 << '\n';
+              //std::cout << "Encima1: " << mat1 << '\n';
+              //std::cout << "Encima2: " << mat2 << '\n';
               int ii = 0;
               int jj = j;
               if (mat1 != "" or mat2 != "")
@@ -557,19 +459,25 @@ void terminal::retira_ff(string m) throw(error)
                 {
                   while(jj+1 <= _m-1 and mat2 == est_am[i][jj+1][kk+1])
                   {
-                    std::cout << est_am[i][jj+1][kk+1] << '\n';
+                    //std::cout << est_am[i][jj+1][kk+1] << '\n';
                     cont_der++;
                     jj++;
                   }
                   jj = j;
                   while (jj-1 >= 0 and mat1 == est_am[i][jj-1][kk+1])
                   {
-                    std::cout << est_am[i][jj-1][kk+1] << '\n';
+                    //std::cout << est_am[i][jj-1][kk+1] << '\n';
                     cont_izq++;
                     jj--;
                   }
                   _area_espera.push_front(mat1);
                   _area_espera.push_front(mat2);
+                  if (mat1 == mat2) opsgrua++;
+                  else
+                  {
+                    opsgrua+=2;
+                  }
+
                   jj = j;
 
                   while (ii <= cont_der-1)
@@ -602,6 +510,7 @@ void terminal::retira_ff(string m) throw(error)
                       jj++;
                       ii++;
                   }
+
                   jj = j;
                   while (jj+1 <= _m-1 and est_am[i][jj][kk+1] == est_am[i][jj+1][kk+1] and est_am[i][jj][kk+1] != "")
                   {
@@ -609,7 +518,7 @@ void terminal::retira_ff(string m) throw(error)
                     est_am[i][jj][kk+1]="";
                     cont_der++;
                   }
-
+                  opsgrua++;
                   ii = 0;
                   jj = j-1;
                   while (ii <= cont_izq-1)
@@ -636,6 +545,7 @@ void terminal::retira_ff(string m) throw(error)
               kk++;
             }
             _ct.elimina(co_ub.c.matricula());
+            opsgrua++;
             if (kk==0){
               est_am[i][j][k]="___";
               est_am[i][j2][k]="___";
@@ -645,7 +555,7 @@ void terminal::retira_ff(string m) throw(error)
               est_am[i][j2][k]="";
             }
             actualitza_lliures(_head);
-            _area_espera.sort();
+            //_area_espera.sort();
           }
       }
       // LONGITUD 3
@@ -664,7 +574,7 @@ void terminal::retira_ff(string m) throw(error)
         if (k+1 == _h)
         {
           _ct.elimina(co_ub.c.matricula());
-
+          opsgrua++;
           if (_h == 1)
           {
             est_am[i][j3][k] = "___";
@@ -687,7 +597,7 @@ void terminal::retira_ff(string m) throw(error)
         {
 
           _ct.elimina(co_ub.c.matricula());
-
+          opsgrua++;
           if (_h == 1)
           {
             est_am[i][j3][k] = "___";
@@ -717,9 +627,9 @@ void terminal::retira_ff(string m) throw(error)
               string mat1 = est_am[i][j][kk+1];
               string mat2 = est_am[i][j2][kk+1];
               string mat3 = est_am[i][j3][kk+1];
-              std::cout << "Encima1: " << mat1 << '\n';
-              std::cout << "Encima2: " << mat2 << '\n';
-              std::cout << "Encima3: " << mat3 << '\n';
+              //std::cout << "Encima1: " << mat1 << '\n';
+              //std::cout << "Encima2: " << mat2 << '\n';
+              //std::cout << "Encima3: " << mat3 << '\n';
               int ii = 0;
               int jj = j;
               int jjj = j3;
@@ -730,14 +640,14 @@ void terminal::retira_ff(string m) throw(error)
                 {
                   while(jjj+1 <= _m-1 and mat3 == est_am[i][jjj+1][kk+1])
                   {
-                    std::cout << est_am[i][jj+1][kk+1] << '\n';
+                    //std::cout << est_am[i][jj+1][kk+1] << '\n';
                     cont_der++;
                     jjj++;
                   }
                   jj = j;
                   while (jj-1 >= 0 and mat1 == est_am[i][jj-1][kk+1])
                   {
-                    std::cout << est_am[i][jj-1][kk+1] << '\n';
+                    //std::cout << est_am[i][jj-1][kk+1] << '\n';
                     cont_izq++;
                     jj--;
                   }
@@ -782,7 +692,7 @@ void terminal::retira_ff(string m) throw(error)
                   jj = j3;
                   while (jj+1 <= _m-1 and est_am[i][jj][kk+1] == est_am[i][jj+1][kk+1] and est_am[i][jj][kk+1]!="")
                   {
-                    std::cout << "Recorro esquina derecha: " << est_am[i][jj][kk+1] << '\n';
+                    //std::cout << "Recorro esquina derecha: " << est_am[i][jj][kk+1] << '\n';
                     _area_espera.push_front(est_am[i][jj][kk+1]);
                     est_am[i][jj][kk+1]="";
                     cont_der++;
@@ -802,19 +712,21 @@ void terminal::retira_ff(string m) throw(error)
 
                   while (jj-1 >= 0 and est_am[i][jj][kk+1] == est_am[i][jj-1][kk+1] and est_am[i][jj][kk+1] != "")
                   {
-                    std::cout << "Recorro esquina izqa: " << est_am[i][jj][kk+1] << '\n';
+                    //std::cout << "Recorro esquina izqa: " << est_am[i][jj][kk+1] << '\n';
                     _area_espera.push_front(est_am[i][jj][kk+1]);
                     est_am[i][jj][kk+1]="";
                     cont_izq++;
                   }
                   jj = j;
                   _area_espera.push_front(est_am[i][jj][kk+1]);
+                  opsgrua++;
                   est_am[i][jj][kk+1]="";
                 }
               }
               kk++;
             }
             _ct.elimina(co_ub.c.matricula());
+            opsgrua++;
             if (kk==0){
               est_am[i][j][k]="___";
               est_am[i][j2][k]="___";
@@ -852,7 +764,7 @@ void terminal::retira_ff(string m) throw(error)
     _area_espera.remove("");
     _area_espera.remove("___");
     _area_espera.unique();
-    recorre(0);
+    recorre(1);
   }
 }
   else
@@ -861,7 +773,7 @@ void terminal::retira_ff(string m) throw(error)
   }
 }
 
-bool terminal::revisa(string mat, bool exis_aem)
+/*bool terminal::revisa(string mat, bool exis_aem)
 {
   // PRE
   // POST
@@ -871,7 +783,7 @@ bool terminal::revisa(string mat, bool exis_aem)
     if (*it == mat) exis_aem = true;
   }
   return exis_aem;
-}
+}*/
 
 //
 void terminal::insereix_ff(Cu co_ub) throw(error)
@@ -881,11 +793,13 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
   //std::cout << co_ub.c.matricula() << " " << co_ub.c.longitud() << '\n';
   //std::cout << co_ub.u.filera() << co_ub.u.placa() << co_ub.u.pis() << '\n';
 
-  bool exis_aem = true;
+  bool exis_aem = false;
+  //std::cout << co_ub.c.matricula() << '\n';
 
   if (_ct.existeix(co_ub.c.matricula()))
   {
-    exis_aem = revisa(co_ub.c.matricula(), exis_aem);
+    if (_ct[co_ub.c.matricula()].u == ubicacio(-1,0,0)) exis_aem = true;
+    //exis_aem = revisa(co_ub.c.matricula(), exis_aem);
   }
   else {
     exis_aem = false;
@@ -947,7 +861,7 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
     else
     // BÚSQUEDA DEL PRIMER HUECO LIBRE VÁLIDO, FUERA DEL BUCLE
     {
-      std::cout << co_ub.c.matricula() << '\n';
+      //std::cout << co_ub.c.matricula() << '\n';
       while (p != NULL and not trobat and p->_lliu != true)      // Busca la primera libre
       {
         if (p->_seg == NULL) trobat = true;
@@ -1111,7 +1025,8 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
           _ct.assig(co_ub.c.matricula(), co_ub);
           _area_espera.push_front(co_ub.c.matricula());
         }
-        _area_espera.sort();
+        //else std::cout << "Lo he intentado\n";
+        //_area_espera.sort();
     }
   }
   else
@@ -1455,6 +1370,7 @@ void terminal::area_espera(list<string> &l) const throw()
 
   //std::cout << l.size() << '\n';
   l = _area_espera;
+  l.sort();
   // TO DO :
   // Método de ordenación de la lista l (merge preferiblemente)
   // Bucle que recorra con un iterador desde l.begin hasta l.end y printee los elementos de la lista l
