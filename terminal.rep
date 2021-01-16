@@ -1,61 +1,72 @@
 // Dimensions i estrategia de la terminal
-nat _n;                               // Fileres de la terminal
-nat _m;                               // Plaçes per filera
-nat _h;                               // Alçada màxima d'apilament
-estrategia _st;                       // Estrategia utilizada
+
+nat _n;                               	// Fileres de la terminal
+nat _m;                               	// Plaçes per filera
+nat _h;                               	// Alçada màxima d'apilament
+estrategia _st;                       	// Estrategia utilizada
 
 
-struct Cu {                           // Tipo Cu: Contiene un campo contenedor y otro ubicacion
+struct Cu {                           	// Tipus Cu: Conté un camp contenidor i un camp ubicació
   contenidor c;
   ubicacio u;
 
-  Cu(): c("A10", 10), u(0,0,0){}        // Inicializador por defecto del tipo Cu
+  Cu(): c("A10", 10), u(0,0,0){}        // Inicialitzador per defecte del tipus Cu
 };
-// ----- Estructures de dades -----
-// 1. Catàleg de contenidors de la terminal (Àrees d'emmagatzematge i espera)
-cataleg<Cu> _ct;          // Guarda els contenidors presents a la terminal,
-                          // sent Clau = Matricula, i Valor = Cu (Struct format per un camp contenidor i un camp ubicació)
 
-// 2. Àrea d'emmagatzematge: Tridimensional array
+
+// ------------------------------------------------ Estructures de dades ------------------------------------------------
+// 1. Catàleg de contenidors de la terminal (Àrees d'emmagatzematge i espera)
+cataleg<Cu> _ct;          				// Guarda els contenidors presents a la terminal,
+                          				// sent Clau: String matricula, i Valor: Cu (Struct format per un camp contenidor i un camp ubicació)
+
+// 2. Àrea d'emmagatzematge: Array tridimensional d'strings
 string ***est_am;
 
 
 // 3. Llista enllaçada: Guarda ubicacions lliures de l'àrea d'emmagatzematge
 struct node {
-  node(): _u(0,0,0) {};				  // Inicialització del tipus node
+  node(): _u(0,0,0) {};				  	// Inicialització del tipus node
 
-  ubicacio _u;                        // Cada node de la llista guarda un objecte ubicació
-  bool _lliu;                         // Indica si la ubicació està lliure o no
-  node *_seg;                         // Punter al següent node
-  node *_ant;                         // Punter a l'anterior
+  ubicacio _u;                        	// Cada node de la llista guarda un objecte ubicació
+  bool _lliu;                         	// Indica si la ubicació està lliure o no
+  node *_seg;                         	// Punter al següent node
+  node *_ant;                         	// Punter a l'anterior
 };
-nat _size;
-node *_head;                          // Punter al primer element de la llista d'ubicacions lliures
+nat _size;							  	// Mida de la llista
+node *_head;                          	// Punter al primer element de la llista d'ubicacions lliures
 
 
-// 4. Àrea espera: Guarda matricules de contenidos que no poden ser col·locats a l'àrea d'emmagatzematge
+// 4. Àrea espera: Guarda matricules de contenidors que no han pogut ser col·locats a l'àrea d'emmagatzematge
 list<string> _area_espera;
 
-nat opsgrua;
+nat opsgrua;							// Nombre d'operacions de grua
 
 
 // Mètodes privats
-void inicialitza_am(int n, int m, int h);
-void borra_am();
-void crea_llista_lliures(int n, int m, int h);
-void borra_llista_lliures(node* &n);
+void inicialitza_am(int n, int m, int h);			// Inicialitza l'àrea d'emmagatzematge buida
+void borra_am();									// Esborra l'àrea d'emmagatzematge
+void crea_llista_lliures(int n, int m, int h);		// Crea llista enllaçada d'ubicacions lliures
+void borra_llista_lliures(node* &n);				// Esborra llista enllaçada d'ubicacions lliures
+void recorrido_der(int i, int j, int k, int jorig, int korig);
+void recorrido_izq(int i, int j, int k, int jorig, int korig);
 
-
-void actualitza_lliures(node* n);
-void recorre(int cont);
-int maxim_dos(int a, int b);
-int maxim_tres(int a, int b, int c);
+void actualitza_lliures(node* n);					// Actualitza la llista d'ubicacions lliures
+void recorre(int cont);								// Recorre l'àrea d'espera per intentar inserir contenidors a l'àrea d'emmagatzematge
+int maxim_dos(int a, int b);						// Retorna el màxim de dos enters
+int maxim_tres(int a, int b, int c);				// Retorna el màxim de tres enters
 
 
 // Estrategia FIRST_FIT
 void insereix_ff(Cu co_ub) throw(error);         	// Insereix contenidor seguint la estrategia FIRST_FIT
-void retira_ff(string m) throw(error);               // Retira contenidor seguint la estrategia FIRST_FIT
+void retira_ff(string m) throw(error);              // Retira contenidor seguint la estrategia FIRST_FIT
 
 // Estrategia LLIURE
 void insereix_cont_LL(const contenidor &c) throw(error);    // Insereix contenidor seguint la estrategia LLIURE
 void retira_cont_LL(const string &m) throw(error);          // Retira contenidor seguint la estrategia LLIURE
+
+
+// ------------------------------------ Classe Terminal - Raonament i decisions ------------------------------------
+/*
+
+
+*/

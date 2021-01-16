@@ -169,22 +169,192 @@ void terminal::recorre(int cont)
         if(_ct[co_ub.c.matricula()].u != ubicacio(-1,0,0))
         {
         	list<string>::iterator it2 = it;
-        	if (it2!=_area_espera.begin()) it=_area_espera.begin();
-        	else it--;
         	_area_espera.erase(it2);
+        	it=_area_espera.begin();
+        	it--;
         }
       }
     }
   }
 }
 
+          void terminal::recorrido_der(int i, int jj, int kk, int jinici, int kinici)
+          {
+          	// PRE: k es k+1 respecto al contenedor a retirar 
+          	//
 
+          	if (kk < _h and jj >= jinici)
+          	{
+          		
+          		if (_ct.existeix(est_am[i][jj][kk]) and _ct[est_am[i][jj][kk]].u != ubicacio(-1,0,0))
+	            {
+	            	//std::cout << "Al area de espera " << est_am[i][jj][kk] << '\n';
+                	Cu co_aux;
+                  	co_aux.c = _ct[est_am[i][jj][kk]].c;
+                  	co_aux.u = ubicacio(-1,0,0);
+                  	_ct.elimina(est_am[i][jj][kk]);
+                  	//std::cout << mat1 << '\n';
+                  	_area_espera.push_back(est_am[i][jj][kk]);
+                  	_ct.assig(est_am[i][jj][kk], co_aux);
+	            }
+	            est_am[i][jj][kk]="";
+          		recorrido_der(i, jj, ++kk, jinici, kinici);
+          		recorrido_der(i, --jj, kinici+1, jinici, kinici);
+          	}
+		}
+
+        void terminal::recorrido_izq(int i, int jj, int kk, int jinici, int kinici)
+        {
+        	if (kk < _h and jj >= jinici)
+          	{
+          		//std::cout << "hola recurs" << i << jj << kk << "\n";
+          		
+          		if (_ct.existeix(est_am[i][jj][kk]) and _ct[est_am[i][jj][kk]].u != ubicacio(-1,0,0))
+	            {
+	            	//std::cout << "Al area de espera " << est_am[i][jj][kk] << '\n';
+                	Cu co_aux;
+                  	co_aux.c = _ct[est_am[i][jj][kk]].c;
+                  	co_aux.u = ubicacio(-1,0,0);
+                  	_ct.elimina(est_am[i][jj][kk]);
+                  	//std::cout << mat1 << '\n';
+                  	_area_espera.push_back(est_am[i][jj][kk]);
+                  	_ct.assig(est_am[i][jj][kk], co_aux);
+	            }
+	            est_am[i][jj][kk]="";
+	            
+          		recorrido_izq(i, jj, ++kk, jinici, kinici);
+          		recorrido_izq(i, --jj, kinici+1, jinici, kinici);
+          		//std::cout << est_am[i][jj][kk] << '\n';
+          		
+          	}
+        }
+
+          		/*if (cont_der == 0 and cont_izq == 0)
+          		{
+	          		while (j+1 <= _m-1 and est_am[i][j][k] == est_am[i][j+1][k]){
+	          			std::cout << est_am[i][j][k] << '\n';
+	          			cont_der++;
+	          			j++;
+	          			if (j+1 == _m){
+	          				std::cout << est_am[i][j][k] << '\n';
+	          				cont_der++;
+	          			}
+	          			est_am[i][j][k]="";
+	          		}
+	          		j = jj;
+	          		while (j-1 >= 0 and est_am[i][j][k] == est_am[i][j-1][k]){
+	          			std::cout << est_am[i][j][k] << '\n';
+	          			cont_izq++;
+	          			j--;
+	          			if (j-1 == -1) cont_izq++;
+	          		}
+	          		std::cout << "Intento mandar al AEM a " << est_am[i][j][k] << " ocupa la ubicacion " << i << j << k << '\n';
+	          		if (_ct.existeix(est_am[i][j][k]) and _ct[est_am[i][j][k]].u != ubicacio(-1,0,0))
+	                {
+	                	Cu co_aux;
+	                  	co_aux.c = _ct[est_am[i][j][k]].c;
+	                  	co_aux.u = ubicacio(-1,0,0);
+	                  	_ct.elimina(est_am[i][j][k]);
+	                  	//std::cout << mat1 << '\n';
+	                  	_area_espera.push_back(est_am[i][j][k]);
+	                  	_ct.assig(est_am[i][j][k], co_aux);
+	                }
+	                est_am[i][j][k]="";
+
+	          		recorrido(i, jj, ++k, cont_izq, cont_der);
+          		}
+          		else
+          		{
+          			std::cout << "Siguientes iteraciones\n";
+          			int cont = 0;
+          			while (j+1 <= _m-1 and cont <= cont_der)
+          			{
+          				std::cout << "Recorro contador derecho: " << cont << '\n';
+          				cont++;
+          				std::cout << "DERECHA: Intento mandar al AEM a " << est_am[i][j][k] << '\n';
+          				if (_ct.existeix(est_am[i][j][k]) and _ct[est_am[i][j][k]].u != ubicacio(-1,0,0))
+		                {
+		                	Cu co_aux;
+		                  	co_aux.c = _ct[est_am[i][j][k]].c;
+		                  	co_aux.u = ubicacio(-1,0,0);
+		                  	_ct.elimina(est_am[i][j][k]);
+		                  	//std::cout << mat1 << '\n';
+		                  	_area_espera.push_back(est_am[i][j][k]);
+		                  	_ct.assig(est_am[i][j][k], co_aux);
+		                }
+		                est_am[i][j][k]="";
+          				j++;
+          				if (j+1 == _m){
+          					std::cout << "DERECHA: Intento mandar al AEM a " << est_am[i][j][k] << '\n';
+							if (_ct.existeix(est_am[i][j][k]) and _ct[est_am[i][j][k]].u != ubicacio(-1,0,0))
+			                {
+			                	Cu co_aux;
+			                  	co_aux.c = _ct[est_am[i][j][k]].c;
+			                  	co_aux.u = ubicacio(-1,0,0);
+			                  	_ct.elimina(est_am[i][j][k]);
+			                  	//std::cout << mat1 << '\n';
+			                  	_area_espera.push_back(est_am[i][j][k]);
+			                  	_ct.assig(est_am[i][j][k], co_aux);
+			                }
+			                est_am[i][j][k]="";
+          				}
+          			}
+          			j = jj;
+          			while (j+1 <= _m-1 and est_am[i][j][k] == est_am[i][j+1][k])
+          			{
+          				std::cout << "Reviso esquina derecha: " << cont_der << '\n';
+          				cont_der++;
+          				j++;
+          				std::cout << "DERECHA: Intento mandar al AEM a " << est_am[i][j][k] << '\n';
+          				if (_ct.existeix(est_am[i][j][k]) and _ct[est_am[i][j][k]].u != ubicacio(-1,0,0))
+		                {
+		                	Cu co_aux;
+		                  	co_aux.c = _ct[est_am[i][j][k]].c;
+		                  	co_aux.u = ubicacio(-1,0,0);
+		                  	_ct.elimina(est_am[i][j][k]);
+		                  	//std::cout << mat1 << '\n';
+		                  	_area_espera.push_back(est_am[i][j][k]);
+		                  	_ct.assig(est_am[i][j][k], co_aux);
+		                }
+          			}
+          			recorrido(i, j, ++k, cont_izq, cont_der);
+          			j = jj;
+          			cont = 0;
+          			while (j-1 >= 0 and cont < cont_izq)
+          			{
+          				std::cout << "Recorro contador izq: " << cont << '\n';
+	          			cont++;
+	          			j--;
+	          		}
+	          		j = jj;
+	          		while (j-1 >= 0 and est_am[i][j][k] == est_am[i][j-1][k])
+	          		{
+	          			std::cout << "Reviso esquina izq: " << cont_izq << '\n';
+	          			cont_izq++;
+	          			j--;
+	          			std::cout << "Intento mandar al AEM a " << est_am[i][j][k] << '\n';
+	          			if (_ct.existeix(est_am[i][j][k]) and _ct[est_am[i][j][k]].u != ubicacio(-1,0,0))
+		                {
+		                	Cu co_aux;
+		                  	co_aux.c = _ct[est_am[i][j][k]].c;
+		                  	co_aux.u = ubicacio(-1,0,0);
+		                  	_ct.elimina(est_am[i][j][k]);
+		                  	//std::cout << mat1 << '\n';
+		                  	_area_espera.push_back(est_am[i][j][k]);
+		                  	_ct.assig(est_am[i][j][k], co_aux);
+		                }
+	          		}
+	          		recorrido(i, jj, ++k, cont_izq, cont_der);
+          		}
+          	}*/
+          
 
 //
 void terminal::retira_ff(string m) throw(error)
 {
   // PRE:
   // POST:
+
   if (_ct.existeix(m))
   {
     Cu co_ub;
@@ -208,32 +378,26 @@ void terminal::retira_ff(string m) throw(error)
       int j = co_ub.u.placa();
       int k = co_ub.u.pis();
 
-      //int cont = 0;                 // Número de contenedores enviados al área de espera
-      //nat pismax = _h-1;
       nat longi = co_ub.c.longitud() / 10;
       // CD1: Sólo tiene una ubicación, por tanto, sólo hay que mirar si hay algo debajo de esa
       if (longi == 1)
       {
-        //std::cout << "Reviso posiciones: " << est_am[i][j][k+1] << '\n';
         if (k == _h-1)  // CD1.1: Estamos en arriba del todo,
         {
             _ct.elimina(co_ub.c.matricula());
             opsgrua++;
-            //std::cout << "Se retira " << co_ub.c.matricula() << '\n';
 
             if (_h == 1) est_am[i][j][k] = "___";
             else est_am[i][j][k] = "";
 
             actualitza_lliures(_head);
 
-            //std::cout << _h << " " << est_am[i][j][k] <<  " " << '\n';
         }
         // CD1.2:NO hay nada encima
         else if (k != _h-1 and est_am[i][j][k+1] == "")
         {
           _ct.elimina(co_ub.c.matricula());
           opsgrua++;
-          //std::cout << "Se retira " << co_ub.c.matricula() << '\n';
 
           if (_h == 1) est_am[i][j][k] = "___";
           else est_am[i][j][k] = "";
@@ -243,11 +407,33 @@ void terminal::retira_ff(string m) throw(error)
         // CD1.2: Hay contenedores encima
         else
         {
-          int cont_der = 0;
-          int cont_izq = 0;
-          int kk = k;
+          //int cont_der = 0;
+          //int cont_izq = 0;
+          int jder = j;
+          int jizq = j;
+          // Traslado hacia la parte más derecha de encima del contenedor
+          while (jder+1 <= _m-1 and est_am[i][jder][k+1] == est_am[i][jder+1][k+1])
+          {
+          		jder++;
+          		
+          }
+          // Traslado hacia la parte más izq de encima del contenedor
+          while (jizq-1 >= 0 and est_am[i][jizq][k+1] == est_am[i][jizq-1][k+1])
+          {
+          		jizq--;
+          		
+          }
+          // PRUEBA RECURSIVIDAD: ii filera actual, jj = posición de encima del contenedor a retirar, k piso actual del contenedor a retirar
+          recorrido_der(i, jder, k+1, j, k);
 
-          while (kk+1 < _h) // Mientras no llegue arriba del todo
+          recorrido_izq(i, j, k+1, jizq, k);
+
+          if (_h == 1) est_am[i][j][k] = "___";
+          else est_am[i][j][k] = "";
+          _ct.elimina(co_ub.c.matricula());
+          actualitza_lliures(_head);
+          // PARTE ITERATIVA QUE FUNCIONA AUNQUE INSERTA EN DESORDEN:
+          /*while (kk+1 < _h) // Mientras no llegue arriba del todo
           {
 
             string mat1 = est_am[i][j][kk+1];
@@ -276,7 +462,7 @@ void terminal::retira_ff(string m) throw(error)
                   	co_aux.u = aem;
                   	_ct.elimina(mat1);
                   	//std::cout << mat1 << '\n';
-                  	_area_espera.push_front(mat1);
+                  	_area_espera.push_back(mat1);
                   	_ct.assig(mat1, co_aux);
                 }
                 
@@ -315,10 +501,10 @@ void terminal::retira_ff(string m) throw(error)
 		              	co_aux.u = aem;
 		              	_ct.elimina(est_am[i][jj][kk+1]);
 		              	//std::cout << est_am[i][jj][kk+1] << '\n';
-		              	_area_espera.push_front(est_am[i][jj][kk+1]);
+		              	_area_espera.push_back(est_am[i][jj][kk+1]);
 		              	_ct.assig(est_am[i][jj][kk+1], co_aux);
 		            }
-                  //_area_espera.push_front(est_am[i][jj][kk+1]);
+                  //_area_espera.push_back(est_am[i][jj][kk+1]);
                   est_am[i][jj][kk+1]="";
 
                     jj++;
@@ -333,7 +519,7 @@ void terminal::retira_ff(string m) throw(error)
 		              	co_aux.u = aem;
 		              	_ct.elimina(est_am[i][jj][kk+1]);
 		              	//std::cout << est_am[i][jj][kk+1] << '\n';
-		              	_area_espera.push_front(est_am[i][jj][kk+1]);
+		              	_area_espera.push_back(est_am[i][jj][kk+1]);
 		              	_ct.assig(est_am[i][jj][kk+1], co_aux);
 		            }
                   est_am[i][jj][kk+1]="";
@@ -349,7 +535,7 @@ void terminal::retira_ff(string m) throw(error)
 		              	co_aux.c = _ct[est_am[i][jj][kk+1]].c;
 		              	co_aux.u = aem;
 		              	_ct.elimina(est_am[i][jj][kk+1]);
-		              	_area_espera.push_front(est_am[i][jj][kk+1]);
+		              	_area_espera.push_back(est_am[i][jj][kk+1]);
 		              	//std::cout << est_am[i][jj][kk+1] << '\n';
 		              	_ct.assig(est_am[i][jj][kk+1], co_aux);
 		            }
@@ -367,7 +553,7 @@ void terminal::retira_ff(string m) throw(error)
 		              	co_aux.c = _ct[est_am[i][jj][kk+1]].c;
 		              	co_aux.u = aem;
 		              	_ct.elimina(est_am[i][jj][kk+1]);
-		              	_area_espera.push_front(est_am[i][jj][kk+1]);
+		              	_area_espera.push_back(est_am[i][jj][kk+1]);
 		              	//std::cout << est_am[i][jj][kk+1] << '\n';
 		              	_ct.assig(est_am[i][jj][kk+1], co_aux);
 		            }
@@ -381,7 +567,7 @@ void terminal::retira_ff(string m) throw(error)
 		              	co_aux.u = aem;
 		              	_ct.elimina(est_am[i][jj][kk+1]);
 		              	//std::cout << est_am[i][jj][kk+1] << '\n';
-		              	_area_espera.push_front(est_am[i][jj][kk+1]);
+		              	_area_espera.push_back(est_am[i][jj][kk+1]);
 		              	_ct.assig(est_am[i][jj][kk+1], co_aux);
 		            }
                 est_am[i][jj][kk+1]="";
@@ -401,7 +587,7 @@ void terminal::retira_ff(string m) throw(error)
 
           //_area_espera.sort();
 
-        }
+        */}
       }
       // CD2: El contenedor a retirar tiene varias ubicaciones
       else
@@ -496,7 +682,7 @@ void terminal::retira_ff(string m) throw(error)
                   co_aux.c = _ct[mat1].c;
                   co_aux.u = aem;
                   _ct.elimina(mat1);
-                  _area_espera.push_front(mat1);
+                  _area_espera.push_back(mat1);
 
                   _ct.assig(mat1, co_aux);
               		}
@@ -504,7 +690,7 @@ void terminal::retira_ff(string m) throw(error)
                   	co_aux.c = _ct[mat2].c;
                   	co_aux.u = aem;
                   	_ct.elimina(mat2);
-                  	_area_espera.push_front(mat2);
+                  	_area_espera.push_back(mat2);
                   	_ct.assig(mat2, co_aux);
                   }
                   
@@ -545,10 +731,10 @@ void terminal::retira_ff(string m) throw(error)
 	                  	co_aux.c = _ct[est_am[i][jj][kk+1]].c;
 	                  	co_aux.u = aem;
 	                  	_ct.elimina(est_am[i][jj][kk+1]);
-	                  	_area_espera.push_front(est_am[i][jj][kk+1]);
+	                  	_area_espera.push_back(est_am[i][jj][kk+1]);
 	                  	_ct.assig(est_am[i][jj][kk+1], co_aux);
                   	}
-                    //_area_espera.push_front(est_am[i][jj][kk+1]);
+                    //_area_espera.push_back(est_am[i][jj][kk+1]);
                     est_am[i][jj][kk+1]="";
 
                       jj++;
@@ -563,7 +749,7 @@ void terminal::retira_ff(string m) throw(error)
 	                  	co_aux.c = _ct[est_am[i][jj][kk+1]].c;
 	                  	co_aux.u = aem;
 	                  	_ct.elimina(est_am[i][jj][kk+1]);
-	                  	_area_espera.push_front(est_am[i][jj][kk+1]);
+	                  	_area_espera.push_back(est_am[i][jj][kk+1]);
 	                  	_ct.assig(est_am[i][jj][kk+1], co_aux);
                   	}
                     est_am[i][jj][kk+1]="";
@@ -579,7 +765,7 @@ void terminal::retira_ff(string m) throw(error)
 	                  	co_aux.c = _ct[est_am[i][jj][kk+1]].c;
 	                  	co_aux.u = aem;
 	                  	_ct.elimina(est_am[i][jj][kk+1]);
-	                  	_area_espera.push_front(est_am[i][jj][kk+1]);
+	                  	_area_espera.push_back(est_am[i][jj][kk+1]);
 	                  	_ct.assig(est_am[i][jj][kk+1], co_aux);
                   	}
                     est_am[i][jj][kk+1]="";
@@ -596,7 +782,7 @@ void terminal::retira_ff(string m) throw(error)
 	                  	co_aux.c = _ct[est_am[i][jj][kk+1]].c;
 	                  	co_aux.u = aem;
 	                  	_ct.elimina(est_am[i][jj][kk+1]);
-	                  	_area_espera.push_front(est_am[i][jj][kk+1]);
+	                  	_area_espera.push_back(est_am[i][jj][kk+1]);
 	                  	_ct.assig(est_am[i][jj][kk+1], co_aux);
                   	}
                     est_am[i][jj][kk+1]="";
@@ -608,7 +794,7 @@ void terminal::retira_ff(string m) throw(error)
 	                  	co_aux.c = _ct[est_am[i][jj][kk+1]].c;
 	                  	co_aux.u = aem;
 	                  	_ct.elimina(est_am[i][jj][kk+1]);
-	                  	_area_espera.push_front(est_am[i][jj][kk+1]);
+	                  	_area_espera.push_back(est_am[i][jj][kk+1]);
 	                  	_ct.assig(est_am[i][jj][kk+1], co_aux);
                   	}
                   est_am[i][jj][kk+1]="";
@@ -727,7 +913,7 @@ void terminal::retira_ff(string m) throw(error)
                   co_aux.c = _ct[mat1].c;
                   co_aux.u = aem;
                   _ct.elimina(mat1);
-                  _area_espera.push_front(mat1);
+                  _area_espera.push_back(mat1);
 
                   _ct.assig(mat1, co_aux);
               		}
@@ -737,7 +923,7 @@ void terminal::retira_ff(string m) throw(error)
                   	co_aux.c = _ct[mat2].c;
                   	co_aux.u = aem;
                   	_ct.elimina(mat2);
-                  	_area_espera.push_front(mat2);
+                  	_area_espera.push_back(mat2);
                   	_ct.assig(mat2, co_aux);
                   }
 
@@ -745,7 +931,7 @@ void terminal::retira_ff(string m) throw(error)
                   	co_aux.c = _ct[mat3].c;
                   	co_aux.u = aem;
                   	_ct.elimina(mat3);
-                  	_area_espera.push_front(mat3);
+                  	_area_espera.push_back(mat3);
                   	_ct.assig(mat3, co_aux);
                   }
                   
@@ -783,7 +969,7 @@ void terminal::retira_ff(string m) throw(error)
 	                  	co_aux.c = _ct[est_am[i][jj][kk+1]].c;
 	                  	co_aux.u = aem;
 	                  	_ct.elimina(est_am[i][jj][kk+1]);
-	                  	_area_espera.push_front(est_am[i][jj][kk+1]);
+	                  	_area_espera.push_back(est_am[i][jj][kk+1]);
 	                  	_ct.assig(est_am[i][jj][kk+1], co_aux);
                   	}
                     est_am[i][jj][kk+1]="";
@@ -800,7 +986,7 @@ void terminal::retira_ff(string m) throw(error)
 	                  	co_aux.c = _ct[est_am[i][jj][kk+1]].c;
 	                  	co_aux.u = aem;
 	                  	_ct.elimina(est_am[i][jj][kk+1]);
-	                  	_area_espera.push_front(est_am[i][jj][kk+1]);
+	                  	_area_espera.push_back(est_am[i][jj][kk+1]);
 	                  	_ct.assig(est_am[i][jj][kk+1], co_aux);
                   	}
                     est_am[i][jj][kk+1]="";
@@ -816,7 +1002,7 @@ void terminal::retira_ff(string m) throw(error)
 	                  	co_aux.c = _ct[est_am[i][jj][kk+1]].c;
 	                  	co_aux.u = aem;
 	                  	_ct.elimina(est_am[i][jj][kk+1]);
-	                  	_area_espera.push_front(est_am[i][jj][kk+1]);
+	                  	_area_espera.push_back(est_am[i][jj][kk+1]);
 	                  	_ct.assig(est_am[i][jj][kk+1], co_aux);
                   	}
                     est_am[i][jj][kk+1]="";
@@ -834,7 +1020,7 @@ void terminal::retira_ff(string m) throw(error)
 	                  	co_aux.c = _ct[est_am[i][jj][kk+1]].c;
 	                  	co_aux.u = aem;
 	                  	_ct.elimina(est_am[i][jj][kk+1]);
-	                  	_area_espera.push_front(est_am[i][jj][kk+1]);
+	                  	_area_espera.push_back(est_am[i][jj][kk+1]);
 	                  	_ct.assig(est_am[i][jj][kk+1], co_aux);
                   	}
                     est_am[i][jj][kk+1]="";
@@ -846,7 +1032,7 @@ void terminal::retira_ff(string m) throw(error)
 	                  	co_aux.c = _ct[est_am[i][jj][kk+1]].c;
 	                  	co_aux.u = aem;
 	                  	_ct.elimina(est_am[i][jj][kk+1]);
-	                  	_area_espera.push_front(est_am[i][jj][kk+1]);
+	                  	_area_espera.push_back(est_am[i][jj][kk+1]);
 	                  	_ct.assig(est_am[i][jj][kk+1], co_aux);
                   	}
                   opsgrua++;
@@ -893,7 +1079,7 @@ void terminal::retira_ff(string m) throw(error)
     }
     //_area_espera.remove("");
     //_area_espera.remove("___");
-    _area_espera.unique();
+    //_area_espera.unique();
     //std::cout << "ey\n";
     recorre(1);
   }
@@ -1160,8 +1346,6 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
           _ct.assig(co_ub.c.matricula(), co_ub);
           _area_espera.push_front(co_ub.c.matricula());
         }
-        //else std::cout << "Lo he intentado\n";
-        //_area_espera.sort();
     }
   }
   else
