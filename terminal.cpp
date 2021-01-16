@@ -178,176 +178,71 @@ void terminal::recorre(int cont)
   }
 }
 
-          void terminal::recorrido_der(int i, int jj, int kk, int jinici, int kinici)
-          {
-          	// PRE: k es k+1 respecto al contenedor a retirar 
-          	//
+void terminal::recorrido_der(int i, int jj, int kk, int jinici, int kinici)
+{
+	// PRE: k es k+1 respecto al contenedor a retirar 
+	//
 
-          	if (kk < _h and jj >= jinici)
-          	{
-          		
-          		if (_ct.existeix(est_am[i][jj][kk]) and _ct[est_am[i][jj][kk]].u != ubicacio(-1,0,0))
-	            {
-	            	//std::cout << "Al area de espera " << est_am[i][jj][kk] << '\n';
-                	Cu co_aux;
-                  	co_aux.c = _ct[est_am[i][jj][kk]].c;
-                  	co_aux.u = ubicacio(-1,0,0);
-                  	_ct.elimina(est_am[i][jj][kk]);
-                  	//std::cout << mat1 << '\n';
-                  	_area_espera.push_back(est_am[i][jj][kk]);
-                  	_ct.assig(est_am[i][jj][kk], co_aux);
-	            }
-	            est_am[i][jj][kk]="";
-          		recorrido_der(i, jj, ++kk, jinici, kinici);
-          		recorrido_der(i, --jj, kinici+1, jinici, kinici);
-          	}
-		}
+	if (kk < _h and jj >= jinici)
+	{
+		//std::cout << i << jj << kk << "\n";
+		if (_ct.existeix(est_am[i][jj][kk]) and _ct[est_am[i][jj][kk]].u != ubicacio(-1,0,0))
+    	{
+	    	//std::cout << "Al area de espera " << est_am[i][jj][kk] << '\n';
+	    	Cu co_aux;
+	      	co_aux.c = _ct[est_am[i][jj][kk]].c;
+	      	co_aux.u = ubicacio(-1,0,0);
+	      	_ct.elimina(est_am[i][jj][kk]);
+	      	//std::cout << mat1 << '\n';
+	      	_area_espera.push_back(est_am[i][jj][kk]);
+	      	_ct.assig(est_am[i][jj][kk], co_aux);
+    	}
+    	est_am[i][jj][kk]="";
+		recorrido_der(i, jj, ++kk, jinici, kinici);
+		recorrido_der(i, --jj, kinici+1, jinici, kinici);
+	}
+}
 
-        void terminal::recorrido_izq(int i, int jj, int kk, int jinici, int kinici)
+void terminal::recorrido_izq(int i, int jj, int kk, int jinici, int kinici)
+{
+	if (kk < _h and jj >= jinici)
+  	{
+  		//std::cout << i << jj << kk << "\n";
+  		
+  		if (_ct.existeix(est_am[i][jj][kk]) and _ct[est_am[i][jj][kk]].u != ubicacio(-1,0,0))
         {
-        	if (kk < _h and jj >= jinici)
-          	{
-          		//std::cout << "hola recurs" << i << jj << kk << "\n";
-          		
-          		if (_ct.existeix(est_am[i][jj][kk]) and _ct[est_am[i][jj][kk]].u != ubicacio(-1,0,0))
-	            {
-	            	//std::cout << "Al area de espera " << est_am[i][jj][kk] << '\n';
-                	Cu co_aux;
-                  	co_aux.c = _ct[est_am[i][jj][kk]].c;
-                  	co_aux.u = ubicacio(-1,0,0);
-                  	_ct.elimina(est_am[i][jj][kk]);
-                  	//std::cout << mat1 << '\n';
-                  	_area_espera.push_back(est_am[i][jj][kk]);
-                  	_ct.assig(est_am[i][jj][kk], co_aux);
-	            }
-	            est_am[i][jj][kk]="";
-	            
-          		recorrido_izq(i, jj, ++kk, jinici, kinici);
-          		recorrido_izq(i, --jj, kinici+1, jinici, kinici);
-          		//std::cout << est_am[i][jj][kk] << '\n';
-          		
-          	}
+        	//std::cout << "Al area de espera " << est_am[i][jj][kk] << '\n';
+        	Cu co_aux;
+          	co_aux.c = _ct[est_am[i][jj][kk]].c;
+          	co_aux.u = ubicacio(-1,0,0);
+          	_ct.elimina(est_am[i][jj][kk]);
+          	//std::cout << mat1 << '\n';
+          	_area_espera.push_back(est_am[i][jj][kk]);
+          	_ct.assig(est_am[i][jj][kk], co_aux);
         }
-
-          		/*if (cont_der == 0 and cont_izq == 0)
-          		{
-	          		while (j+1 <= _m-1 and est_am[i][j][k] == est_am[i][j+1][k]){
-	          			std::cout << est_am[i][j][k] << '\n';
-	          			cont_der++;
-	          			j++;
-	          			if (j+1 == _m){
-	          				std::cout << est_am[i][j][k] << '\n';
-	          				cont_der++;
-	          			}
-	          			est_am[i][j][k]="";
-	          		}
-	          		j = jj;
-	          		while (j-1 >= 0 and est_am[i][j][k] == est_am[i][j-1][k]){
-	          			std::cout << est_am[i][j][k] << '\n';
-	          			cont_izq++;
-	          			j--;
-	          			if (j-1 == -1) cont_izq++;
-	          		}
-	          		std::cout << "Intento mandar al AEM a " << est_am[i][j][k] << " ocupa la ubicacion " << i << j << k << '\n';
-	          		if (_ct.existeix(est_am[i][j][k]) and _ct[est_am[i][j][k]].u != ubicacio(-1,0,0))
-	                {
-	                	Cu co_aux;
-	                  	co_aux.c = _ct[est_am[i][j][k]].c;
-	                  	co_aux.u = ubicacio(-1,0,0);
-	                  	_ct.elimina(est_am[i][j][k]);
-	                  	//std::cout << mat1 << '\n';
-	                  	_area_espera.push_back(est_am[i][j][k]);
-	                  	_ct.assig(est_am[i][j][k], co_aux);
-	                }
-	                est_am[i][j][k]="";
-
-	          		recorrido(i, jj, ++k, cont_izq, cont_der);
-          		}
-          		else
-          		{
-          			std::cout << "Siguientes iteraciones\n";
-          			int cont = 0;
-          			while (j+1 <= _m-1 and cont <= cont_der)
-          			{
-          				std::cout << "Recorro contador derecho: " << cont << '\n';
-          				cont++;
-          				std::cout << "DERECHA: Intento mandar al AEM a " << est_am[i][j][k] << '\n';
-          				if (_ct.existeix(est_am[i][j][k]) and _ct[est_am[i][j][k]].u != ubicacio(-1,0,0))
-		                {
-		                	Cu co_aux;
-		                  	co_aux.c = _ct[est_am[i][j][k]].c;
-		                  	co_aux.u = ubicacio(-1,0,0);
-		                  	_ct.elimina(est_am[i][j][k]);
-		                  	//std::cout << mat1 << '\n';
-		                  	_area_espera.push_back(est_am[i][j][k]);
-		                  	_ct.assig(est_am[i][j][k], co_aux);
-		                }
-		                est_am[i][j][k]="";
-          				j++;
-          				if (j+1 == _m){
-          					std::cout << "DERECHA: Intento mandar al AEM a " << est_am[i][j][k] << '\n';
-							if (_ct.existeix(est_am[i][j][k]) and _ct[est_am[i][j][k]].u != ubicacio(-1,0,0))
-			                {
-			                	Cu co_aux;
-			                  	co_aux.c = _ct[est_am[i][j][k]].c;
-			                  	co_aux.u = ubicacio(-1,0,0);
-			                  	_ct.elimina(est_am[i][j][k]);
-			                  	//std::cout << mat1 << '\n';
-			                  	_area_espera.push_back(est_am[i][j][k]);
-			                  	_ct.assig(est_am[i][j][k], co_aux);
-			                }
-			                est_am[i][j][k]="";
-          				}
-          			}
-          			j = jj;
-          			while (j+1 <= _m-1 and est_am[i][j][k] == est_am[i][j+1][k])
-          			{
-          				std::cout << "Reviso esquina derecha: " << cont_der << '\n';
-          				cont_der++;
-          				j++;
-          				std::cout << "DERECHA: Intento mandar al AEM a " << est_am[i][j][k] << '\n';
-          				if (_ct.existeix(est_am[i][j][k]) and _ct[est_am[i][j][k]].u != ubicacio(-1,0,0))
-		                {
-		                	Cu co_aux;
-		                  	co_aux.c = _ct[est_am[i][j][k]].c;
-		                  	co_aux.u = ubicacio(-1,0,0);
-		                  	_ct.elimina(est_am[i][j][k]);
-		                  	//std::cout << mat1 << '\n';
-		                  	_area_espera.push_back(est_am[i][j][k]);
-		                  	_ct.assig(est_am[i][j][k], co_aux);
-		                }
-          			}
-          			recorrido(i, j, ++k, cont_izq, cont_der);
-          			j = jj;
-          			cont = 0;
-          			while (j-1 >= 0 and cont < cont_izq)
-          			{
-          				std::cout << "Recorro contador izq: " << cont << '\n';
-	          			cont++;
-	          			j--;
-	          		}
-	          		j = jj;
-	          		while (j-1 >= 0 and est_am[i][j][k] == est_am[i][j-1][k])
-	          		{
-	          			std::cout << "Reviso esquina izq: " << cont_izq << '\n';
-	          			cont_izq++;
-	          			j--;
-	          			std::cout << "Intento mandar al AEM a " << est_am[i][j][k] << '\n';
-	          			if (_ct.existeix(est_am[i][j][k]) and _ct[est_am[i][j][k]].u != ubicacio(-1,0,0))
-		                {
-		                	Cu co_aux;
-		                  	co_aux.c = _ct[est_am[i][j][k]].c;
-		                  	co_aux.u = ubicacio(-1,0,0);
-		                  	_ct.elimina(est_am[i][j][k]);
-		                  	//std::cout << mat1 << '\n';
-		                  	_area_espera.push_back(est_am[i][j][k]);
-		                  	_ct.assig(est_am[i][j][k], co_aux);
-		                }
-	          		}
-	          		recorrido(i, jj, ++k, cont_izq, cont_der);
-          		}
-          	}*/
+        est_am[i][jj][kk]="";
+        
+  		recorrido_izq(i, jj, ++kk, jinici, kinici);
+  		recorrido_izq(i, --jj, kinici+1, jinici, kinici);
+  		//std::cout << est_am[i][jj][kk] << '\n';
+  		
+  	}
+}
           
+void terminal::reorganitza(nat actuals)
+{
+	//
+	//
+
+	int i = 0;
+	for (list<string>::iterator it=_area_espera.begin(); it!=_area_espera.end() and i < actuals; it++, i++)
+	{
+		list<string>::iterator it2 = it;
+		_area_espera.push_back(*it);
+		_area_espera.erase(it2);
+	}
+}
+
 
 //
 void terminal::retira_ff(string m) throw(error)
@@ -424,9 +319,11 @@ void terminal::retira_ff(string m) throw(error)
           		
           }
           // PRUEBA RECURSIVIDAD: ii filera actual, jj = posición de encima del contenedor a retirar, k piso actual del contenedor a retirar
+          nat actuals = _area_espera.size();
           recorrido_der(i, jder, k+1, j, k);
 
           recorrido_izq(i, j, k+1, jizq, k);
+          reorganitza(actuals);
 
           if (_h == 1) est_am[i][j][k] = "___";
           else est_am[i][j][k] = "";
@@ -605,6 +502,12 @@ void terminal::retira_ff(string m) throw(error)
             j2 = j-1;
           }
           // j y jj son las placas que ocupa nuestro contenedor a retirar
+          if (j2 < j)
+          {
+          	int aux = j2;
+          	j2 = j;
+          	j = aux;
+          }
 
           if (k+1 == _h)                                        // CD2.1: Estamos en el piso más alto
           {
@@ -646,8 +549,39 @@ void terminal::retira_ff(string m) throw(error)
           else
           // CD3: Hay contenedores encima
           {
-            int cont_der = 0;
-            int cont_izq = 0;
+          	int jizq = j;
+          	int jder = j2;
+          	
+          // Traslado hacia la parte más derecha de encima del contenedor
+          while (jder+1 <= _m-1 and est_am[i][jder][k+1] == est_am[i][jder+1][k+1])
+          {
+          		jder++;
+          }
+          // Traslado hacia la parte más izq de encima del contenedor
+          while (jizq-1 >= 0 and est_am[i][jizq][k+1] == est_am[i][jizq-1][k+1])
+          {
+          		jizq--;
+          		
+          }
+          nat actuals = _area_espera.size();
+          recorrido_der(i, jder, k+1, j2, k);
+
+          recorrido_izq(i, j, k+1, jizq, k);
+          reorganitza(actuals);
+          if (_h == 1)
+          {
+          		est_am[i][j][k] = "___";
+          		est_am[i][j2][k] = "___";
+          }
+          else
+          {
+          	est_am[i][j][k] = "";
+          	est_am[i][j2][k] = "";
+          }
+          _ct.elimina(co_ub.c.matricula());
+          actualitza_lliures(_head);
+           /* //int cont_der = 0;
+            //int cont_izq = 0;
             int kk = k;
 
             while (kk+1 < _h) // Mientras no llegue arriba del todo
@@ -814,7 +748,7 @@ void terminal::retira_ff(string m) throw(error)
             }
             actualitza_lliures(_head);
             //_area_espera.sort();
-          }
+          */}
       }
       // LONGITUD 3
       if (longi == 3)
@@ -876,6 +810,43 @@ void terminal::retira_ff(string m) throw(error)
         // CD3: Hay contenedores encima
         else
         {
+        	int jizq = j;
+        	//int jcen = j2;
+          	int jder = j3;
+          	
+          // Traslado hacia la parte más derecha de encima del contenedor
+          while (jder+1 <= _m-1 and est_am[i][jder][k+1] == est_am[i][jder+1][k+1])
+          {
+          		jder++;
+          }
+          // Traslado hacia la parte más izq de encima del contenedor
+          while (jizq-1 >= 0 and est_am[i][jizq][k+1] == est_am[i][jizq-1][k+1])
+          {
+          		jizq--;
+          		
+          }
+          //jcen=jder-1;
+          nat actuals = _area_espera.size();
+          recorrido_der(i, jder, k+1, j2, k);
+
+          recorrido_izq(i, j, k+1, jizq, k);       
+          reorganitza(actuals);
+
+          if (_h == 1)
+          {
+          		est_am[i][j][k] = "___";
+          		est_am[i][j2][k] = "___";
+          		est_am[i][j3][k] = "___";
+          }
+          else
+          {
+          	est_am[i][j][k] = "";
+          	est_am[i][j2][k] = "";
+          	est_am[i][j3][k] = "";
+          }
+          _ct.elimina(co_ub.c.matricula());
+          actualitza_lliures(_head);
+        	/*
             int cont_der = 0;
             int cont_izq = 0;
             int kk = k;
@@ -1058,7 +1029,7 @@ void terminal::retira_ff(string m) throw(error)
 
           //_ct.elimina(co_ub.c.matricula());
 
-          /*if (_h == 1)
+          if (_h == 1)
           {
             est_am[i][j3][k] = "___";
             est_am[i][j2][k] = "___";
@@ -1090,17 +1061,6 @@ void terminal::retira_ff(string m) throw(error)
   }
 }
 
-/*bool terminal::revisa(string mat, bool exis_aem)
-{
-  // PRE
-  // POST
-  exis_aem = false;
-  for (list<string>::iterator it=_area_espera.begin(); it!=_area_espera.end() and not exis_aem; it++)
-  {
-    if (*it == mat) exis_aem = true;
-  }
-  return exis_aem;
-}*/
 
 //
 void terminal::insereix_ff(Cu co_ub) throw(error)
