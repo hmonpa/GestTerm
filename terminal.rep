@@ -53,8 +53,6 @@ void reorganitza(nat actuals);
 
 void actualitza_lliures(node* n);					// Actualitza la llista d'ubicacions lliures
 void recorre(int cont);								// Recorre l'àrea d'espera per intentar inserir contenidors a l'àrea d'emmagatzematge
-int maxim_dos(int a, int b);						// Retorna el màxim de dos enters
-int maxim_tres(int a, int b, int c);				// Retorna el màxim de tres enters
 
 
 // Estrategia FIRST_FIT
