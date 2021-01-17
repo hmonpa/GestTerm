@@ -48,9 +48,9 @@ list<string> _aem;
 // Mètodes privats
 void inicialitza_am(int n, int m, int h);							// Inicialitza l'àrea d'emmagatzematge buida
 
-void crea_llista_lliures(int n, int m, int h);						// Crea llista enllaçada d'ubicacions lliures
+void crea_llista_lliures(int n, int m, int h);						// Crea llista enllaçada d'ubicacions lliures per a l'estrategia FIRST_FIT
 
-void borra_llista_lliures(node *&n);								// Esborra llista enllaçada d'ubicacions lliures
+void borra_llista(node *&n);										// Esborra llista enllaçada d'ubicacions lliures
 
 void recorre_dreta(int i, int j, int k, int jorig, int korig);
 
@@ -58,12 +58,12 @@ void recorre_esq(int i, int j, int k, int jorig, int korig);
 
 void reorganitza_aem(nat actuals);
 
-void actualitza_lliures();											// Actualitza la llista d'ubicacions lliures
+void actualitza_lliures();											// Actualitza la llista d'ubicacions lliures per l'estrategia FIRST_FIT
 
-void reinserta();													// Després d'una inserció o retirada, recorre l'àrea d'espera per intentar inserir contenidors a l'àrea d'emmagatzematge
+void reinserta_ff();												// Després d'una inserció o retirada, recorre l'àrea d'espera per intentar inserir contenidors a l'àrea d'emmagatzematge
+void reinserta_ll();
 
-void allibera_ubi(int i, int j, int k, nat longi);					// Després de fer una retirada, allibera l'espai de l'àrea d'emmagatzematge
-
+void allibera_places(int i, int j, int k, nat longi);				// Després de fer una retirada, allibera l'espai de l'àrea d'emmagatzematge
 
 // Estrategia FIRST_FIT
 void insereix_ff(Cu co_ub) throw(error);         					// Insereix contenidor seguint la estrategia FIRST_FIT
@@ -71,8 +71,8 @@ void insereix_ff(Cu co_ub) throw(error);         					// Insereix contenidor seg
 void retira_ff(string m) throw(error);              				// Retira contenidor seguint la estrategia FIRST_FIT
 
 // Estrategia LLIURE
-void insereix_cont_LL(const contenidor &c) throw(error);    		// Insereix contenidor seguint la estrategia LLIURE
-void retira_cont_LL(const string &m) throw(error);          		// Retira contenidor seguint la estrategia LLIURE
+void insereix_ll(Cu co_ub) throw(error);    						// Insereix contenidor seguint la estrategia LLIURE
+void retira_ll(string m) throw(error);          					// Retira contenidor seguint la estrategia LLIURE
 
 
 // ------------------------------------ Classe Terminal - Raonament i decisions ------------------------------------

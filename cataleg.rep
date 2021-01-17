@@ -1,4 +1,5 @@
-struct node_hash{
+struct node_hash
+{
     string _k;                    // Clau = String no buit
     Valor _v;                     // Valor
     node_hash *_seg;              // Punter al següent element de la llista de sinònims
