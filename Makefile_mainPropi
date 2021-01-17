@@ -1,0 +1,22 @@
+OPCIONS = -O0 -Wall -Wextra -Werror -Wno-sign-compare -std=c++11 -ansi -g
+
+main.exe: main.o ubicacio.o contenidor.o terminal.o
+	g++ -o main.exe main.o ubicacio.o contenidor.o terminal.o -lesin
+	rm *.o
+
+ubicacio.o: ubicacio.cpp ubicacio.hpp
+	g++ -c ubicacio.cpp $(OPCIONS)
+
+contenidor.o: contenidor.cpp contenidor.hpp
+	g++ -c contenidor.cpp $(OPCIONS)
+
+terminal.o: terminal.cpp terminal.hpp
+	g++ -c terminal.cpp $(OPCIONS)
+
+main.o: main.cpp ubicacio.hpp contenidor.hpp terminal.hpp
+	g++ -c main.cpp $(OPCIONS)
+
+clean:
+	rm *.o
+	rm *.exe
+	rm *.gch
