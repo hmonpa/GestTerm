@@ -1,0 +1,22 @@
+OPCIONS = -O0 -Wall -Wextra -Werror -Wno-sign-compare -std=c++11 -ansi -g
+
+lliure.exe: driver_lliure.o ubicacio.o contenidor.o terminal.o
+	g++ -o lliure.exe driver_gestterm.o ubicacio.o contenidor.o terminal.o -lesin
+	rm *.o
+
+ubicacio.o: ubicacio.cpp ubicacio.hpp
+	g++ -c ubicacio.cpp $(OPCIONS)
+
+contenidor.o: contenidor.cpp contenidor.hpp
+	g++ -c contenidor.cpp $(OPCIONS)
+
+terminal.o: terminal.cpp terminal.hpp
+	g++ -c terminal.cpp $(OPCIONS)
+
+driver_lliure.o: driver_lliure.cpp ubicacio.hpp contenidor.hpp terminal.hpp
+	g++ -c driver_lliure.cpp $(OPCIONS)
+
+clean:
+	rm *.o
+	rm *.exe
+	rm *.gch

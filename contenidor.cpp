@@ -11,13 +11,13 @@ bool contenidor::matricula_valida(const string &mat)
 
   bool mat_valida = true;
 
-    if (mat.size() == 0) mat_valida = false;
-    else {
-      for (nat i = 0; i < mat.size(); ++i) {
-        // Comprobar si la and es una or
-        if (((mat[i] < 'A') or (mat[i] > 'Z')) and ((mat[i] < '0') or (mat[i] > '9'))) mat_valida = false;
-      }
+  if (mat.size() == 0) mat_valida = false;
+  else {
+    for (nat i = 0; i < mat.size(); ++i)
+    {
+      if (((mat[i] < 'A') or (mat[i] > 'Z')) and ((mat[i] < '0') or (mat[i] > '9'))) mat_valida = false;
     }
+  }
   return mat_valida;
 }
 
@@ -28,8 +28,7 @@ contenidor::contenidor(const string &m, nat l) throw(error)
 {
   // PRE: True
   // POST: Crea un contenidor vàlid, retorna un error en cas contrari
-  //std::cout << "Intentamos crear contenedor con matricula:" << m << " y longitud: " << l << '\n';
-  //std::cout << "La matricula es valida? " << matricula_valida(m);
+
   if (matricula_valida(m))
   {
     if (l != 10 and l != 20 and l != 30)
@@ -106,7 +105,7 @@ bool contenidor::operator==(const contenidor &c) const throw()
 bool contenidor::operator!=(const contenidor &c) const throw()
 {
   // PRE: True
-  // POST: Retorna fals si el contenidor del p.i i el contenidor c son diferents,
+  // POST: Retorna true si el contenidor del p.i i el contenidor c son diferents,
   //       false en cas contrari
   return not(*this==c);
 }

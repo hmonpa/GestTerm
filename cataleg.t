@@ -48,9 +48,7 @@ void cataleg<Valor>::redispersio(bool alpha_alt)
       nat nova_cell = hash(aux->_k);
       aux->_seg = _t[nova_cell];
       _t[nova_cell] = aux;
-
       _quants++;
-
     }
   }
   delete[] _taula;
@@ -244,8 +242,8 @@ void cataleg<Valor>::assig(const string &k, const Valor &v) throw(error)
     else
     {
       node_hash *n = new node_hash;
-    	n->_k = k;
-    	n->_v = v;
+      n->_k = k;
+      n->_v = v;
       n->_seg = _taula[pos];
       _taula[pos] = n;
 
@@ -253,7 +251,7 @@ void cataleg<Valor>::assig(const string &k, const Valor &v) throw(error)
     }
 
     float fc_actual = (float)_quants / (float)_mida;    // Fàctor de càrrega actual = fc_actual
-    if (fc_actual > alpha)                              // ... es comprova si es major a 0.75
+    if (fc_actual > _alpha)                             // ... es comprova si es major a 0.75
     {
       redispersio(true);                                // ... en cas afirmatiu, fem redispersió doblant la mida de la taula
     }
@@ -292,7 +290,7 @@ void cataleg<Valor>::elimina(const string &k) throw(error)
   {
     if (p_ant == NULL)                    // Era el primer element de la llista de sinònims
     {
-      _taula[pos] = p->_seg;              // NULL
+      _taula[pos] = p->_seg;              
     }
     else                                  // Era qualsevol element següent de la llista
     {
@@ -303,7 +301,7 @@ void cataleg<Valor>::elimina(const string &k) throw(error)
     _quants--;
 
     float fc_actual = (float)_quants / (float)_mida;    // Fàctor de càrrega actual = fc_actual
-    if (fc_actual < (alpha/3))                          // ... es comprova si es 3 cops mes petit que 0.75
+    if (fc_actual < (_alpha/3))                         // ... es comprova si es 3 cops mes petit que 0.75 (0.25)
     {
       redispersio(false);                               // ... en cas afirmatiu, fem redispersió partint la mida de la taula
     }
@@ -345,7 +343,7 @@ Valor cataleg<Valor>::operator[](const string &k) const throw(error)
 {
   // PRE: True
   // POST: Retorna el valor associat a la clau k.
-  // 	     Retorna un error en cas de que la clau k no existeixi
+  //       Retorna un error en cas de que la clau k no existeixi
 
   nat pos = hash(k);
   node_hash *p = _taula[pos];
