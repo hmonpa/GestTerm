@@ -11,17 +11,17 @@ void terminal::inicialitza_am(int n, int m, int h)
   string buit = "";
   string buit_a_baix = "___";
   est_am = new string**[n];
+
   for (int i=0; i<n; i++)
   {
-    est_am[i] = new string*[m]();
+    est_am[i] = new string*[m];
 
     for (int j=0; j<m; j++)
     {
-      est_am[i][j] = new string[h]();
+      est_am[i][j] = new string[h];
 
       for (int k=0; k<h; k++)
       {
-        //est_am[i][j][k] = new string();
         if (k==0) est_am[i][j][k] = buit_a_baix;
         else est_am[i][j][k] = buit;
       }
@@ -29,6 +29,7 @@ void terminal::inicialitza_am(int n, int m, int h)
   }
 }
 
+//
 void terminal::borra_am()
 {
   // PRE:
@@ -77,29 +78,30 @@ void terminal::crea_llista_lliures(int n, int m, int h)
           prev->_seg = act;
           act->_ant = prev;
         }
+        
         act->_lliu = true;            // Se inicializan las posiciones a TRUE = Están libres todas inicialmente
         act->_seg = NULL;
         prev = act;
         _size++;
-        //std::cout << act->_u.filera() << act->_u.placa() << act->_u.pis();
-        //std::cout << "- " << act->_lliu << "  ";
       }
     }
   }
-  //std::cout << "\n Tamano total de la lista: " << _size << "\n\n";
-  //std::cout << "Elementos en la lista enlazada: " << _size << '\n';
 }
 
 // Líneal
-void terminal::actualitza_lliures(node* n)
+void terminal::actualitza_lliures()
 {
   // PRE: n es el _head y js es la plaza más a la derecha (depende de las plazas que ocupe)
   // POST: Recorre la lista hasta el centinela (js = siguiente plaça)
 
-  bool acaba = false;
+  node* n = _head;
+
   int i = n->_u.filera();
   int j = n->_u.placa();
   int k = n->_u.pis();
+
+  bool acaba = false;
+
   while (n != NULL and not acaba)
   {
       if (est_am[i][j][k] == "___" or est_am[i][j][k] == "") n->_lliu = true;
@@ -124,28 +126,22 @@ void terminal::actualitza_lliures(node* n)
 
 
 // Líneal. Recorre todo el área de espera
-void terminal::recorre(int cont)
+void terminal::reinserta()
 {
   // PRE:
   // POST: Recorre el área de espera para intentar insertar contenedores
 
   Cu co_ub;
-  bool acaba = false;
+
   if (not _area_espera.empty())
   {
-    if (cont != 0)
-    {
-      for (list<string>::iterator it=_area_espera.begin(); it!=_area_espera.end() and not acaba; it++)
+      for (list<string>::iterator it=_area_espera.begin(); it!=_area_espera.end(); it++)
       {
         co_ub.c = _ct[*it].c;
         co_ub.u = _ct[*it].u;
-
-        /*std::cout << "Intento de inserción de "<< co_ub.c.matricula() << '\n';
-        std::cout << "LISTA ACTUAL:\n";
-        for (list<string>::iterator it=_area_espera.begin(); it!=_area_espera.end(); it++) std::cout << (*it) << " ";
-		std::cout << '\n';*/
         insereix_ff(co_ub);
-        if(_ct[co_ub.c.matricula()].u != ubicacio(-1,0,0))
+
+        if (_ct[co_ub.c.matricula()].u != ubicacio(-1,0,0))
         {
         	list<string>::iterator it2 = it;
         	_area_espera.erase(it2);
@@ -153,66 +149,58 @@ void terminal::recorre(int cont)
         	it--;
         }
       }
-    }
   }
 }
 
 //
-void terminal::recorrido_der(int i, int jj, int kk, int jinici, int kinici)
+void terminal::recorrido_der(int i, int j, int k, int jinici, int kinici)
 {
 	// PRE: k es k+1 respecto al contenedor a retirar 
 	//
 
-	if (kk < _h and jj >= jinici)
+	if (k < _h and j >= jinici)
 	{
-		//std::cout << i << jj << kk << "\n";
-		if (_ct.existeix(est_am[i][jj][kk]) and _ct[est_am[i][jj][kk]].u != ubicacio(-1,0,0))
+		if (_ct.existeix(est_am[i][j][k]) and _ct[est_am[i][j][k]].u != ubicacio(-1,0,0))
     	{
-	    	//std::cout << "Al area de espera " << est_am[i][jj][kk] << '\n';
 	    	Cu co_aux;
-	      	co_aux.c = _ct[est_am[i][jj][kk]].c;
+	      	co_aux.c = _ct[est_am[i][j][k]].c;
 	      	co_aux.u = ubicacio(-1,0,0);
-	      	_ct.elimina(est_am[i][jj][kk]);
-	      	//std::cout << mat1 << '\n';
-	      	_area_espera.push_back(est_am[i][jj][kk]);
+	      	_ct.elimina(est_am[i][j][k]);
+	      	_area_espera.push_back(est_am[i][j][k]);
 	      	opsgrua++;
-	      	_ct.assig(est_am[i][jj][kk], co_aux);
+	      	_ct.assig(est_am[i][j][k], co_aux);
     	}
-    	est_am[i][jj][kk]="";
-		recorrido_der(i, jj, ++kk, jinici, kinici);
-		recorrido_der(i, --jj, kinici+1, jinici, kinici);
+    	est_am[i][j][k]="";
+		recorrido_der(i, j, ++k, jinici, kinici);
+		recorrido_der(i, --j, kinici+1, jinici, kinici);
 	}
 }
 
 //
-void terminal::recorrido_izq(int i, int jj, int kk, int jinici, int kinici)
+void terminal::recorrido_izq(int i, int j, int k, int jinici, int kinici)
 {
-	if (kk < _h and jj >= jinici)
+	//
+	//
+
+	if (k < _h and j >= jinici)
   	{
-  		//std::cout << i << jj << kk << "\n";
-  		
-  		if (_ct.existeix(est_am[i][jj][kk]) and _ct[est_am[i][jj][kk]].u != ubicacio(-1,0,0))
+  		if (_ct.existeix(est_am[i][j][k]) and _ct[est_am[i][j][k]].u != ubicacio(-1,0,0))
         {
-        	//std::cout << "Al area de espera " << est_am[i][jj][kk] << '\n';
         	Cu co_aux;
-          	co_aux.c = _ct[est_am[i][jj][kk]].c;
+          	co_aux.c = _ct[est_am[i][j][k]].c;
           	co_aux.u = ubicacio(-1,0,0);
-          	_ct.elimina(est_am[i][jj][kk]);
-          	//std::cout << mat1 << '\n';
-          	_area_espera.push_back(est_am[i][jj][kk]);
+          	_ct.elimina(est_am[i][j][k]);
+          	_area_espera.push_back(est_am[i][j][k]);
           	opsgrua++;
-          	_ct.assig(est_am[i][jj][kk], co_aux);
+          	_ct.assig(est_am[i][j][k], co_aux);
         }
-        est_am[i][jj][kk]="";
-        
-  		recorrido_izq(i, jj, ++kk, jinici, kinici);
-  		recorrido_izq(i, --jj, kinici+1, jinici, kinici);
-  		//std::cout << est_am[i][jj][kk] << '\n';
-  		
+        est_am[i][j][k]="";
+  		recorrido_izq(i, j, ++k, jinici, kinici);
+  		recorrido_izq(i, --j, kinici+1, jinici, kinici); 		
   	}
 }
 
-//
+// Constante, el for recorre pocos elementos
 void terminal::reorganitza(nat actuals)
 {
 	// PRE:
@@ -231,6 +219,42 @@ void terminal::reorganitza(nat actuals)
 	}
 }
 
+void terminal::allibera_ubi(int i, int j, int k, nat longi)
+{
+	if (longi == 1)
+	{
+		if (_h == 1) est_am[i][j][k] = "___";
+		else est_am[i][j][k] = "";
+	}
+	else if (longi == 2)
+	{
+		if (_h == 1)
+        {
+          	est_am[i][j][k] = "___";
+          	est_am[i][j+1][k] = "___";
+        }
+        else
+        {
+          	est_am[i][j][k] = "";
+          	est_am[i][j+1][k] = "";
+        }
+    }
+    else if (longi == 3)
+    {
+    	if (_h == 1)
+      	{
+        	est_am[i][j][k] = "___";
+        	est_am[i][j+1][k] = "___";
+        	est_am[i][j+2][k] = "___";
+      }
+      else
+      {
+        	est_am[i][j][k] = "";
+        	est_am[i][j+1][k] = "";
+        	est_am[i][j+2][k] = "";
+      }
+    }
+}
 
 //
 void terminal::retira_ff(string m) throw(error)
@@ -243,185 +267,108 @@ void terminal::retira_ff(string m) throw(error)
     Cu co_ub;
     co_ub.c = _ct[m].c;
     co_ub.u = _ct[m].u;
-    Cu co_aux;
-    ubicacio aem = ubicacio(-1,0,0);
-    //std::cout << co_ub.c.matricula() << '\n';
-    //std::cout << co_ub.u.filera() << co_ub.u.placa() << co_ub.u.pis() << '\n';
+    ubicacio ub_aem = ubicacio(-1,0,0);
 
-    // CD1 : Está en el área de espera
-    if (co_ub.u == aem)
+    // CD: El contenidor es troba a l'AEM
+    if (co_ub.u == ub_aem)
     {
       _ct.elimina(co_ub.c.matricula());
       _area_espera.remove(co_ub.c.matricula());
     }
+    // Es troba a l'AM
     else
     {
-      // Está en el área de almacenaje
       int i = co_ub.u.filera();
       int j = co_ub.u.placa();
       int k = co_ub.u.pis();
 
-      nat longi = co_ub.c.longitud() / 10;
-      // CD1: Sólo tiene una ubicación, por tanto, sólo hay que mirar si hay algo debajo de esa
+      nat longi = co_ub.c.longitud() / 10;									// Es fixen les ubicacions que ocupa un contenidor a l'AM, en funció de la seva longitud
+
+      // C1: El contenidor a retirar només ocupa una ubicació a l'AM
       if (longi == 1)
       {
-        if (k == _h-1)  // CD1.1: Estamos en arriba del todo,
-        {
-            _ct.elimina(co_ub.c.matricula());
-            opsgrua++;
-
-            if (_h == 1) est_am[i][j][k] = "___";
-            else est_am[i][j][k] = "";
-
-            actualitza_lliures(_head);
-
-        }
-        // CD1.2:NO hay nada encima
-        else if (k != _h-1 and est_am[i][j][k+1] == "")
+      	// CD: El contenidor està al pis més alt, o no te res a sobre
+        if (k+1 == _h or (k+1 != _h and est_am[i][j][k+1] == ""))
         {
           _ct.elimina(co_ub.c.matricula());
           opsgrua++;
 
-          if (_h == 1) est_am[i][j][k] = "___";
-          else est_am[i][j][k] = "";
-
-          actualitza_lliures(_head);
+          allibera_ubi(i, j, k, longi);
+          actualitza_lliures();
         }
-        // CD1.2: Hay contenedores encima
+        // CR: El contenidor té contenidors a sobre
         else
         {
-          //int cont_der = 0;
-          //int cont_izq = 0;
           int jder = j;
           int jizq = j;
-          // Traslado hacia la parte más derecha de encima del contenedor
-          while (jder+1 <= _m-1 and est_am[i][jder][k+1] == est_am[i][jder+1][k+1])
-          {
-          		jder++;
-          		
-          }
-          // Traslado hacia la parte más izq de encima del contenedor
-          while (jizq-1 >= 0 and est_am[i][jizq][k+1] == est_am[i][jizq-1][k+1])
-          {
-          		jizq--;
-          		
-          }
-          // PRUEBA RECURSIVIDAD: ii filera actual, jj = posición de encima del contenedor a retirar, k piso actual del contenedor a retirar
+
+          while (jder+1 <= _m-1 and est_am[i][jder][k+1] == est_am[i][jder+1][k+1])	jder++;
+
+          while (jizq-1 >= 0 and est_am[i][jizq][k+1] == est_am[i][jizq-1][k+1])	jizq--;		
+
           nat actuals = _area_espera.size();
+
           recorrido_der(i, jder, k+1, j, k);
-
           recorrido_izq(i, j, k+1, jizq, k);
-          reorganitza(actuals);
 
-          if (_h == 1) est_am[i][j][k] = "___";
-          else est_am[i][j][k] = "";
+          if (actuals != 0) reorganitza(actuals);
+
           _ct.elimina(co_ub.c.matricula());
           opsgrua++;
-          actualitza_lliures(_head);
+
+          allibera_ubi(i, j, k, longi);
+          actualitza_lliures();
         }
       }
-      // CD2: El contenedor a retirar tiene varias ubicaciones
-      else
-      {
-        if (longi == 2)
-        {
-          //std::cout << co_ub.c.matricula() << '\n';
-          int j2 = 0;
-          if (est_am[i][j+1][k] == co_ub.c.matricula())         // Buscamos posicion adyacentes
-          {
-            j2 = j+1;
-          }
-          else if (est_am[i][j-1][k] == co_ub.c.matricula())
-          {
-            j2 = j-1;
-          }
-          // j y jj son las placas que ocupa nuestro contenedor a retirar
-          if (j2 < j)
-          {
-          	int aux = j2;
-          	j2 = j;
-          	j = aux;
-          }
+      // C2: El contenidor a retirar ocupa dues ubicacions a l'AM
+      else if (longi == 2)
+	  {
+	      int j2 = 0;
+	      if (est_am[i][j+1][k] == co_ub.c.matricula())			j2 = j+1;	// Fixem les dues ubicacions adjacents 
+	      else if (est_am[i][j-1][k] == co_ub.c.matricula())	j2 = j-1;
+	      if (j2 < j)														// j2 serà, de les dues ubicacions, la situada més a la dreta
+	      {
+	      	int aux = j2;
+	      	j2 = j;
+	      	j = aux;
+	      }
 
-          if (k+1 == _h)                                        // CD2.1: Estamos en el piso más alto
-          {
+	      // CD: El contenidor està al pis més alt, o no te res a sobre
+	      if (k+1 == _h or (k+1 != _h and (est_am[i][j][k+1] == "" and est_am[i][j2][k+1] == "")))       
+	      {
+	        _ct.elimina(co_ub.c.matricula());
+	        opsgrua++;
 
-            _ct.elimina(co_ub.c.matricula());
-            opsgrua++;
-              //std::cout << "Se retira " << co_ub.c.matricula() << '\n';
-            if (_h == 1)
-            {
-              est_am[i][j][k] = "___";
-              est_am[i][j2][k] = "___";
-            }
-            else
-            {
-              est_am[i][j][k] = "";
-              est_am[i][j2][k] = "";
-            }
+	        allibera_ubi(i, j, k, longi);
+	        actualitza_lliures();
 
-            actualitza_lliures(_head);
-          }
-          else if (k+1 != _h and est_am[i][j][k+1] == "" and est_am[i][j2][k+1] == "")       // CD2.2: No hay nada encima
-          {
-            _ct.elimina(co_ub.c.matricula());
-            opsgrua++;
+	      }
+	      // CR: El contenidor té contenidors a sobre
+	      else
+	      {
+	      	int jizq = j;
+	      	int jder = j2;
+	      	
+	      	while (jder+1 <= _m-1 and est_am[i][jder][k+1] == est_am[i][jder+1][k+1])	jder++;
+	      	while (jizq-1 >= 0 and est_am[i][jizq][k+1] == est_am[i][jizq-1][k+1])		jizq--;	
 
-            if (_h == 1)
-            {
-              est_am[i][j][k] = "___";
-              est_am[i][j2][k] = "___";
-            }
-            else
-            {
-              est_am[i][j][k] = "";
-              est_am[i][j2][k] = "";
-            }
+	      	nat actuals = _area_espera.size();
 
-            actualitza_lliures(_head);
+	      	recorrido_der(i, jder, k+1, j2, k);
+	      	recorrido_izq(i, j, k+1, jizq, k);
 
-          }
-          else
-          // CD3: Hay contenedores encima
-          {
-          	int jizq = j;
-          	int jder = j2;
-          	
-          // Traslado hacia la parte más derecha de encima del contenedor
-          while (jder+1 <= _m-1 and est_am[i][jder][k+1] == est_am[i][jder+1][k+1])
-          {
-          		jder++;
-          }
-          // Traslado hacia la parte más izq de encima del contenedor
-          while (jizq-1 >= 0 and est_am[i][jizq][k+1] == est_am[i][jizq-1][k+1])
-          {
-          		jizq--;
-          		
-          }
-          nat actuals = _area_espera.size();
-          recorrido_der(i, jder, k+1, j2, k);
-          recorrido_izq(i, j, k+1, jizq, k);
-          reorganitza(actuals);
+	      	if (actuals != 0) reorganitza(actuals);
 
-          if (_h == 1)
-          {
-          		est_am[i][j][k] = "___";
-          		est_am[i][j2][k] = "___";
-          }
-          else
-          {
-          	est_am[i][j][k] = "";
-          	est_am[i][j2][k] = "";
-          }
-          _ct.elimina(co_ub.c.matricula());
-          opsgrua++;
-          actualitza_lliures(_head);
+	      	_ct.elimina(co_ub.c.matricula());
+	      	opsgrua++;
 
+	      	allibera_ubi(i, j, k, longi);
+	      	actualitza_lliures();
+	 	 }
 
-          }
-      }
-      // LONGITUD 3
-      if (longi == 3)
+	  }
+      // C3: El contenidor a retirar ocupa tres ubicacions a l'AM
+      else 
       {
         int j3 = 0;
         int j2 = 0;
@@ -433,97 +380,42 @@ void terminal::retira_ff(string m) throw(error)
         j2 = j3-1;
         j = j2-1;
 
-        // CD3.1: Estamos en el piso más alto
-        if (k+1 == _h)
+		// CD: El contenidor està al pis més alt, o no te res a sobre
+        if (k+1 == _h or (k+1 != _h and (est_am[i][j][k+1] == "" and est_am[i][j2][k+1] == "" and est_am[i][j3][k+1] == "")))
         {
           _ct.elimina(co_ub.c.matricula());
           opsgrua++;
 
-          if (_h == 1)
-          {
-            est_am[i][j3][k] = "___";
-            est_am[i][j2][k] = "___";
-            est_am[i][j][k] = "___";
-          }
-          else
-          {
-            est_am[i][j3][k] = "";
-            est_am[i][j2][k] = "";
-            est_am[i][j][k] = "";
-          }
-          actualitza_lliures(_head);
+          allibera_ubi(i, j, k, longi);
+          actualitza_lliures();
         }
-        // CD3.2: No hay nada encima
-        else if (est_am[i][j][k+1] == "" and est_am[i][j2][k+1] == "" and est_am[i][j3][k+1] == "")
-        {
-
-          _ct.elimina(co_ub.c.matricula());
-          opsgrua++;
-          if (_h == 1)
-          {
-            est_am[i][j3][k] = "___";
-            est_am[i][j2][k] = "___";
-            est_am[i][j][k] = "___";
-          }
-          else
-          {
-            est_am[i][j3][k] = "";
-            est_am[i][j2][k] = "";
-            est_am[i][j][k] = "";
-          }
-
-          actualitza_lliures(_head);
-
-        }
-        // CD3.3: Hay contenedores encima
+        // CR: El contenidor té contenidors a sobre
         else
         {
         	int jizq = j;
-        	//int jcen = j2;
           	int jder = j3;
           	
-          // Traslado hacia la parte más derecha de encima del contenedor
-          while (jder+1 <= _m-1 and est_am[i][jder][k+1] == est_am[i][jder+1][k+1])
-          {
-          		jder++;
-          }
+          while (jder+1 <= _m-1 and est_am[i][jder][k+1] == est_am[i][jder+1][k+1])		jder++;
           // Traslado hacia la parte más izq de encima del contenedor
-          while (jizq-1 >= 0 and est_am[i][jizq][k+1] == est_am[i][jizq-1][k+1])
-          {
-          		jizq--;
-          		
-          }
+          while (jizq-1 >= 0 and est_am[i][jizq][k+1] == est_am[i][jizq-1][k+1])		jizq--;
+
           nat actuals = _area_espera.size();
+
           recorrido_der(i, jder, k+1, j2, k);
+          recorrido_izq(i, j, k+1, jizq, k);   
 
-          recorrido_izq(i, j, k+1, jizq, k);       
-          reorganitza(actuals);
+          if (actuals != 0) reorganitza(actuals);
 
-          if (_h == 1)
-          {
-          		est_am[i][j][k] = "___";
-          		est_am[i][j2][k] = "___";
-          		est_am[i][j3][k] = "___";
-          }
-          else
-          {
-          	est_am[i][j][k] = "";
-          	est_am[i][j2][k] = "";
-          	est_am[i][j3][k] = "";
-          }
           _ct.elimina(co_ub.c.matricula());
           opsgrua++;
-          actualitza_lliures(_head);
+
+          allibera_ubi(i, j, k, longi);
+          actualitza_lliures();
         }
       }
     }
-    //_area_espera.remove("");
-    //_area_espera.remove("___");
-    //_area_espera.unique();
-    //std::cout << "ey\n";
-    recorre(1);
+    reinserta();
   }
-}
   else
   {
     throw error(MatriculaInexistent);
@@ -536,44 +428,39 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
 {
   // PRE:
   // POST:
-  //std::cout << co_ub.c.matricula() << " " << co_ub.c.longitud() << '\n';
-  //std::cout << co_ub.u.filera() << co_ub.u.placa() << co_ub.u.pis() << '\n';
 
-  bool exis_aem = false;
-  bool reinsercio = false;		// Si es un contenedor que viene del área de espera, no se entra en la función recorre, ya que ya venimos de allí
-  //std::cout << co_ub.c.matricula() << '\n';
+  bool existeix_aem = false;
+  bool reinsercio = false;						// Si un contenidor que està intentant sent insertat, ho es finalment
+  												// no truquem al mètode reinserta() de nou, ja que ja està recorrent l'AEM en aquests moments
+
+  ubicacio ub_aem = ubicacio(-1,0,0);
 
   if (_ct.existeix(co_ub.c.matricula()))
   {
-    if (_ct[co_ub.c.matricula()].u == ubicacio(-1,0,0)) exis_aem = true;
-    //exis_aem = revisa(co_ub.c.matricula(), exis_aem);
+    if (_ct[co_ub.c.matricula()].u == ub_aem) existeix_aem = true;
   }
-  else 
-  {
-    exis_aem = false;
-  }
+  else existeix_aem = false;
 
-  if (not _ct.existeix(co_ub.c.matricula()) or exis_aem)
+  if (not _ct.existeix(co_ub.c.matricula()) or existeix_aem)
   {
-
     nat longi = co_ub.c.longitud() / 10;
-    bool trobat = false;    // Se pone a TRUE para indicar que hemos llegado al final del área de almacenaje
+    bool trobat = false;    					// El booleà trobat es posarà a true quan insereixi un contenidor de 10 peus, o quan es surti dels límits de l'AM
     node *p = _head;
     node* inici;
     node* p2 = NULL;
 
-    // El contenedor necesita más ubicaciones que tanaño del área de almacenaje
+    // CD: El contenidor es major que la mida de l'AM
     if (longi > _size)
     {
       trobat = true;
     }
-    // RECORRIDO EN BUSCA DE UBICACIONES PARA LOS CONTENEDORES
 
-    // EL CONTENEDOR ES DE 10 PIES
+    // C1: El contenidor a insertar només ocupará una ubicació a l'AM,
+    // agafarà la primera ubicació lliure que trobi amb el recorregut actual
+
     if (longi == 1)
     {
-
-      while (not trobat and p->_lliu != true)      // Busca una libre
+      while (not trobat and p->_lliu != true)      
       {
         if (p->_seg == NULL) trobat = true;
         else  p = p->_seg;
@@ -582,37 +469,31 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
       {
         if (_ct.existeix(co_ub.c.matricula()))
         {
-          //std::cout << "Eliminado antes de reinsertarse\n";
-          //_area_espera.remove(co_ub.c.matricula());
           _ct.elimina(co_ub.c.matricula());
           reinsercio = true;
         }
-        co_ub.u = p->_u;
-        _ct.assig(co_ub.c.matricula(), co_ub);      // Asigna al catálogo el contenedor
-        opsgrua++;
-        //std::cout << "Long 1: Se inserta " << co_ub.c.matricula() << '\n';
-        p->_lliu = false;                           // Marca la ubicación como ocupada
 
-        // Se inserta contenedor en su ubicación del área de almacenaje (matriz)
+        co_ub.u = p->_u;
+        _ct.assig(co_ub.c.matricula(), co_ub);      			
+
+        opsgrua++;	
+        p->_lliu = false;                           			// Marca la ubicació com a ocupada
+
+        
         int i = p->_u.filera();
         int j = p->_u.placa();
         int k = p->_u.pis();
         est_am[i][j][k] = co_ub.c.matricula();
-        //std::cout << "10 PIES: Ub del mapa almacenaje:   " << est_am[i][j][k] << '\n';
-        //std::cout << "Colocado en " << p->_u.filera() << " " << p->_u.placa() << " " << p->_u.pis() << "\n";
         
         trobat = true;
-        actualitza_lliures(_head);
-        //actualitza_lliures(_head, j);
-        if (not reinsercio) recorre(1);
+
+        if (not reinsercio) reinserta();
       }
     }
-    // EL CONTENEDOR ES DE 20 o 30 PIES
+    // C2: El contenidor a insertar ocuparà dues o tres ubicacions a l'AM
     else
-    // BÚSQUEDA DEL PRIMER HUECO LIBRE VÁLIDO, FUERA DEL BUCLE
     {
-      //std::cout << co_ub.c.matricula() << '\n';
-      while (p != NULL and not trobat and p->_lliu != true)      // Busca la primera libre
+      while (p != NULL and not trobat and p->_lliu != true)     
       {
         if (p->_seg == NULL) trobat = true;
         p = p->_seg;
@@ -623,18 +504,14 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
         int filera_act = inici->_u.filera();
         int pis_act = inici->_u.pis();
 
-        nat i = 1;      // Ha encontrado el primero (inici)
+        nat i = 1;      							// Es troba la primera ubicació lliure de dos o tres necessaries
 
         while (p != NULL and i < longi and not trobat)
         {
-
-            if (i == 0)           // Buscamos el primer libre de nuevo, en caso de que la primera búsqueda haya sido mala
+            if (i == 0)           					// Si la inserció a les primeres ubicacions lliures ha fracasat, tornem a intentar-ho
             {
-              if (p->_seg != NULL){
+              if (p->_seg != NULL)	p = inici->_seg;
 
-                p = inici->_seg;
-
-              }
               while (p!=NULL and not trobat and p->_lliu != true)
               {
                 if (p->_seg == NULL) trobat = true;
@@ -646,136 +523,117 @@ void terminal::insereix_ff(Cu co_ub) throw(error)
               p2 = NULL;
               filera_act = inici->_u.filera();
               pis_act = inici->_u.pis();
+
             }
             if (p == NULL) trobat = true;
             else
             {
-              if (p->_seg != NULL) p = p->_seg;
-              else trobat = true;
-              while (p->_seg!=NULL and (p->_u.pis() != pis_act and p->_u.filera() == filera_act) and not trobat) // Fem el salt cap a la següent plaça
-              {
-                p = p->_seg;
-              }
+              	if (p->_seg != NULL) p = p->_seg;
+              	else trobat = true;
+              	while (p->_seg!=NULL and (p->_u.pis() != pis_act and p->_u.filera() == filera_act) and not trobat) // Fem el salt cap a la següent plaça
+              	{
+                	p = p->_seg;
+              	}
 
-              //if (p->_seg == NULL) trobat = true;
-              //else
-              //{
-                if (inici->_u.pis() != 0 or p->_u.pis() != 0)
-                {
-
-                  if (p2 != NULL)
-                  {
-                    if (p->_ant->_lliu == true or inici->_ant->_lliu == true or p2->_ant->_lliu == true) i = 0;
-                  }
-                  if ((p->_ant->_lliu == true or inici->_ant->_lliu == true) and p->_u.filera() == filera_act){
-
-                    i = 0;    // Comprobamos si el de debajo nuestro está libre, si es así, no ponemos en el aire
-                  }
-                }
-                if (i != 0)
-                {
-                  if ((filera_act == p->_u.filera()) and (inici->_lliu == true and p->_lliu == true))
-                  {
-                    i++;
-                    if (i == 2) p2 = p;
-                  }
-                  else i = 0;
-                }
-              //}
+              	if (inici->_u.pis() != 0 or p->_u.pis() != 0)
+              	{
+              		if (p2 != NULL)
+	                {
+	                	if (p->_ant->_lliu == true or inici->_ant->_lliu == true or p2->_ant->_lliu == true) i = 0;
+	                }
+	                if ((p->_ant->_lliu == true or inici->_ant->_lliu == true) and p->_u.filera() == filera_act)
+	                {
+	                    i = 0;    // Comprobamos si el de debajo nuestro está libre, si es así, no ponemos en el aire
+	                }
+              	}
+              	if (i != 0)
+              	{
+                	if ((filera_act == p->_u.filera()) and (inici->_lliu == true and p->_lliu == true))
+                	{
+                		i++;
+                    	if (i == 2) p2 = p;
+                	}
+                	else i = 0;
+               }
             }
-          }
+        }
       }
     }
-    // FIN DEL BUCLE -- INSERCIONES
-
-    // TROBAT = FALSE -> SE AÑADE AL CATALEG Y AL AREA DE ALMACENAJE
+    // Si !trobat, no ens hem sortit dels limits de l'AM 
     if (not trobat)
     {
-        // 1- Insercions al catàleg de contenidors:
-        // Contenidor de 20 peus -> Insercions al catàleg d'ubicacions
-      if (longi == 2)
-      {
-        if (_ct.existeix(co_ub.c.matricula()))
-        {
-          //std::cout << "Eliminado antes de reinsertarse\n";
-          //_area_espera.remove(co_ub.c.matricula());
-          _ct.elimina(co_ub.c.matricula());
-          reinsercio = true;
-        }
+    	// El contenidor a afegir ocupa 2 ubicacions
+      	if (longi == 2)
+      	{
+      		// Si ja estiguès al catàleg, significaria que està a l'AEM
+        	if (_ct.existeix(co_ub.c.matricula()))
+        	{	
+          		_ct.elimina(co_ub.c.matricula());		// S'elimina del catàleg per tornar a ser inserit
+          		reinsercio = true;						// Es marca la reinserció per no tornar a revisar l'AEM des de l'inici
+        	}
 
-        int i = inici->_u.filera();
-        int j = inici->_u.placa();
-        int k = inici->_u.pis();
-        est_am[i][j][k] = co_ub.c.matricula();
-        co_ub.u = inici->_u;
-        _ct.assig(co_ub.c.matricula(), co_ub);
-        opsgrua++;
-        //std::cout << "Long 2: Se inserta " << co_ub.c.matricula() << '\n';
+	        int i = inici->_u.filera();
+	        int j = inici->_u.placa();
+	        int k = inici->_u.pis();
 
-        i = p2->_u.filera();
-        j = p2->_u.placa();
-        k = p2->_u.pis();
-        est_am[i][j][k] = co_ub.c.matricula();
-        co_ub.u = p2->_u;
+	        est_am[i][j][k] = co_ub.c.matricula();		// Ocupa l'AM
 
-        
+	        co_ub.u = inici->_u;						// S'inserta al catàleg amb la plaça més petita de les ubicacions que ocupa
+	        _ct.assig(co_ub.c.matricula(), co_ub);		// Es reinserta al catàleg
+	        opsgrua++;
 
-        inici->_lliu = false;
-        p2->_lliu = false;
-        actualitza_lliures(_head);
-        if (not reinsercio) recorre(1);
+	        i = p2->_u.filera();
+	        j = p2->_u.placa();
+	        k = p2->_u.pis();
+	        est_am[i][j][k] = co_ub.c.matricula();		// Ocupa l'AM
+
+	        inici->_lliu = false;						// Les places que ocupa ja no estàn lliures
+	        p2->_lliu = false;
+
+	        if (not reinsercio) reinserta();
       }
-      // Contenidor 30 peus -> Insercions al catàleg de contenidors
+      // El contenidor a afegir ocupa 3 ubicacions
       else if (longi == 3)
       {
-        while (_ct.existeix(co_ub.c.matricula()))
-        {
-          //_area_espera.remove(co_ub.c.matricula());
-          _ct.elimina(co_ub.c.matricula());
-          reinsercio = true;
-        }
-        co_ub.u = inici->_u;
-        _ct.assig(co_ub.c.matricula(), co_ub);
-        opsgrua++;
-        //std::cout << "Long 3: Se inserta " << co_ub.c.matricula() << '\n';
-        co_ub.u = p2->_u;
-        //_ct.assig(co_ub.c.matricula(), co_ub);
-        co_ub.u = p->_u;
-        //_ct.assig(co_ub.c.matricula(), co_ub);
+        	if (_ct.existeix(co_ub.c.matricula()))
+        	{
+          		_ct.elimina(co_ub.c.matricula());
+          		reinsercio = true;
+        	}
 
-        int i = inici->_u.filera();
-        int j = inici->_u.placa();
-        int k = inici->_u.pis();
-        est_am[i][j][k] = co_ub.c.matricula();
+        	int i = inici->_u.filera();
+        	int j = inici->_u.placa();
+        	int k = inici->_u.pis();
 
-        i = p2->_u.filera();
-        j = p2->_u.placa();
-        k = p2->_u.pis();
-        est_am[i][j][k] = co_ub.c.matricula();
+	        est_am[i][j][k] = co_ub.c.matricula();
 
+	        co_ub.u = inici->_u;
+	        _ct.assig(co_ub.c.matricula(), co_ub);
+	        opsgrua++;
 
-        i = p->_u.filera();
-        j = p->_u.placa();
-        k = p->_u.pis();
-        est_am[i][j][k] = co_ub.c.matricula();
+	        i = p2->_u.filera();
+	        j = p2->_u.placa();
+	        k = p2->_u.pis();
+	        est_am[i][j][k] = co_ub.c.matricula();
 
-        
+	        i = p->_u.filera();
+	        j = p->_u.placa();
+	        k = p->_u.pis();
+	        est_am[i][j][k] = co_ub.c.matricula();
 
-        inici->_lliu = false;
-        p2->_lliu = false;
-        p->_lliu = false;
-        actualitza_lliures(_head);
-        if (not reinsercio) recorre(1);
+	        inici->_lliu = false;
+	        p2->_lliu = false;
+	        p->_lliu = false;
+	        
+	        if (not reinsercio) reinserta();
       }
     }
-    // TROBAT = TRUE -> DIRECTO AL CATALEG Y AL ÁREA DE ESPERA
+    // Si trobat, ens hem sortit dels limits de l'AM 
     else
     {
         if (not _ct.existeix(co_ub.c.matricula()))
         {
-          //std::cout << "meto en aem\n";
-          ubicacio u_ae(-1,0,0);
-          co_ub.u = u_ae;
+          co_ub.u = ub_aem;
           _ct.assig(co_ub.c.matricula(), co_ub);
           _area_espera.push_front(co_ub.c.matricula());
         }

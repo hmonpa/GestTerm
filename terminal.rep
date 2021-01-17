@@ -51,8 +51,9 @@ void recorrido_der(int i, int j, int k, int jorig, int korig);
 void recorrido_izq(int i, int j, int k, int jorig, int korig);
 void reorganitza(nat actuals);
 
-void actualitza_lliures(node* n);					// Actualitza la llista d'ubicacions lliures
-void recorre(int cont);								// Recorre l'àrea d'espera per intentar inserir contenidors a l'àrea d'emmagatzematge
+void actualitza_lliures();							// Actualitza la llista d'ubicacions lliures
+void reinserta();									// Després d'una inserció o retirada, recorre l'àrea d'espera per intentar inserir contenidors a l'àrea d'emmagatzematge
+void allibera_ubi(int i, int j, int k, nat longi);	// Després de fer una retirada, allibera l'espai de l'àrea d'emmagatzematge
 
 
 // Estrategia FIRST_FIT
