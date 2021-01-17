@@ -186,7 +186,11 @@ void terminal::reinserta_ll()
 // θ(1)
 void terminal::recorre_dreta(int i, int j, int k, int jinici, int kinici)
 {
-	// PRE: 
+	// PRE: i es la filera que ocupa el contenidor a retirar
+	//		j es el nombre de places, cap a la dreta, que ocupa el contenidor de sobre del que estem retirant
+	// 		k es el pis de sobre al contenidor a retirar
+	// 		jinici es la plaça que ocupa el contenidor a retirar
+	//		kinici es el pis que ocupa el contenidor a retirar
 	// POST: Envia a l'AEM els contenidors de la part superior dreta d'un contenidor a retirar
 
 	if (k < _h and j >= jinici)
@@ -210,7 +214,11 @@ void terminal::recorre_dreta(int i, int j, int k, int jinici, int kinici)
 // θ(1)
 void terminal::recorre_esq(int i, int j, int k, int jinici, int kinici)
 {
-	// PRE:
+	// PRE: i es la filera que ocupa el contenidor a retirar
+	//		j es la plaça que ocupa el contenidor a retirar
+	// 		k es el pis de sobre al contenidor a retirar
+	// 		jinici es el nombre de places, cap a la esquerra, que ocupa el contenidor de sobre del que estem retirant
+	//		kinici es el pis que ocupa el contenidor a retirar
 	// POST: Envia a l'AEM els contenidors de la part superior esquerra d'un contenidor a retirar
 
 	if (k < _h and j >= jinici)
@@ -293,7 +301,9 @@ void terminal::allibera_places(int i, int j, int k, nat longi)
 void terminal::retira_ff(string m) throw(error)
 {
   	// PRE: m es la matricula d'un contenidor
-  	// POST: Si el contenidor al que fa referència m, està present al catàleg, es retira de la ubicació
+  	// POST: Si el contenidor al que fa referència m, està present al catàleg, es retira de la ubicació que ocupava (AEM o AM) seguint l'estrategia FIRST_FIT.
+  	//		 En cas de que estigués ubicat a l'AM, si el contenidor en qüestió tenia contenidors a sobre, s'envien a l'AEM temporalment
+  	//		 En cas de no existir al catàleg, es retorna un error.
 
   	if (_ct.existeix(m))
   	{	
@@ -464,8 +474,10 @@ void terminal::retira_ff(string m) throw(error)
 // 0(n)
 void terminal::insereix_ff(Cu co_ub) throw(error)
 {
-  	// PRE:
-  	// POST:
+  	// PRE: co_ub es un objecte del tipus Cu, que conté l'objecte contenidor a inserir seguint l'estrategia FIRST_FIT.
+  	// POST: Si el contenidor no està present al catàleg, o està present però ubicat a l'AEM, s'intenta inserir a l'AM.
+  	//		 ... Si no fos possible d'insertar, s'enviaria directament a l'AEM, i s'afegiria al catàleg. En cas de que ja fos a l'AEM, es mantindria.
+  	//		 En cas contrari, es retorna un error.
 
   	bool existeix_aem = false;
   	bool reinsercio = false;							// Si un contenidor que està intentant ser reinsertat després d'una retirada d'un contenidor d'un pis inferior, ho es finalment
@@ -815,8 +827,8 @@ terminal::~terminal() throw()
 // θ(n)
 void terminal::insereix_contenidor(const contenidor &c) throw(error)
 {
-  	// PRE:
-  	// POST:
+  	// PRE: c es un contenidor
+  	// POST: S'afegeix un contenidor a la terminal (AEM o AM)
 
   	Cu co_ub;				// Creació objecte tipus Cu
   	co_ub.c = c;			// El camp contenidor de l'objecte, obté l'objecte rebut per paràmetre
@@ -828,8 +840,8 @@ void terminal::insereix_contenidor(const contenidor &c) throw(error)
 // θ(n)
 void terminal::retira_contenidor(const string &m) throw(error)
 {
-  	// PRE:
-  	// POST:
+  	// PRE: m es la matricula d'un contenidor
+  	// POST: Es retira el contenidor associat a la matricula m de la terminal (AEM o AM)
 
   	retira_ff(m);
 }
