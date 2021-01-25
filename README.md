@@ -1,4 +1,4 @@
-# Gestterm
+# GestTerm
 Projecte d'ESIN tardor de 2020
 
 ## Enunciat del projecte
