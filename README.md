@@ -1,5 +1,5 @@
 # GestTerm
-Projecte d'ESIN tardor de 2020
+Projecte final d'ESIN - Tardor de 2020
 
 ## Enunciat del projecte
 El propòsit d’aquest projecte és desenvolupar un sistema de gestió automàtica d’una
